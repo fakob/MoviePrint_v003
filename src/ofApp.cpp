@@ -119,18 +119,18 @@ void ofApp::setup(){
 //    tweenBlendStartDropImageCounter.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,100,0);
 
 
-    startImage.load("MoviePrint_StartBildschirm_v002_00000.png");
-    dropZoneImage.load("MoviePrint_DropZone_v002_00000.png");
-    backgroundImage.load("MoviePrint_Background_v002_00000.jpg");
-    printImage.load("MoviePrint_Print_v002_00000.png");
-    printListImage.load("MoviePrint_PrintList_v002_00000.png");
-    loadMovieImage.load("MoviePrint_Loading_v002_00000.png");
-    updatingImage.load("MoviePrint_Updating_v002_00000.png");
-    inPointImage.load("MoviePrint_InPoint_v001_00000.png");
-    outPointImage.load("MoviePrint_OutPoint_v001_00000.png");
-    layoutHeaderImage.load("MoviePrint_Layout_Header_v001_00000.png");
-    helpMenuImage.load("HelpMenu_v001.png");
-    backgroundImagePreview.load("MoviePrint_PreviewBackground_v001_00000.png");
+    startImage.load("images/MoviePrint_StartBildschirm_v002_00000.png");
+    dropZoneImage.load("images/MoviePrint_DropZone_v002_00000.png");
+    backgroundImage.load("images/MoviePrint_Background_v002_00000.jpg");
+    printImage.load("images/MoviePrint_Print_v002_00000.png");
+    printListImage.load("images/MoviePrint_PrintList_v002_00000.png");
+    loadMovieImage.load("images/MoviePrint_Loading_v002_00000.png");
+    updatingImage.load("images/MoviePrint_Updating_v002_00000.png");
+    inPointImage.load("images/MoviePrint_InPoint_v001_00000.png");
+    outPointImage.load("images/MoviePrint_OutPoint_v001_00000.png");
+    layoutHeaderImage.load("images/MoviePrint_Layout_Header_v001_00000.png");
+    helpMenuImage.load("images/HelpMenu_v001.png");
+    backgroundImagePreview.load("images/MoviePrint_PreviewBackground_v001_00000.png");
 
 //    fontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
 //    fontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
@@ -212,7 +212,7 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    loadedMovie.update();
+//    loadedMovie.update();
 
     if (updateMovieFromDrop) {
 //        printListNotImage = FALSE;
@@ -221,6 +221,8 @@ void ofApp::update(){
         showLoadMovieScreen = TRUE;
 //        counterToUpdate++;
 //        if (counterToUpdate > 1) {
+            ofLog(OF_LOG_VERBOSE, "droppedFiles[0].path()" + ofToString(droppedFiles[0].path()));
+
             loadNewMovie(droppedFiles[0].path(), TRUE, FALSE, TRUE);
             if (loadedMovie.isMovieLoaded) {
                 moveToMovie();
@@ -233,7 +235,88 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    loadedMovie.gmMovie.draw(20,20);
+
+
+//    if (!(tweenListInOut.update() == 0.0)) { // stop drawing when position is at showMovieView
+
+//        drawList(scrollListAmountRel);
+//        scrollBarList.draw();
+
+//    }
+
+//    if (!(tweenListInOut.update() == 1.0)) { // stop drawing when position is at showListView
+
+        if (!loadedMovie.isMovieLoaded) { // if no movie is loaded
+            if (!showListView) { // if no List View
+//                guiTimeline->setVisible(FALSE);
+//                drawStartScreen();
+            }
+
+        } else {
+
+            // draw all frames
+            drawDisplayGrid(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
+
+            // draw the In and Out Point Manipulations
+            if (updateInOut) {
+
+                ofPushStyle();
+
+                ofEnableAlphaBlending();
+//                ofSetColor(0,(int)(tweenFading.update()/255)*155);
+                ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+//                ofSetColor(255,255,255,(int)tweenFading.update());
+
+//                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * 1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+//                loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (tweenFading.update()/255));
+
+//                ofSetColor(255, 255, 255, (int)(tweenFading.update()/255)*255);
+
+//                if (uiRangeSliderTimeline->hitLow) {
+//                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
+//                }
+//                if (uiRangeSliderTimeline->hitHigh) {
+//                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
+//                }
+//                if (uiRangeSliderTimeline->hitCenter) {
+//                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
+//                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
+//                }
+
+//                if(tweenFading.update() < 5){
+//                    updateInOut = FALSE;
+//                    manipulateSlider = FALSE;
+//                }
+
+                ofSetColor(255);
+
+                ofPopStyle();
+
+            }
+
+//            // draw the scrubbed video
+//            if (updateScrub) {
+//                drawScrubScreen(1.0);
+//            }
+
+//            scrollBar.draw();
+
+        }
+
+//    }
+
+//    drawUI(1, FALSE);
+
+//    if(showLoadMovieScreen){
+//        drawLoadMovieScreen();
+//    } else if (showPrintScreen) {
+//        drawPrintScreen();
+//    } else {
+//        if(showUpdateScreen && loadedMovie.isMovieLoaded){
+//            drawUpdateScreen();
+//        }
+//    }
 
     ofxNotify::draw(drawNotify);
 }
@@ -290,13 +373,14 @@ void ofApp::gotMessage(ofMessage msg){
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){
+    ofLog(OF_LOG_VERBOSE, "Drag event------------------------------------------------");
 //    if (!lockedDueToInteraction && !lockedDueToPrinting) {
 
 //        if (setupFinished) {
 
             if( dragInfo.files.size() > 0 ){
 
-                loadNewMovie("", FALSE, TRUE, FALSE);
+//                loadNewMovie("", FALSE, TRUE, FALSE);
 
 
 
@@ -367,11 +451,10 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
         moveToMovie();
     }
 
-//    loadedMovie.stop(TRUE);
+    loadedMovie.stop(TRUE);
 
     ofxNotify() << "Movie has started to load";
-//    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, numberOfStills, showPlaceHolder, !_loadInBackground);
-    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath);
+    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, numberOfStills, showPlaceHolder, !_loadInBackground);
     calculateNewPrintGrid();
     if (loadedMovie.gmTotalFrames <=1) {
         movieProperlyLoaded = FALSE;
@@ -538,7 +621,7 @@ void ofApp::calculateNewPrintGrid(){
     } else {
         scrubWindowH = scrubWindowW * 0.5625 * 1;
     }
-//    loadedMovie.stop(TRUE);
+    loadedMovie.stop(TRUE);
     if (isnan(loadedMovie.gmImageRatio) || !loadedMovie.gmMovie.isLoaded()) {
         gridRatio = 0.5625;
     } else {
@@ -622,4 +705,24 @@ void ofApp::updateAllStills(){
     loadedMovie.start();
 
     ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
+}
+
+//--------------------------------------------------------------
+void ofApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder){
+    ofPushMatrix();
+    ofPushStyle();
+    float _scrollAmount = 0;
+//    if (scrollBar.sbActive) {
+//        _scrollAmount = ((displayGridHeight - (ofGetWindowHeight() - headerHeight - topMargin - bottomMargin)) * -1) * _scrollAmountRel;
+//    }
+//    if (isnan(_scrollAmount)) {
+//        _scrollAmount = 0;
+//    }
+//    float tempX = (leftMargin + listWidth * tweenListInOut.update()) * _scaleFactor;
+    float tempX = (leftMargin + listWidth * 1) * _scaleFactor;
+    float tempY = (_scrollAmount + headerHeight + topMargin)  * _scaleFactor;
+    ofLog(OF_LOG_VERBOSE, "_scrollAmount:"+ ofToString(_scrollAmount) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
+    loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
+    ofPopStyle();
+    ofPopMatrix();
 }

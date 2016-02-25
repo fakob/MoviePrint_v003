@@ -54,6 +54,8 @@ public:
     void calculateNewPrintGrid();
     void updateGridTimeArrayWithAutomaticInterval();
     void updateAllStills();
+    void drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder);
+
 
     // Movie
     fakGrabbedMovie loadedMovie;
