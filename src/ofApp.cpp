@@ -50,16 +50,16 @@ void ofApp::setup(){
     displayGridMargin = 5;
     loaderBarHeight = 20;
     timeSliderHeight = 10;
-    gridColumns = 5;
-    gridRows = 4;
-    printNumberOfThumbs = 20;
+    gridColumns = 3;
+    gridRows = 3;
+    printNumberOfThumbs = 9;
     menuWidth = 255;
     listWidth = 1320;
 
     overwriteMoviePrint = false;
 
-    moviePrintDataSet.printGridColumns = 4;
-    moviePrintDataSet.printGridRows = 5;
+    moviePrintDataSet.printGridColumns = 3;
+    moviePrintDataSet.printGridRows = 3;
     moviePrintDataSet.printGridMargin = 5;
     moviePrintDataSet.printDisplayVideoAudioInfo = true;
     moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
@@ -374,26 +374,32 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){
     ofLog(OF_LOG_VERBOSE, "Drag event------------------------------------------------");
+    ofxNotify() << "Drag event";
+
 //    if (!lockedDueToInteraction && !lockedDueToPrinting) {
 
 //        if (setupFinished) {
 
             if( dragInfo.files.size() > 0 ){
 
-//                loadNewMovie("", FALSE, TRUE, FALSE);
+                loadNewMovie("", FALSE, TRUE, FALSE);
+
+                ofxNotify() << "dragInfo.files[0]" + ofToString(dragInfo.files[0]);
+                ofxNotify() << "dragInfo.files[0]" + ofToString(ofToDataPath(dragInfo.files[0]));
 
 
 
 //                droppedList.disableMouseEvents(droppedFiles.size());
-//                droppedFiles.clear();
-//                for (int i=0; i<dragInfo.files.size(); i++) {
-//                    ofFile testFile(dragInfo.files[i]);
-//                    if (!testFile.isDirectory()) {
-//                        if (checkExtension(ofToString(testFile.getExtension()))){
+                droppedFiles.clear();
+                for (int i=0; i<dragInfo.files.size(); i++) {
+                    ofFile testFile(dragInfo.files[i]);
+                    if (!testFile.isDirectory()) {
+                        if (checkExtension(ofToString(testFile.getExtension()))){
 //                            droppedFiles.push_back(dragInfo.files[i]);
-//                        }
-//                    }
-//                }
+                            droppedFiles.push_back(testFile);
+                        }
+                    }
+                }
 
 //                droppedList.setup(droppedFiles);
 //                updateTheListScrollBar();
@@ -402,6 +408,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 //                    moveToList();
                 } else if(droppedFiles.size() > 0){
                     ofLog(OF_LOG_VERBOSE, "Start LoadingMovie------------------------------------------------");
+                    ofxNotify() << "updateMovieFromDrop = TRUE";
                     updateMovieFromDrop = TRUE;
 
                 }
@@ -719,9 +726,9 @@ void ofApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPr
 //        _scrollAmount = 0;
 //    }
 //    float tempX = (leftMargin + listWidth * tweenListInOut.update()) * _scaleFactor;
-    float tempX = (leftMargin + listWidth * 1) * _scaleFactor;
+    float tempX = (leftMargin + listWidth * 0) * _scaleFactor;
     float tempY = (_scrollAmount + headerHeight + topMargin)  * _scaleFactor;
-    ofLog(OF_LOG_VERBOSE, "_scrollAmount:"+ ofToString(_scrollAmount) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
+//    ofLog(OF_LOG_VERBOSE, "tempX:"+ ofToString(tempX) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
     loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
     ofPopStyle();
     ofPopMatrix();
