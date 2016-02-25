@@ -20,7 +20,7 @@ Project{
         ]
 
         of.addons: [
-
+            "ofxNotify"
         ]
 
         // additional flags for the project. the of module sets some
