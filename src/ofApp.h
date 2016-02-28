@@ -50,6 +50,7 @@ public:
 
     void moveToMovie();
     void loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBackground, bool _loadScrubMovie);
+    void loadNewMovie2(string _newMoviePath);
     bool checkExtension(string _tempExtension);
     void calculateNewPrintGrid();
     void updateGridTimeArrayWithAutomaticInterval();

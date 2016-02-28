@@ -223,8 +223,13 @@ void ofApp::update(){
 //        if (counterToUpdate > 1) {
             ofLog(OF_LOG_VERBOSE, "droppedFiles[0].path()" + ofToString(droppedFiles[0].path()));
 
-            loadNewMovie(droppedFiles[0].path(), TRUE, FALSE, TRUE);
-            loadedMovie2.gmMovie.load(droppedFiles[0].path());
+            loadNewMovie2(droppedFiles[0].path());
+//            loadNewMovie(droppedFiles[0].path(), TRUE, FALSE, TRUE);
+//            loadedMovie2.gmMovie.load(droppedFiles[0].path());
+            loadedMovie2.loadNewMovieToBeGrabbed(droppedFiles[0].path(), 9, false, true);
+
+
+
             if (loadedMovie.isMovieLoaded()) {
                 moveToMovie();
             }
@@ -465,12 +470,12 @@ void ofApp::moveToMovie(){
 //--------------------------------------------------------------
 void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBackground, bool _loadScrubMovie){
 
-    movieLoading = TRUE;
-    if (!_loadInBackground) {
-        moveToMovie();
-    }
+//    movieLoading = TRUE;
+//    if (!_loadInBackground) {
+//        moveToMovie();
+//    }
 
-    loadedMovie.stop(TRUE);
+//    loadedMovie.stop(TRUE);
 
     ofxNotify() << "Movie has started to load";
     loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, numberOfStills, showPlaceHolder, !_loadInBackground);
@@ -575,6 +580,17 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
 //    stringMovieData.push_back(loadedMovie.gmMIAFormat);
 //    stringMovieData.push_back(loadedMovie.gmMIAChannelsString);
 //    stringMovieData.push_back(loadedMovie.gmMIASamplingRate);
+
+}
+
+//--------------------------------------------------------------
+void ofApp::loadNewMovie2(string _newMoviePath){
+
+    ofxNotify() << "Movie2 has started to load";
+    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, 9, false, true);
+    ofLog(OF_LOG_VERBOSE, "Finished Loading Movie2--------------------------------------------");
+
+
 
 }
 
