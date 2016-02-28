@@ -224,6 +224,7 @@ void ofApp::update(){
             ofLog(OF_LOG_VERBOSE, "droppedFiles[0].path()" + ofToString(droppedFiles[0].path()));
 
             loadNewMovie(droppedFiles[0].path(), TRUE, FALSE, TRUE);
+            loadedMovie2.gmMovie.load(droppedFiles[0].path());
             if (loadedMovie.isMovieLoaded()) {
                 moveToMovie();
             }
@@ -232,6 +233,7 @@ void ofApp::update(){
 //        }
     }
     loadedMovie.gmMovie.update();
+    loadedMovie2.gmMovie.update();
 
 }
 
@@ -321,6 +323,7 @@ void ofApp::draw(){
 //    }
 
         loadedMovie.gmMovie.draw(0,400,640,360);
+        loadedMovie2.gmMovie.draw(640,400,640,360);
 
     ofxNotify::draw(drawNotify);
 }
@@ -330,6 +333,9 @@ void ofApp::keyPressed(int key){
     ofPixels tempPixels = loadedMovie.gmMovie.getPixels();
     ofLog(OF_LOG_VERBOSE, "tempPixels width: " + ofToString(tempPixels.getWidth()) + " height: " + ofToString(tempPixels.getHeight()));
     ofLog(OF_LOG_VERBOSE, "tempPixels width: " + ofToString(tempPixels.getWidth()) + " height: " + ofToString(tempPixels.getHeight()));
+    ofPixels tempPixels2 = loadedMovie2.gmMovie.getPixels();
+    ofLog(OF_LOG_VERBOSE, "tempPixels2 width: " + ofToString(tempPixels2.getWidth()) + " height: " + ofToString(tempPixels2.getHeight()));
+    ofLog(OF_LOG_VERBOSE, "tempPixels2 width: " + ofToString(tempPixels2.getWidth()) + " height: " + ofToString(tempPixels2.getHeight()));
 }
 
 //--------------------------------------------------------------

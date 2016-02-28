@@ -59,6 +59,8 @@ public:
 
     // Movie
     fakGrabbedMovie loadedMovie;
+    fakGrabbedMovie loadedMovie2;
+
     vector<string> stringMovieInfo;
     vector<string> stringMovieData;
 
