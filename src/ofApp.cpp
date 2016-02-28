@@ -231,6 +231,8 @@ void ofApp::update(){
 //            counterToUpdate = 0;
 //        }
     }
+    loadedMovie.gmMovie.update();
+
 }
 
 //--------------------------------------------------------------
@@ -318,12 +320,16 @@ void ofApp::draw(){
 //        }
 //    }
 
+        loadedMovie.gmMovie.draw(0,400,640,360);
+
     ofxNotify::draw(drawNotify);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+    ofPixels tempPixels = loadedMovie.gmMovie.getPixels();
+    ofLog(OF_LOG_VERBOSE, "tempPixels width: " + ofToString(tempPixels.getWidth()) + " height: " + ofToString(tempPixels.getHeight()));
+    ofLog(OF_LOG_VERBOSE, "tempPixels width: " + ofToString(tempPixels.getWidth()) + " height: " + ofToString(tempPixels.getHeight()));
 }
 
 //--------------------------------------------------------------
@@ -709,7 +715,19 @@ void ofApp::updateAllStills(){
 //    }
 
     movieIsBeingGrabbed = TRUE;
-    loadedMovie.start();
+
+      //    loadedMovie.stop(TRUE);
+
+
+//    loadedMovie.gmMovie.play();
+//    loadedMovie.gmMovie.setFrame(2000);
+
+    ofPixels tempPixels = loadedMovie.gmMovie.getPixels();
+    ofLog(OF_LOG_VERBOSE, "tempPixels width: " + ofToString(tempPixels.getWidth()) + " height: " + ofToString(tempPixels.getHeight()));
+    ofLog(OF_LOG_VERBOSE, "tempPixels width: " + ofToString(tempPixels.getWidth()) + " height: " + ofToString(tempPixels.getHeight()));
+//    grabbedImage.setFromPixels(tempPixels);
+
+//    loadedMovie.start();
 
     ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
 }

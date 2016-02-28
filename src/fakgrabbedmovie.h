@@ -161,7 +161,7 @@ public:
     }
 
     bool isMovieLoaded(){
-        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(gmMovie.isLoaded()));
+//        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(gmMovie.isLoaded()));
         return gmMovie.isLoaded();
     }
 
