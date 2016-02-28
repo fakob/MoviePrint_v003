@@ -109,7 +109,7 @@ public:
         setNumberOfStills(_numberOfStills);
         stop(FALSE);
 
-        isMovieLoaded = FALSE;
+        isMovieLoaded2 = FALSE;
 
         if (!_showPlaceHolder) {
             ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function");
@@ -118,7 +118,7 @@ public:
             ofLog(OF_LOG_VERBOSE, "_____________________________________ " + ofToString(vfMovieName));
 
             if (gmMovie.isLoaded()) {
-                isMovieLoaded = TRUE;
+                isMovieLoaded2 = TRUE;
                 if (gmMovie.getTotalNumFrames() < 2) { //check if movie has only one frame, if so than calculate totalframes and later use setPosition instead of setFrame
                     gmHasNoFrames = TRUE;
                     gmFrameRate = 25;
@@ -145,19 +145,24 @@ public:
 
         gmSetTitleInfo = TRUE;
 
-        return isMovieLoaded;
+        return isMovieLoaded();
     }
 
     void update(){
-        if (isMovieLoaded) {
+        if (isMovieLoaded()) {
             gmMovie.update();
         }
     }
 
     void play(){
-        if (isMovieLoaded) {
+        if (isMovieLoaded()) {
             gmMovie.play();
         }
+    }
+
+    bool isMovieLoaded(){
+        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(gmMovie.isLoaded()));
+        return gmMovie.isLoaded();
     }
 
     void setNumberOfStills(int _numberOfStills){
@@ -187,7 +192,7 @@ public:
     }
 
     void updateAllFrameNumbers(vector<int>* _gridTimeArray){
-        if (isMovieLoaded) {
+        if (isMovieLoaded()) {
             for (int i = 0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
                 grabbedStill[i].gsFrameNumber = _gridTimeArray->at(i);
                 grabbedStill[i].gsUpdateOrderNumber = i;
@@ -200,7 +205,7 @@ public:
     }
 
     void allocateNewNumberOfStills(int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _drawPlaceHolder, bool _addListener){
-        if (isMovieLoaded) {
+        if (isMovieLoaded()) {
             gmCurrAllocating = true;
             gmThumbWidth = _gmThumbWidth;
             gmThumbHeight = _gmThumbHeight;
@@ -298,7 +303,7 @@ public:
 
     void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
 
-        if (isMovieLoaded) {
+        if (isMovieLoaded()) {
 
             ofPushStyle();
             ofEnableAlphaBlending();
@@ -449,6 +454,102 @@ public:
             ofSetColor(255);        }
     }
 
+
+    void grabToImage(int i, int f){
+
+        if (isMovieLoaded()) {
+
+            if (f < 0) {
+                f = 0;
+            }
+            if (f > gmTotalFrames-1) {
+                f = gmTotalFrames-1;
+            }
+
+            if (gmHasNoFrames) { // movies die "keine frames haben" benoetigen setPosition, deshalb sind auch meist die ersten paar frames "kaputt"
+                if (f < 5) {
+                    f = 5;
+                }
+                gmMovie.setPosition((float)(f-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
+                gmMovie.nextFrame();
+                gmMovie.nextFrame();
+                if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+                    ofSleepMillis(TimeToWaitForMovie);
+                }
+                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+
+            } else {
+                if (f==0) {
+                    gmMovie.setFrame(0);
+                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+                        ofSleepMillis(TimeToWaitForMovie);
+                    }
+                } else {
+                    gmMovie.setFrame(f);
+                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+                        ofSleepMillis(TimeToWaitForMovie);
+                    }
+                }
+            }
+            if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
+                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
+                grabbedStill[i].gsToBeGrabbed = FALSE;
+            } else {
+                ofLog(OF_LOG_VERBOSE, "CRASH AVOIDED grabbedStill[i].gsImage.isAllocated() FALSE _______________________________");
+            }
+        }
+    }
+
+    bool allGrabbed(){
+        int allGrabbed = 0;
+        if (isMovieLoaded()) {
+
+            for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
+            {
+                if(!grabbedStill[i].gsToBeGrabbed){
+                    allGrabbed++;
+                }
+
+            }
+        }
+        if (allGrabbed == gmNumberOfStills){
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+
+    }
+
+    // Thread funcions
+
+    void threadedFunction(){
+
+        if (gmSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
+            lock();
+            do {
+//                for (int i = 0; i<gmNumberOfStills; i++) {
+//                    if (grabbedStill[i].gsToBeGrabbed) {
+//                        gmThreadCounter++;
+//                        grabToImage(i, grabbedStill[i].gsFrameNumber);
+//                    }
+//                }
+
+                for (int i = 0; i<gmOrderNumberVector.size(); i++) { // frames are being updated in the order of their framenumber
+                    if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
+                        gmThreadCounter++;
+//                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
+                        grabToImage(gmOrderNumberVector.at(i).x, grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber);
+                    }
+                }
+
+            } while (!allGrabbed());
+            unlock();
+        }
+        stop(TRUE);
+                ofLog(OF_LOG_VERBOSE, "Closing Thread Function-----------------------------------------------" );
+
+    }
+
     void start(){
 
 //        startThread(true, false);   // blocking, verbose
@@ -475,7 +576,7 @@ public:
     vector<ofVec2f> gmOrderNumberVector;
 
     bool devTurnOffMovieSwitch = FALSE;
-    bool isMovieLoaded = FALSE;
+    bool isMovieLoaded2 = FALSE;
 
     float gmDuration;
     string gmMovieName;

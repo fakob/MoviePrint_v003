@@ -224,7 +224,7 @@ void ofApp::update(){
             ofLog(OF_LOG_VERBOSE, "droppedFiles[0].path()" + ofToString(droppedFiles[0].path()));
 
             loadNewMovie(droppedFiles[0].path(), TRUE, FALSE, TRUE);
-            if (loadedMovie.isMovieLoaded) {
+            if (loadedMovie.isMovieLoaded()) {
                 moveToMovie();
             }
             updateMovieFromDrop = FALSE;
@@ -246,7 +246,7 @@ void ofApp::draw(){
 
 //    if (!(tweenListInOut.update() == 1.0)) { // stop drawing when position is at showListView
 
-        if (!loadedMovie.isMovieLoaded) { // if no movie is loaded
+        if (!loadedMovie.isMovieLoaded()) { // if no movie is loaded
             if (!showListView) { // if no List View
 //                guiTimeline->setVisible(FALSE);
 //                drawStartScreen();
@@ -313,7 +313,7 @@ void ofApp::draw(){
 //    } else if (showPrintScreen) {
 //        drawPrintScreen();
 //    } else {
-//        if(showUpdateScreen && loadedMovie.isMovieLoaded){
+//        if(showUpdateScreen && loadedMovie.isMovieLoaded()){
 //            drawUpdateScreen();
 //        }
 //    }
@@ -511,7 +511,7 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
 //    undoPosition = 0;
 //    addMoviePrintDataSet(0);
 
-//    if (!loadedMovie.isMovieLoaded) {
+//    if (!loadedMovie.isMovieLoaded()) {
 //        guiTimeline->setVisible(FALSE);
 //        scrollBar.unregisterMouseEvents();
 //        loadedMovie.disableMouseEvents();
