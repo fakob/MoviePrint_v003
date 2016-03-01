@@ -4,6 +4,8 @@
 #include "fakgrabbedmovie.h"
 
 #include "ofxNotify.h"
+#include "ofxEasing.h"
+#include "ofxMSATimer.h"
 
 class ofApp : public ofBaseApp{
 
@@ -43,6 +45,17 @@ public:
 //        }
     };
 
+
+    //--------------------------------------------------------------
+    struct tweenStruct {
+        float value;
+        float initialTime;
+        float duration;
+        float minValue;
+        float maxValue;
+    };
+
+
     moviePrintDataStruct moviePrintDataSet;
     deque<moviePrintDataStruct> previousMoviePrintDataSet;
     int undoPosition;
@@ -51,11 +64,15 @@ public:
     void moveToMovie();
     void loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBackground, bool _loadScrubMovie);
     bool checkExtension(string _tempExtension);
-    void calculateNewPrintGrid();
     void updateGridTimeArrayWithAutomaticInterval();
     void updateAllStills();
     void drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder);
-
+    void moveInOutTimeline();
+    void writeFboToPreview(float _scaleFactor, bool _showPlaceHolder);
+    void drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder);
+    void calculateNewPrintSize();
+    void calculateNewPrintGrid();
+    void updateDisplayGrid();
 
     // Movie
     fakGrabbedMovie loadedMovie;
@@ -199,6 +216,16 @@ public:
 //    ofxTween tweenFading;
 //    ofxTween tweenTimeDelay;
 
+
+    tweenStruct initTime;
+    tweenStruct tweenTimelineInOut;
+    tweenStruct tweenListInOut;
+    tweenStruct tweenMoviePrintPreview;
+    tweenStruct tweenBlendStartDropImage;
+    tweenStruct tweenBlendStartDropImageCounter;
+    tweenStruct tweenFading;
+    tweenStruct tweenTimeDelay;
+
 //    ofxEasingBack 	easingback;
 //    ofxEasingBounce 	easingbounce;
 //    ofxEasingCirc 	easingcirc;
@@ -283,7 +310,7 @@ public:
     float scrollMultiplier;
 
     // Timer
-//    ofxMSATimer timer;
+    ofxMSATimer timer;
 
     // Once Counter
     int windowResizedOnce;

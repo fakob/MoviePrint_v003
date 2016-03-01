@@ -148,6 +148,14 @@ public:
         return isMovieLoaded();
     }
 
+    void loadNewMovieToBeScrubbed(string vfMovieName){
+
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function SCRUB");
+            gmMovieScrub.loadMovie(vfMovieName);
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function SCRUB");
+
+    }
+
     void update(){
         if (isMovieLoaded()) {
             gmMovie.update();
@@ -161,7 +169,7 @@ public:
     }
 
     bool isMovieLoaded(){
-        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(gmMovie.isLoaded()));
+//        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(gmMovie.isLoaded()));
         return gmMovie.isLoaded();
     }
 
@@ -457,47 +465,78 @@ public:
 
     void grabToImage(int i, int f){
 
+//        if (isMovieLoaded()) {
+
+//            if (f < 0) {
+//                f = 0;
+//            }
+//            if (f > gmTotalFrames-1) {
+//                f = gmTotalFrames-1;
+//            }
+
+//            if (gmHasNoFrames) { // movies die "keine frames haben" benoetigen setPosition, deshalb sind auch meist die ersten paar frames "kaputt"
+//                if (f < 5) {
+//                    f = 5;
+//                }
+//                gmMovie.setPosition((float)(f-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
+//                gmMovie.nextFrame();
+//                gmMovie.nextFrame();
+//                if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+//                    ofSleepMillis(TimeToWaitForMovie);
+//                }
+//                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+
+//            } else {
+//                if (f==0) {
+//                    gmMovie.setFrame(0);
+//                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+//                        ofSleepMillis(TimeToWaitForMovie);
+//                    }
+//                } else {
+//                    gmMovie.setFrame(f);
+//                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+//                        ofSleepMillis(TimeToWaitForMovie);
+//                    }
+//                }
+//            }
+//            if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
+//                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
+//                grabbedStill[i].gsToBeGrabbed = FALSE;
+//            } else {
+//                ofLog(OF_LOG_VERBOSE, "CRASH AVOIDED grabbedStill[i].gsImage.isAllocated() FALSE _______________________________");
+//            }
+//        }
+    }
+
+    int numberLoaded(){
+        gmNumberLoadedCounter = 0;
         if (isMovieLoaded()) {
-
-            if (f < 0) {
-                f = 0;
-            }
-            if (f > gmTotalFrames-1) {
-                f = gmTotalFrames-1;
-            }
-
-            if (gmHasNoFrames) { // movies die "keine frames haben" benoetigen setPosition, deshalb sind auch meist die ersten paar frames "kaputt"
-                if (f < 5) {
-                    f = 5;
+            for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
+            {
+                if(!grabbedStill[i].gsToBeUpdated){
+                    gmNumberLoadedCounter++;
                 }
-                gmMovie.setPosition((float)(f-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
-                gmMovie.nextFrame();
-                gmMovie.nextFrame();
-                if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-                    ofSleepMillis(TimeToWaitForMovie);
-                }
-                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
-
-            } else {
-                if (f==0) {
-                    gmMovie.setFrame(0);
-                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-                        ofSleepMillis(TimeToWaitForMovie);
-                    }
-                } else {
-                    gmMovie.setFrame(f);
-                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-                        ofSleepMillis(TimeToWaitForMovie);
-                    }
-                }
-            }
-            if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
-                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
-                grabbedStill[i].gsToBeGrabbed = FALSE;
-            } else {
-                ofLog(OF_LOG_VERBOSE, "CRASH AVOIDED grabbedStill[i].gsImage.isAllocated() FALSE _______________________________");
             }
         }
+        return gmNumberLoadedCounter;
+    }
+
+    int numberGrabbed(){
+        gmNumberGrabbedCounter = 0;
+        if (isMovieLoaded()) {
+            for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
+            {
+                if(!grabbedStill[i].gsToBeGrabbed){
+                    gmNumberGrabbedCounter++;
+                }
+            }
+        }
+        return gmNumberGrabbedCounter;
+    }
+
+    float percLoaded(){
+        int gmNumberLoaded = numberLoaded();
+        return (float)gmNumberLoaded/(gmNumberOfStills-1);
     }
 
     bool allGrabbed(){
@@ -518,6 +557,170 @@ public:
             return FALSE;
         }
 
+    }
+
+    void setAllLimitsUpper(int _upperLimit){
+//        ofLog(OF_LOG_VERBOSE, "gmNumberOfStills" + ofToString(gmNumberOfStills));
+//        ofLog(OF_LOG_VERBOSE, "grabbedStill" + ofToString(grabbedStill.size()));
+        gmUpperLimitY = _upperLimit;
+        for (int i=0; i<grabbedStill.size(); i++) {
+            grabbedStill[i].gsUpperLimitY = gmUpperLimitY;
+        }
+    }
+
+    void setAllLimitsLower(int _LowerLimit){
+        gmLowerLimitY = _LowerLimit;
+        for (int i=0; i<grabbedStill.size(); i++) {
+            grabbedStill[i].gsLowerLimitY = gmLowerLimitY;
+        }
+    }
+
+    void setAllLimitsLeft(int _leftLimit){
+        gmLeftLimitX = _leftLimit;
+        for (int i=0; i<grabbedStill.size(); i++) {
+            grabbedStill[i].gsLeftLimitX = gmLeftLimitX;
+        }
+    }
+
+    void setAllLimitsRight(int _rightLimit){
+        gmRightLimitX = _rightLimit;
+        for (int i=0; i<grabbedStill.size(); i++) {
+            grabbedStill[i].gsRightLimitX = gmRightLimitX;
+        }
+    }
+
+    void drawMoviePrint(float _x, float _y, int _gridColumns, int _gridRows, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo, bool _drawPreview){
+
+        ofPushStyle();
+        ofPushMatrix();
+
+        if (_printDisplayVideoAudioInfo) { // draw info header
+            ofPushStyle();
+            ofPushMatrix();
+            ofEnableAlphaBlending();
+            ofSetColor(FAK_GRAY);
+            ofRect(_x * _scaleFactor, _y * _scaleFactor, (_gridMargin + (gmThumbWidth+_gridMargin) * _gridColumns) * _scaleFactor, _printHeaderHeight * _scaleFactor);
+            for(int i=0; i<_gridColumns; i++)
+            {
+                switch (i%5) {
+                    case 0:
+                        ofSetColor(FAK_ORANGE1);
+                        break;
+                    case 1:
+                        ofSetColor(FAK_ORANGE2);
+                        break;
+                    case 2:
+                        ofSetColor(FAK_ORANGE3);
+                        break;
+                    case 3:
+                        ofSetColor(FAK_ORANGE4);
+                        break;
+                    case 4:
+                        ofSetColor(FAK_ORANGE5);
+                        break;
+                    default:
+                        ofSetColor(255, 255, 255, 255);
+                        break;
+                }
+                // draw orange stripes
+                ofRect((_x + _gridMargin + (gmThumbWidth+_gridMargin) * i) * _scaleFactor, (_y + _printHeaderHeight*0.7) * _scaleFactor, gmThumbWidth * _scaleFactor, _printHeaderHeight* 0.15 * _scaleFactor);
+            }
+
+            if (_drawPreview) { // draw Info fake for preview
+                ofSetColor(255, 255, 255, 255);
+                ofRect(((_x + _gridMargin) * _scaleFactor), ((_y +_printHeaderHeight*0.3) * _scaleFactor), (gmThumbWidth/4.0 - gmThumbWidth/40.0) * _scaleFactor, _printHeaderHeight*0.3 * _scaleFactor);
+                ofRect(((_x + _gridMargin + gmThumbWidth/4.0) * _scaleFactor), ((_y + _printHeaderHeight*0.45) * _scaleFactor), ((gmThumbWidth/4)*3) * _scaleFactor, _printHeaderHeight*0.15 * _scaleFactor);
+            } else {
+                // draw Info text
+                float tempFontHeightBig = 20;
+                float tempFontHeightSmall = 10;
+                float tempFontScale = _scaleFactor;
+
+                // get Width of Type
+//                float tempWidthOfName = gmFontStashFranchise.getBBox("movieprint", tempFontHeightBig * _scaleFactor, 0, 0).getWidth();
+//                float tempWidthOfPathName = gmFontStashHelveticaMedium.getBBox(ofToString(gmMovie.getMoviePath()), tempFontHeightSmall * _scaleFactor, 0, 0).getWidth();
+
+                // when PathName width bigger then display width then downscale the PathName
+//                if ((((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName) <= tempWidthOfPathName) {
+//                    tempFontScale = tempFontScale * (((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName)/tempWidthOfPathName*0.75;
+//                }
+//                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, 0, 0).getWidth();
+
+                ofSetColor(255, 255, 255, 255);
+//                gmFontStashFranchise.draw("movieprint",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+//                gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+//                gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+            }
+
+            ofPopMatrix();
+            ofPopStyle();
+
+            ofTranslate(0, (_printHeaderHeight) * _scaleFactor);
+        }
+
+        // draw all frames
+        ofEnableAlphaBlending();
+        ofSetColor(255, 255, 255, 255);
+        int tempNumberOfThumbsToDisplay;
+        tempNumberOfThumbsToDisplay = _gridColumns * _gridRows;
+
+        for(int i=0; i<tempNumberOfThumbsToDisplay; i++)
+        {
+            float tempX = (_x + _gridMargin + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
+            float tempY = (_y + _gridMargin + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
+            if (((_gridColumns * _gridRows) > gmNumberOfStills) || !isMovieLoaded()) {
+                printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, true);
+            } else {
+                printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, _drawPlaceHolder);
+            }
+        }
+        ofPopMatrix();
+        ofPopStyle();
+    }
+
+    void printStill(int i, float _x, float _y, float _w, float _h, bool _drawPlaceHolder){
+
+        if (_drawPlaceHolder){
+
+            ofPushStyle();
+            ofSetColor(FAK_MIDDLEGRAY);
+
+            ofRect(_x, _y, _w, _h);
+
+            ofPopStyle();
+
+        } else if (isMovieLoaded()) {
+
+            ofPushStyle();
+            ofEnableAlphaBlending();
+            ofSetColor(255);
+
+            grabbedStill[i].gsDrawWidth = _w;
+            grabbedStill[i].gsDrawHeight = _h;
+            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
+
+            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
+                if (!grabbedStill[i].gsToBeGrabbed) {
+                    if (gmCalcResizeSwitch) {
+                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
+                    }
+                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
+                    grabbedStill[i].gsToBeUpdated = FALSE;
+                }
+            }
+
+            shader.begin(); // draw still with rounded corners
+            shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
+            grabbedStill[i].gsTexture.draw(_x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+            shader.end();
+
+//            if (gmShowFramesUI) { // drawing UI
+//                drawStillUI(i, _x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, 1.0);
+//            }
+
+            ofPopStyle();
+            ofSetColor(255);
+        }
     }
 
     // Thread funcions

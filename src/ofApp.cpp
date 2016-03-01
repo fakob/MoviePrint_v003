@@ -118,6 +118,18 @@ void ofApp::setup(){
 //    tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
 //    tweenBlendStartDropImageCounter.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,100,0);
 
+    tweenTimelineInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 300);
+    tweenTimelineInOut.duration = ofRandom(600, 1000);
+    tweenTimelineInOut.minValue = 1.0;
+    tweenTimelineInOut.maxValue = 0.0;
+    tweenListInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 300);
+    tweenListInOut.duration = ofRandom(600, 1000);
+    tweenListInOut.minValue = 1.0;
+    tweenListInOut.maxValue = 0.0;
+    tweenBlendStartDropImageCounter.initialTime = ofGetElapsedTimef();
+    tweenBlendStartDropImageCounter.duration = 100.0;
+    tweenBlendStartDropImageCounter.minValue = 0.0;
+    tweenBlendStartDropImageCounter.maxValue = 1.0;
 
     startImage.load("images/MoviePrint_StartBildschirm_v002_00000.png");
     dropZoneImage.load("images/MoviePrint_DropZone_v002_00000.png");
@@ -214,6 +226,239 @@ void ofApp::setup(){
 void ofApp::update(){
 //    loadedMovie.update();
 
+    tweenTimelineInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimelineInOut.initialTime, (tweenTimelineInOut.initialTime + tweenTimelineInOut.duration), tweenTimelineInOut.minValue, tweenTimelineInOut.maxValue, &ofxeasing::exp::easeInOut);
+    tweenListInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenListInOut.initialTime, (tweenListInOut.initialTime + tweenListInOut.duration), tweenListInOut.minValue, tweenListInOut.maxValue, &ofxeasing::exp::easeInOut);
+    tweenBlendStartDropImageCounter.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenBlendStartDropImageCounter.initialTime, (tweenBlendStartDropImageCounter.initialTime + tweenBlendStartDropImageCounter.duration), tweenBlendStartDropImageCounter.minValue, tweenBlendStartDropImageCounter.maxValue, &ofxeasing::exp::easeInOut);
+    tweenTimeDelay.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimeDelay.initialTime, (tweenTimeDelay.initialTime + tweenTimeDelay.duration), tweenTimeDelay.minValue, tweenTimeDelay.maxValue, &ofxeasing::exp::easeInOut);
+
+    threadIsRunning = loadedMovie.isThreadRunning();
+
+    // set window to minium width !!NOT WORKING
+//    if (windowWasResized && !ofGetMousePressed()) {
+//        ofSetWindowShape(fmin(ofGetWindowWidth(),1320),ofGetWindowHeight());
+//        windowWasResized = false;
+//    }
+
+//    loadedMovie.update();
+
+    if (tweenListInOut.value == 0.0 || tweenListInOut.value == 1.0) {
+        lockedDueToInteraction = false;
+    }
+
+    if (!finishedUpdating) {
+        if (!threadIsRunning && !ofGetMousePressed()) {
+            timer.setStartTime();
+            finishedUpdating = TRUE;
+            ofLog(OF_LOG_VERBOSE, "Finished Updating Movie--------------------------------------------");
+        }
+    }
+    if (showPrintScreen) {
+        if (finishedPrinting) {
+            if (timer.getElapsedSeconds() > 0.5) {
+                showPrintScreen = FALSE;
+            }
+        }
+    }
+    if (showLoadMovieScreen) {
+        if (finishedLoadingMovie) {
+            if (timer.getElapsedSeconds() > 0.5) {
+                showLoadMovieScreen = FALSE;
+            }
+        }
+
+    }
+    if (showUpdateScreen) {
+        if (finishedUpdating) {
+            if (timer.getElapsedSeconds() > 0.5) {
+                showUpdateScreen = FALSE;
+            }
+        }
+    }
+    if (showTimeline) {
+        if (finishedTimeline) {
+            if (tweenTimelineInOut.value > 0.5) {
+                showTimeline = FALSE;
+                moveInOutTimeline();
+            }
+        }
+    }
+
+    if (movieIsBeingGrabbed) {
+        if (loadedMovie.allGrabbed() || !loadedMovie.isMovieLoaded()) {
+            movieIsBeingGrabbed = FALSE;
+        }
+
+    }
+
+    // update Loader
+    loadValue = ofMap(loadedMovie.percLoaded(), 0, 1.0, 0.0, 1.0, true);
+
+    // update Movie for Scrubbing or InOut manipulations
+    if (loadedMovie.gmScrubMovie || updateInOut) {
+        loadedMovie.gmMovieScrub.update();
+    }
+
+//    handlingEventOverlays();
+
+    if (showMoviePrintPreview){
+        if (showListView) {
+            writeFboToPreview(fmin(fboToPreview.getWidth()/(float)printGridWidth, fboToPreview.getHeight()/(float)printGridHeight), true);
+        } else {
+            writeFboToPreview(fmin(fboToPreview.getWidth()/(float)printGridWidth, fboToPreview.getHeight()/(float)printGridHeight), false);
+        }
+    }
+
+//    // calculate rollout of ofxUI pos, scal
+//    guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
+//    guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
+
+//    guiSettings->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
+//    guiSettings->setHeight(menuSettings.getSizeH()-headerHeight);
+//    //    guiSettings->setHeight(menuSettings.getSizeH()-headerHeight);
+
+//    guiTimeline->setPosition(leftMargin - OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
+
+
+    if (loadedMovie.isMovieLoaded()) { // if no movie is loaded or we are in dev mode then only draw rects
+
+        // update while scrubbing
+        if (loadedMovie.gmScrubMovie) {
+
+            updateInOut = FALSE;
+            updateScrub = TRUE;
+            int i = loadedMovie.gmScrubID;
+
+            if (scrubbingJustStarted) {
+                scrubbingJustStarted = false;
+                scrubDelta = 0.0;
+                scrubMouseDelta = 0.0;
+                scrubInitialFrame = loadedMovie.grabbedStill[i].gsFrameNumber;
+            }
+
+            scrubMouseDelta = (ofGetMouseX() - loadedMovie.grabbedStill[i].gsX - thumbWidth/2);
+
+            if (abs(scrubMouseDelta) >= 0 && (abs(scrubMouseDelta) < thumbWidth/6.0)) {
+                scrubMouseDelta = 0;
+            }
+            if (scrubMouseDelta >= thumbWidth/6.0) {
+                scrubMouseDelta = scrubMouseDelta - thumbWidth/6.0;
+            } else if (scrubMouseDelta <= -thumbWidth/6.0) {
+                scrubMouseDelta = scrubMouseDelta + thumbWidth/6.0;
+            }
+
+            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta before:" + ofToString(scrubMouseDelta));
+
+            float expScrubMouseDelta;
+
+            if (scrubMouseDelta < 0) {
+                expScrubMouseDelta = exp(fmin(6.0,(abs(scrubMouseDelta)/20.0) - 0)) * -1;
+            } else {
+                expScrubMouseDelta = exp(fmin(6.0,(scrubMouseDelta/20.0) - 0));
+            }
+
+            if(shiftKeyPressed) {
+                scrubDelta = scrubDelta + expScrubMouseDelta/10.0;
+            } else{
+                scrubDelta = scrubDelta + expScrubMouseDelta/100.0;
+            }
+
+            if ((scrubDelta + scrubInitialFrame) > loadedMovie.gmTotalFrames-1) {
+                scrubDelta = loadedMovie.gmTotalFrames-1 - scrubInitialFrame;
+            }
+            if ((scrubDelta + scrubInitialFrame) < 0) {
+                scrubDelta = 0 - scrubInitialFrame;
+            }
+
+
+            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta after:" + ofToString(expScrubMouseDelta));
+            ofLog(OF_LOG_VERBOSE, "scrubDelta:" + ofToString(scrubDelta));
+            // new Frame Number is being cropped by the movies first and last frame
+            int newFrameNumber = scrubDelta + scrubInitialFrame;
+            if (newFrameNumber > loadedMovie.gmTotalFrames-1) {
+                newFrameNumber = loadedMovie.gmTotalFrames-1;
+            }
+            if (newFrameNumber < 0) {
+                newFrameNumber = 0;
+            }
+
+            if (loadedMovie.gmHasNoFrames) {
+                int tempNewFrameNumber = newFrameNumber;
+                if (tempNewFrameNumber < 5) {
+                    tempNewFrameNumber = 5;
+                }
+                loadedMovie.gmMovieScrub.setPosition((float)(tempNewFrameNumber - 2)/(float)(loadedMovie.gmTotalFrames-1));
+                loadedMovie.gmMovieScrub.nextFrame();
+                loadedMovie.gmMovieScrub.nextFrame();
+            } else {
+                loadedMovie.gmMovieScrub.setFrame(newFrameNumber);
+            }
+            loadedMovie.grabbedStill[i].gsFrameNumber = newFrameNumber;
+        }
+
+//        // update while Slider sends event
+//        if (manipulateSlider) {
+//            updateScrub = FALSE;
+//            updateInOut = TRUE;
+//            if (uiRangeSliderTimeline->hitLow) {
+//                scrubWindowGridNumber = 0;
+//                if (loadedMovie.gmHasNoFrames) {
+//                    loadedMovie.gmMovieScrub.setPosition((float)(uiSliderValueLow - 1)/(float)(loadedMovie.gmTotalFrames-1));
+//                    loadedMovie.gmMovieScrub.nextFrame();
+//                } else {
+//                    loadedMovie.gmMovieScrub.setFrame(uiSliderValueLow);
+//                }
+//                loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = uiSliderValueLow;
+//            } else if (uiRangeSliderTimeline->hitHigh)
+//            {
+//                scrubWindowGridNumber = numberOfStills-1;
+//                if (loadedMovie.gmHasNoFrames) {
+//                    loadedMovie.gmMovieScrub.setPosition((float)(uiSliderValueHigh - 1)/(float)(loadedMovie.gmTotalFrames-1));
+//                    loadedMovie.gmMovieScrub.nextFrame();
+//                } else {
+//                    loadedMovie.gmMovieScrub.setFrame(uiSliderValueHigh);
+//                }
+//                loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = uiSliderValueHigh;
+//            } else if (uiRangeSliderTimeline->hitCenter)
+//            {
+//                scrubWindowGridNumber = numberOfStills/2;
+//                if (loadedMovie.gmHasNoFrames) {
+//                    loadedMovie.gmMovieScrub.setPosition((float)(((uiSliderValueHigh - uiSliderValueLow)/2 + uiSliderValueLow) - 1)/(float)(loadedMovie.gmTotalFrames-1));
+//                    loadedMovie.gmMovieScrub.nextFrame();
+//                } else {
+//                    loadedMovie.gmMovieScrub.setFrame((uiSliderValueHigh - uiSliderValueLow)/2 + uiSliderValueLow);
+//                }
+//                loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = (uiSliderValueHigh - uiSliderValueLow)/2 + uiSliderValueLow;
+//            }
+//        }
+    }
+
+    if (updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed()) {
+        updateInOut = FALSE;
+        updateScrub = FALSE;
+
+        if(tweenTimeDelay.value < 5){
+            updateNewPrintGrid = FALSE;
+            if (!showListView) {
+                loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder, true);
+                updateAllStills();
+            }
+        }
+    }
+
+//    if (droppedList.glUpdateMovieFromList) {
+//        printListNotImage = FALSE;
+//        showListView = FALSE;
+//        finishedLoadingMovie = FALSE;
+//        showLoadMovieScreen = TRUE;
+//        moveToMovie();
+//        counterToUpdate++;
+//        if (counterToUpdate > 1) {
+//            loadNewMovie(droppedList.glDroppedItem[droppedList.glActiveID].gliFile.path(), TRUE, FALSE, TRUE);
+//            droppedList.glUpdateMovieFromList = FALSE;
+//            counterToUpdate = 0;
+//        }
+//    }
+
     if (updateMovieFromDrop) {
 //        printListNotImage = FALSE;
 //        showListView = FALSE;
@@ -228,8 +473,69 @@ void ofApp::update(){
                 moveToMovie();
             }
             updateMovieFromDrop = FALSE;
-//            counterToUpdate = 0;
+    //            counterToUpdate = 0;
+    //        }
+    }
+
+//    if (scrollBar.sbActive) {
+//    //        ofLog(OF_LOG_VERBOSE, "scrollBar Active:" + ofToString(scrollAmountRel) );
+//        if (scrollGrid) {
+//    //            ofLog(OF_LOG_VERBOSE, "scrollGrid True:" + ofToString(scrollAmountRel) );
+//            if (!scrollBar.sbCalculateScrollInertia && !scrollBar.sbScrollBarDrag) {
+//                scrollGrid = false;
+//            } else {
+//            scrollBar.update();
+//            scrollAmountRel = scrollBar.getRelativePos();
+//    //            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
+//            }
 //        }
+//    } else {
+//        scrollAmountRel = 0;
+
+//    }
+
+//    if (scrollBarList.sbActive) {
+//    //        ofLog(OF_LOG_VERBOSE, "scrollBarList Active:" + ofToString(scrollListAmountRel) );
+//        if (scrollList) {
+//    //            ofLog(OF_LOG_VERBOSE, "scrollList True:" + ofToString(scrollListAmountRel) );
+//            if (!scrollBarList.sbCalculateScrollInertia && !scrollBarList.sbScrollBarDrag) {
+//                scrollList = false;
+//            } else {
+//            scrollBarList.update();
+//            scrollListAmountRel = scrollBarList.getRelativePos();
+//    //            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollListAmountRel) );
+//            }
+//        }
+//    } else {
+//        scrollListAmountRel = 0;
+//    }
+
+//    if (currPrintingList) {
+//        updateScrub = FALSE;
+//        updateInOut = FALSE;
+//        printListToFile();
+//    }
+
+//    if (showPrintScreen && !finishedPrinting) {
+//        // to ensure that print screen is showing before printing starts
+//        counterToPrint++;
+//        if (counterToPrint > 1) {
+//            if (printListNotImage) {
+//                startListPrinting();
+//            } else {
+//                startPrinting();
+//            }
+//            counterToPrint = 0;
+//        }
+//    }
+
+
+    // sollte kurze wait schleife fuer das scrubvideoloading sein - leider funktioniert das nicht so ganz - man kann zwar das scrubvideo etwas spaeter loaden, waerenddessen haelt aber trotzdem alles an
+    if (loadNewMovieToBeScrubbedBool) {
+        if (timer.getElapsedSeconds() > 0.1) {
+            loadedMovie.loadNewMovieToBeScrubbed(loadedMovie.gmMovie.getMoviePath());
+            loadNewMovieToBeScrubbedBool = FALSE;
+        }
     }
 }
 
@@ -319,6 +625,14 @@ void ofApp::draw(){
 //    }
 
     ofxNotify::draw(drawNotify);
+}
+
+//--------------------------------------------------------------
+void ofApp::writeFboToPreview(float _scaleFactor, bool _showPlaceHolder){
+    fboToPreview.begin();
+    ofClear(255,255,255, 0);
+    drawMoviePrintPreview(_scaleFactor, _showPlaceHolder);
+    fboToPreview.end();
 }
 
 //--------------------------------------------------------------
@@ -422,7 +736,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 //--------------------------------------------------------------
 void ofApp::moveToMovie(){
-//    ofLog(OF_LOG_VERBOSE, "moveToMovie()-------------------------------------------");
+    ofLog(OF_LOG_VERBOSE, "moveToMovie()-------------------------------------------");
 //    lockedDueToInteraction = true;
 //    closeAllMenus();
 
@@ -444,9 +758,39 @@ void ofApp::moveToMovie(){
 //    updateInOut = FALSE;
 //    manipulateSlider = FALSE;
 
-//    if (tweenListInOut.update() != 0.0) {
-//        tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
-//    }
+    if (tweenListInOut.value != 0.0) {
+    //        tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
+        tweenListInOut.initialTime = ofGetElapsedTimef();
+        tweenListInOut.duration = ofRandom(600, 1000);
+        tweenListInOut.minValue = 1.0;
+        tweenListInOut.maxValue = 0.0;
+    }
+
+}
+
+//--------------------------------------------------------------
+void ofApp::moveInOutTimeline(){
+
+    if (showTimeline) {
+        tweenTimelineInOut.initialTime = ofGetElapsedTimef();
+        tweenTimelineInOut.duration = ofRandom(600, 1000);
+        tweenTimelineInOut.minValue = 1.0;
+        tweenTimelineInOut.maxValue = 0.0;
+
+    } else {
+        tweenTimelineInOut.initialTime = ofGetElapsedTimef();
+        tweenTimelineInOut.duration = ofRandom(600, 1000);
+        tweenTimelineInOut.minValue = 0.0;
+        tweenTimelineInOut.maxValue = 1.0;
+    }
+
+    if (showTimeline){
+        loadedMovie.setAllLimitsLower(ofGetHeight() - footerHeight);
+//        droppedList.setAllLimitsLower(ofGetHeight() - footerHeight);
+    } else {
+        loadedMovie.setAllLimitsLower(ofGetHeight());
+//        droppedList.setAllLimitsLower(ofGetHeight());
+    }
 
 }
 
@@ -665,12 +1009,16 @@ void ofApp::calculateNewPrintGrid(){
     loadedMovie.gmThumbWidth = thumbWidth;
     loadedMovie.gmThumbHeight = thumbHeight;
 
-//    calculateNewPrintSize();
+    calculateNewPrintSize();
 
-//    updateNewPrintGrid = true;
+    updateNewPrintGrid = true;
 //    tweenTimeDelay.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+    tweenTimeDelay.initialTime = ofGetElapsedTimef();
+    tweenTimeDelay.duration = 500.0;
+    tweenTimeDelay.minValue = 255.0;
+    tweenTimeDelay.maxValue = 0.0;
 
-//    updateDisplayGrid();
+    updateDisplayGrid();
 
     ofxNotify() << "New Grid is Calculated - Total Number of Stills: " + ofToString(numberOfStills);
 
@@ -732,4 +1080,66 @@ void ofApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPr
     loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
     ofPopStyle();
     ofPopMatrix();
+}
+
+//--------------------------------------------------------------
+void ofApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
+    ofPushStyle();
+    ofPushMatrix();
+    _scaleFactor = _scaleFactor * 0.95;
+    float tempX = (fboToPreviewWidth - _scaleFactor * printGridWidth) / 2;
+    float tempY = (fboToPreviewHeight - _scaleFactor * printGridHeight) / 2;
+    ofTranslate(tempX, tempY);
+    ofSetColor(255);
+    backgroundImagePreview.draw(0, 0, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
+    loadedMovie.drawMoviePrint(0, 0, moviePrintDataSet.printGridColumns, moviePrintDataSet.printGridRows, moviePrintDataSet.printGridMargin, _scaleFactor, 1, _showPlaceHolder, printHeaderHeight, moviePrintDataSet.printDisplayVideoAudioInfo, true);
+
+    // drawing frame
+    float tempFrameWidth = 3;
+    ofSetColor(220);
+    ofRect(0, 0 - tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    ofRect(0 - tempFrameWidth, 0 - tempFrameWidth, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
+    ofRect(0 + _scaleFactor * printGridWidth, 0, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
+    ofRect(0 - tempFrameWidth, 0 + _scaleFactor * printGridHeight, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    // drawing shadow
+    ofSetColor(0,200);
+    ofRect(0 + _scaleFactor * printGridWidth + tempFrameWidth, 0, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth*2);
+    ofRect(0, 0 + _scaleFactor * printGridHeight + tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    ofPopMatrix();
+    ofPopStyle();
+}
+
+//--------------------------------------------------------------
+void ofApp::calculateNewPrintSize(){
+    printGridWidth = (thumbWidth + moviePrintDataSet.printGridMargin) * moviePrintDataSet.printGridColumns + moviePrintDataSet.printGridMargin;
+    if (moviePrintDataSet.printDisplayVideoAudioInfo) {
+        printGridHeight = (thumbHeight + moviePrintDataSet.printGridMargin) * moviePrintDataSet.printGridRows + moviePrintDataSet.printGridMargin + printHeaderHeight;
+    } else {
+        printGridHeight = (thumbHeight + moviePrintDataSet.printGridMargin) * moviePrintDataSet.printGridRows + moviePrintDataSet.printGridMargin;
+    }
+    //    ofLog(OF_LOG_VERBOSE, "printGridSize" + ofToString(printGridWidth) + "x" + ofToString(printGridHeight));
+}
+
+//--------------------------------------------------------------
+void ofApp::updateDisplayGrid(){
+
+    gridColumns = fmax(1, (int)(ofGetWindowWidth() - leftMargin - scrollBarWidth + displayGridMargin) / (thumbWidth + displayGridMargin));
+
+    displayGridWidth = (gridColumns * (thumbWidth + displayGridMargin) - displayGridMargin);
+    gridRows = ceil(numberOfStills/(float)gridColumns);
+    displayGridHeight = (gridRows * (thumbHeight + displayGridMargin)) - displayGridMargin;
+    //    ofLog(OF_LOG_VERBOSE, "displayGridMargin: " + ofToString(displayGridMargin));
+    //    ofLog(OF_LOG_VERBOSE, "displayGridHeight: " + ofToString(thumbHeight));
+    //    ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(displayGridHeight));
+
+//    updateAllLimits();
+//    updateTheScrollBar();
+//    updateTheListScrollBar();
+//    updateTimeline();
+
+    ofxNotify() << "updateDisplayGrid - Total Number of Stills: " + ofToString(numberOfStills);
+
+    //    ofLog(OF_LOG_VERBOSE, "displayGridWidth: " + ofToString(displayGridWidth));
+    //    ofLog(OF_LOG_VERBOSE, "displayGridHeight: " + ofToString(displayGridHeight));
+
 }
