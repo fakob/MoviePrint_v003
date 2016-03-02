@@ -151,9 +151,118 @@ public:
     void loadNewMovieToBeScrubbed(string vfMovieName){
 
             ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function SCRUB");
-            gmMovieScrub.loadMovie(vfMovieName);
+            gmMovieScrub.load(vfMovieName);
             ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function SCRUB");
 
+    }
+
+    string ReplaceString(string subject, const string& search, const string& replace) {
+        size_t pos = 0;
+        while ((pos = subject.find(search, pos)) != std::string::npos) {
+            subject.replace(pos, search.length(), replace);
+            pos += replace.length();
+        }
+        return subject;
+    }
+
+    void getMovieInformation(string _vfMovieName){
+
+        gmMIFilePathOhne = getMoviePathName();
+        gmMIFilePath = "FilePath: " + gmMIFilePath;
+
+
+//        //Information about MediaInfo
+//        MediaInfo MI;
+//        MI.Open(__T(_vfMovieName));
+
+//        MI.Option(__T("Inform"), __T("General;Name : %FileName%.%FileExtension%\\r\\n:::Format : %Format%\\r\\n:::Format/String : %Format/String%\\r\\n:::FileSize : %FileSize/String%\\r\\n:::Duration : %Duration/String1%\\r\\n:::\nVideo;FrameCount : %FrameCount%\\r\\n:::Size : %Width%x%Height%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio/String%\\r\\n:::FrameRate : %FrameRate/String%"));
+
+//        gmInfCol1 = MI.Inform();
+//        gmInfCol1 = ReplaceString(gmInfCol1, ":::", "\n");
+
+//        gmMIFileName = MI.Get(Stream_General, 0, __T("FileName"), Info_Text).c_str();
+//        gmMIFileExtension = MI.Get(Stream_General, 0, __T("FileExtension"), Info_Text).c_str();
+//        gmMIFormat = MI.Get(Stream_General, 0, __T("Format"), Info_Text).c_str();
+//        gmMIFormatString = MI.Get(Stream_General, 0, __T("Format/String"), Info_Text).c_str();
+//        gmMIFileSizeString = MI.Get(Stream_General, 0, __T("FileSize/String"), Info_Text).c_str();
+//        gmMIDurationString1 = MI.Get(Stream_General, 0, __T("Duration/String1"), Info_Text).c_str();
+
+//        gmMIFrameCount = MI.Get(Stream_Video, 0, __T("FrameCount"), Info_Text).c_str();
+//        gmMIWidth = MI.Get(Stream_Video, 0, __T("Width"), Info_Text).c_str();
+//        gmMIHeight = MI.Get(Stream_Video, 0, __T("Height"), Info_Text).c_str();
+//        gmMIWidth = gmMIWidth + "x" + gmMIHeight;
+//        gmMIDisplayAspectRatioString = MI.Get(Stream_Video, 0, __T("DisplayAspectRatio/String"), Info_Text).c_str();
+//        gmMIFrameRateString = MI.Get(Stream_Video, 0, __T("FrameRate/String"), Info_Text).c_str();
+//        gmMIVFormat = MI.Get(Stream_Video, 0, __T("Format"), Info_Text).c_str();
+//        gmMIFormatInfo = MI.Get(Stream_Video, 0, __T("Format/Info"), Info_Text).c_str();
+//        gmMIBitRate = MI.Get(Stream_Video, 0, __T("BitRate"), Info_Text).c_str();
+//        gmMIPixelAspectRatio = MI.Get(Stream_Video, 0, __T("PixelAspectRatio"), Info_Text).c_str();
+//        gmMIDisplayAspectRatio = MI.Get(Stream_Video, 0, __T("DisplayAspectRatio"), Info_Text).c_str();
+//        gmMIFrameRate_ModeString = MI.Get(Stream_Video, 0, __T("FrameRate_Mode/String"), Info_Text).c_str();
+//        gmMIColorSpace = MI.Get(Stream_Video, 0, __T("ColorSpace"), Info_Text).c_str();
+//        gmMIChromaSubsampling = MI.Get(Stream_Video, 0, __T("ChromaSubsampling"), Info_Text).c_str();
+//        gmMIBitDepthString = MI.Get(Stream_Video, 0, __T("BitDepth/String"), Info_Text).c_str();
+//        gmMIInterlacementString = MI.Get(Stream_Video, 0, __T("Interlacement/String"), Info_Text).c_str();
+
+//        gmMIAFormat = MI.Get(Stream_Audio, 0, __T("Format"), Info_Text).c_str();
+//        gmMIAChannelsString = MI.Get(Stream_Audio, 0, __T("Channel(s)/String"), Info_Text).c_str();
+//        gmMIASamplingRate = MI.Get(Stream_Audio, 0, __T("SamplingRate/String"), Info_Text).c_str();
+
+//        gmMIFileNameClean = gmMIFileName + "." + gmMIFileExtension;
+
+//        MI.Option(__T("Inform"), __T("Video;Video\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::PixelAspectRatio : %PixelAspectRatio%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio%\\r\\n:::FrameRate_Mode/String : %FrameRate_Mode/String%\\r\\n:::ColorSpace : %ColorSpace%\\r\\n:::ChromaSubsampling : %ChromaSubsampling%\\r\\n:::BitDepth/String : %BitDepth/String%\\r\\n:::Interlacement/String : %Interlacement/String%"));
+
+//        gmInfCol2 = MI.Inform().c_str();
+//        gmInfCol2 = ReplaceString(gmInfCol2, ":::", "\n");
+
+//        MI.Option(__T("Inform"), __T("Audio;Audio\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::Channel(s)/String : %Channel(s)/String%\\r\\n:::ChannelPositons : %ChannelPositons%\\r\\n:::SamplingRate/String : %SamplingRate/String%"));
+
+//        gmInfCol3 = MI.Inform().c_str();
+//        gmInfCol3 = ReplaceString(gmInfCol3, ":::", "\n");
+
+//        MI.Close();
+
+    }
+
+    string StringToUpper(string strToConvert){
+        std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::toupper);
+        return strToConvert;
+    }
+
+    string getMoviePathName(){
+        gmMIFilePath = ofToString(gmMovie.getMoviePath());
+        vector<string> tempVectorString = ofSplitString(gmMIFilePath, "/");
+        tempVectorString.pop_back();
+        return ofJoinString(tempVectorString, "/") + "/";
+    }
+
+    int CountNewlines(string s){
+        int len = s.length();
+        int c = 0;
+        for (int i=0; i < len;  i++)
+        {
+            if (s[i] == '\n') c++;
+        }
+        return c;
+    }
+
+     void scrubMovie(int & i){
+        if (isMovieLoaded()) {
+            gmScrubID = i;
+//            ofLog(OF_LOG_VERBOSE, "rollOverMovieID" + ofToString(gmRollOverMovieID) + "gmRollOverMovieButtonID" + ofToString(gmRollOverMovieButtonID));
+            if (gmRollOverMovieButtonID == 0) {
+                gmScrubMovie = TRUE;
+            }
+        }
+    }
+
+    void rollOverMovie(ofVec2f & i){
+        if (isMovieLoaded()) {
+            gmRollOverMovieID = i.x;
+            gmRollOverMovieButtonID = i.y;
+            gmRollOver = TRUE;
+//            ofLog(OF_LOG_VERBOSE, "rollOverMovieID" + ofToString(gmRollOverMovieID) + "gmRollOverMovieButtonID" + ofToString(gmRollOverMovieButtonID));
+        }
     }
 
     void update(){
@@ -171,6 +280,26 @@ public:
     bool isMovieLoaded(){
 //        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(gmMovie.isLoaded()));
         return gmMovie.isLoaded();
+    }
+
+    void disableMouseEvents(){
+        gmMouseEventsEnabled = false;
+        for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
+            grabbedStill[i].unregisterMouseEvents();
+        }
+    }
+
+    bool getMouseEventsEnabled(){
+        return gmMouseEventsEnabled;
+    }
+
+    void enableMouseEvents(){
+        if (isMovieLoaded()) {
+            gmMouseEventsEnabled = true;
+            for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
+                grabbedStill[i].registerMouseEvents();
+            }
+        }
     }
 
     void setNumberOfStills(int _numberOfStills){
@@ -462,6 +591,15 @@ public:
             ofSetColor(255);        }
     }
 
+    void setAllToBeGrabbedAndToBeUpdated(){
+        if (isMovieLoaded()) {
+            for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
+                grabbedStill[i].gsToBeUpdated = TRUE;
+                grabbedStill[i].gsToBeGrabbed = TRUE;
+                grabbedStill[i].gsManipulated = FALSE;
+            }
+        }
+    }
 
     void grabToImage(int i, int f){
 
@@ -599,7 +737,7 @@ public:
             ofPushMatrix();
             ofEnableAlphaBlending();
             ofSetColor(FAK_GRAY);
-            ofRect(_x * _scaleFactor, _y * _scaleFactor, (_gridMargin + (gmThumbWidth+_gridMargin) * _gridColumns) * _scaleFactor, _printHeaderHeight * _scaleFactor);
+            ofDrawRectangle(_x * _scaleFactor, _y * _scaleFactor, (_gridMargin + (gmThumbWidth+_gridMargin) * _gridColumns) * _scaleFactor, _printHeaderHeight * _scaleFactor);
             for(int i=0; i<_gridColumns; i++)
             {
                 switch (i%5) {
@@ -623,13 +761,13 @@ public:
                         break;
                 }
                 // draw orange stripes
-                ofRect((_x + _gridMargin + (gmThumbWidth+_gridMargin) * i) * _scaleFactor, (_y + _printHeaderHeight*0.7) * _scaleFactor, gmThumbWidth * _scaleFactor, _printHeaderHeight* 0.15 * _scaleFactor);
+                ofDrawRectangle((_x + _gridMargin + (gmThumbWidth+_gridMargin) * i) * _scaleFactor, (_y + _printHeaderHeight*0.7) * _scaleFactor, gmThumbWidth * _scaleFactor, _printHeaderHeight* 0.15 * _scaleFactor);
             }
 
             if (_drawPreview) { // draw Info fake for preview
                 ofSetColor(255, 255, 255, 255);
-                ofRect(((_x + _gridMargin) * _scaleFactor), ((_y +_printHeaderHeight*0.3) * _scaleFactor), (gmThumbWidth/4.0 - gmThumbWidth/40.0) * _scaleFactor, _printHeaderHeight*0.3 * _scaleFactor);
-                ofRect(((_x + _gridMargin + gmThumbWidth/4.0) * _scaleFactor), ((_y + _printHeaderHeight*0.45) * _scaleFactor), ((gmThumbWidth/4)*3) * _scaleFactor, _printHeaderHeight*0.15 * _scaleFactor);
+                ofDrawRectangle(((_x + _gridMargin) * _scaleFactor), ((_y +_printHeaderHeight*0.3) * _scaleFactor), (gmThumbWidth/4.0 - gmThumbWidth/40.0) * _scaleFactor, _printHeaderHeight*0.3 * _scaleFactor);
+                ofDrawRectangle(((_x + _gridMargin + gmThumbWidth/4.0) * _scaleFactor), ((_y + _printHeaderHeight*0.45) * _scaleFactor), ((gmThumbWidth/4)*3) * _scaleFactor, _printHeaderHeight*0.15 * _scaleFactor);
             } else {
                 // draw Info text
                 float tempFontHeightBig = 20;
@@ -678,6 +816,16 @@ public:
         ofPopStyle();
     }
 
+    string framesToTime(int _frames){
+
+        int frames  =    _frames % gmFrameRate;
+        int seconds =   (_frames / gmFrameRate) % 60;
+        int minutes =  ((_frames / gmFrameRate) / 60) % 60;
+        int hours   = (((_frames / gmFrameRate) / 60) / 60) % 24;
+        return (ofToString(hours,2,'0') + ":" + ofToString(minutes,2,'0') + ":" + ofToString(seconds,2,'0') + ":" + ofToString(frames,2,'0'));
+
+    }
+
     void printStill(int i, float _x, float _y, float _w, float _h, bool _drawPlaceHolder){
 
         if (_drawPlaceHolder){
@@ -685,7 +833,7 @@ public:
             ofPushStyle();
             ofSetColor(FAK_MIDDLEGRAY);
 
-            ofRect(_x, _y, _w, _h);
+            ofDrawRectangle(_x, _y, _w, _h);
 
             ofPopStyle();
 
@@ -710,7 +858,7 @@ public:
             }
 
             shader.begin(); // draw still with rounded corners
-            shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
+            shader.setUniformTexture("maskTex", maskFbo.getTexture(), 1 );
             grabbedStill[i].gsTexture.draw(_x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
             shader.end();
 
@@ -720,6 +868,42 @@ public:
 
             ofPopStyle();
             ofSetColor(255);
+        }
+    }
+
+    void drawStillUI(int i, float x, float y, float w, float h, float _alpha){
+
+        if (isMovieLoaded()) {
+
+            float tempFontSize = ofMap(w, 0.0, 1000.0, 0.0, 45.0); // groessen mapping der still UI
+            string dummyString;
+
+            if (vfFramesToTimeSwitch) {
+                dummyString = framesToTime(grabbedStill[i].gsFrameNumber);
+            } else {
+                dummyString = "#" + ofToString(grabbedStill[i].gsFrameNumber);
+            }
+
+            ofPushStyle();
+            ofEnableAlphaBlending();
+
+//            ofRectangle rect = gmFontStashUbuntu.getBBox(dummyString, tempFontSize, 0, 0);
+            ofRectangle rect (0, 0, 100, 100); // substitute for not functional code
+            if (grabbedStill[i].gsManipulated) {
+                ofSetColor(FAK_ORANGECOLOR, 200*_alpha);
+            } else {
+                ofSetColor(0,0,0,200*_alpha);
+            }
+            ofDrawRectRounded(x, y, rect.width + rect.width*0.03, rect.height + rect.height*0.3, rect.width*0.03);
+            if (grabbedStill[i].gsToBeUpdated) {
+                ofSetColor(100, 255 * _alpha);
+            } else {
+                ofSetColor(255, 255 * _alpha);
+            }
+//            gmFontStashUbuntu.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
+
+            ofPopStyle();
+
         }
     }
 
