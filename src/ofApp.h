@@ -73,6 +73,13 @@ public:
     void calculateNewPrintSize();
     void calculateNewPrintGrid();
     void updateDisplayGrid();
+    bool fequal(float _x, float _y, float _t);
+    void setResourcePath();
+    void activateAllMenus();
+    void inactivateAllMenus();
+    void closeAllMenus();
+    void handlingEventOverlays();
+    void moveToList();
 
     // Movie
     fakGrabbedMovie loadedMovie;

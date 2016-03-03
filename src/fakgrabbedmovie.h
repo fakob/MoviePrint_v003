@@ -603,47 +603,47 @@ public:
 
     void grabToImage(int i, int f){
 
-//        if (isMovieLoaded()) {
+        if (isMovieLoaded()) {
 
-//            if (f < 0) {
-//                f = 0;
-//            }
-//            if (f > gmTotalFrames-1) {
-//                f = gmTotalFrames-1;
-//            }
+            if (f < 0) {
+                f = 0;
+            }
+            if (f > gmTotalFrames-1) {
+                f = gmTotalFrames-1;
+            }
 
-//            if (gmHasNoFrames) { // movies die "keine frames haben" benoetigen setPosition, deshalb sind auch meist die ersten paar frames "kaputt"
-//                if (f < 5) {
-//                    f = 5;
-//                }
-//                gmMovie.setPosition((float)(f-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
-//                gmMovie.nextFrame();
-//                gmMovie.nextFrame();
-//                if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-//                    ofSleepMillis(TimeToWaitForMovie);
-//                }
-//                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+            if (gmHasNoFrames) { // movies die "keine frames haben" benoetigen setPosition, deshalb sind auch meist die ersten paar frames "kaputt"
+                if (f < 5) {
+                    f = 5;
+                }
+                gmMovie.setPosition((float)(f-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
+                gmMovie.nextFrame();
+                gmMovie.nextFrame();
+                if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+                    ofSleepMillis(TimeToWaitForMovie);
+                }
+                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
-//            } else {
-//                if (f==0) {
-//                    gmMovie.setFrame(0);
-//                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-//                        ofSleepMillis(TimeToWaitForMovie);
-//                    }
-//                } else {
-//                    gmMovie.setFrame(f);
-//                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-//                        ofSleepMillis(TimeToWaitForMovie);
-//                    }
-//                }
-//            }
-//            if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
-//                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
-//                grabbedStill[i].gsToBeGrabbed = FALSE;
-//            } else {
-//                ofLog(OF_LOG_VERBOSE, "CRASH AVOIDED grabbedStill[i].gsImage.isAllocated() FALSE _______________________________");
-//            }
-//        }
+            } else {
+                if (f==0) {
+                    gmMovie.setFrame(0);
+                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+                        ofSleepMillis(TimeToWaitForMovie);
+                    }
+                } else {
+                    gmMovie.setFrame(f);
+                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+                        ofSleepMillis(TimeToWaitForMovie);
+                    }
+                }
+            }
+            if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
+                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
+                grabbedStill[i].gsToBeGrabbed = FALSE;
+            } else {
+                ofLog(OF_LOG_VERBOSE, "CRASH AVOIDED grabbedStill[i].gsImage.isAllocated() FALSE _______________________________");
+            }
+        }
     }
 
     int numberLoaded(){

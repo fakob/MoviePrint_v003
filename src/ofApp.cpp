@@ -149,7 +149,7 @@ void ofApp::setup(){
 
 
     // load standard movie
-    loadedFile = "Nothing";
+    loadedFile = "movies/FrameTestMovie_4zu3_v001.mov";
     saveMoviePrintPath = appPathUpStr + "/MoviePrints/";
 
     loadedMovie.gmUpperLimitY = headerHeight;
@@ -171,12 +171,12 @@ void ofApp::setup(){
 //    scrollBar.setScrollHeight((float)displayGridHeight);
 //    scrollBar.registerMouseEvents();
 //    scrollBar.registerTouchEvents();
-//    ofAddListener(scrollBar.sbScrollingGoingOn, this, &testApp::scrollEvent);
+//    ofAddListener(scrollBar.sbScrollingGoingOn, this, &ofApp::scrollEvent);
 
 //    scrollBarList.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
 //    scrollBarList.registerMouseEvents();
 //    scrollBarList.registerTouchEvents();
-//    ofAddListener(scrollBarList.sbScrollingGoingOn, this, &testApp::scrollEvent);
+//    ofAddListener(scrollBarList.sbScrollingGoingOn, this, &ofApp::scrollEvent);
 
 //    setGUITimeline();
 //    setGUISettings();
@@ -186,30 +186,30 @@ void ofApp::setup(){
 
 //    menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, 'T', false);
 //    menuMovieInfo.registerMouseEvents();
-//    ofAddListener(menuMovieInfo.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
-//    ofAddListener(menuMovieInfo.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
+//    ofAddListener(menuMovieInfo.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
+//    ofAddListener(menuMovieInfo.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
 //    menuMoviePrintSettings.setupMenu(5,0,0,0,0,headerHeight, true, 'T', false);
 //    menuMoviePrintSettings.registerMouseEvents();
-//    ofAddListener(menuMoviePrintSettings.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
-//    ofAddListener(menuMoviePrintSettings.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
+//    ofAddListener(menuMoviePrintSettings.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
+//    ofAddListener(menuMoviePrintSettings.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
 //    menuSettings.setupMenu(3,0,0,0,0,headerHeight, true, 'T', false);
 //    menuSettings.registerMouseEvents();
-//    ofAddListener(menuSettings.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
-//    ofAddListener(menuSettings.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
+//    ofAddListener(menuSettings.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
+//    ofAddListener(menuSettings.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
 //    menuHelp.setupMenu(2,0,0,0,0,headerHeight, true, 'T', false);
 //    menuHelp.registerMouseEvents();
-//    ofAddListener(menuHelp.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
-//    ofAddListener(menuHelp.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
+//    ofAddListener(menuHelp.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
+//    ofAddListener(menuHelp.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
 //    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, 'B', false);
 //    menuTimeline.registerMouseEvents();
 
 //    menuMoveToList.setupMenu(6,0,0,0,0,leftMargin*2, true, 'L', false);
 //    menuMoveToList.registerMouseEvents();
-//    ofAddListener(menuMoveToList.mMenuIsBeingClicked, this, &testApp::menuIsClicked);
+//    ofAddListener(menuMoveToList.mMenuIsBeingClicked, this, &ofApp::menuIsClicked);
 
 //    moveInOutTimeline();
 
@@ -1142,4 +1142,125 @@ void ofApp::updateDisplayGrid(){
     //    ofLog(OF_LOG_VERBOSE, "displayGridWidth: " + ofToString(displayGridWidth));
     //    ofLog(OF_LOG_VERBOSE, "displayGridHeight: " + ofToString(displayGridHeight));
 
+}
+
+//--------------------------------------------------------------
+void ofApp::moveToList(){
+    ofLog(OF_LOG_VERBOSE, "moveToList()-------------------------------------------");
+    lockedDueToInteraction = true;
+    closeAllMenus();
+
+    showListView = TRUE;
+
+//    scrollBar.unregisterMouseEvents();
+//    scrollBar.unregisterTouchEvents();
+
+//    scrollBarList.registerMouseEvents();
+//    scrollBarList.registerTouchEvents();
+
+    loadedMovie.stop(TRUE);
+    loadedMovie.disableMouseEvents();
+
+//    guiTimeline->setVisible(FALSE);
+//    menuTimeline.unRegisterMouseEvents();
+//    menuTimeline.setMenuInactive();
+
+//    droppedList.enableMouseEvents();
+    printListNotImage = TRUE;
+
+    if (tweenListInOut.value != 1.0) {
+    //        tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
+        tweenListInOut.initialTime = ofGetElapsedTimef();
+        tweenListInOut.duration = ofRandom(600, 1000);
+        tweenListInOut.minValue = 0.0;
+        tweenListInOut.maxValue = 1.0;
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::handlingEventOverlays(){
+    // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs
+//    if (menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated() || menuSettings.getMenuActivated()) {
+//        if (loadedMovie.getMouseEventsEnabled()) {
+//            loadedMovie.disableMouseEvents();
+//        }
+//        if (showListView) {
+//            droppedList.disableMouseEvents(droppedFiles.size());
+//        }
+//    } else {
+//        if (allMenusAreClosedOnce == 0) {
+//            if (!lockedDueToInteraction && !lockedDueToPrinting) {
+//                allMenusAreClosedOnce++;
+//                if (!loadedMovie.getMouseEventsEnabled() && !showListView) {
+//                    loadedMovie.enableMouseEvents();
+//                }
+//                if (showListView) {
+//                    droppedList.enableMouseEvents();
+//                }
+//            }
+//        }
+//    }
+}
+
+//--------------------------------------------------------------
+void ofApp::closeAllMenus(){
+//    menuMoviePrintSettings.closeMenuManually();
+//    menuSettings.closeMenuManually();
+//    menuMovieInfo.closeMenuManually();
+//    menuHelp.closeMenuManually();
+//    ofLog(OF_LOG_VERBOSE, "closeMenuManually-------------------------------------------");
+}
+
+//--------------------------------------------------------------
+void ofApp::inactivateAllMenus(){
+//    menuMoviePrintSettings.setMenuInactive();
+//    menuSettings.setMenuInactive();
+//    menuMovieInfo.setMenuInactive();
+//    menuHelp.setMenuInactive();
+//    ofLog(OF_LOG_VERBOSE, "inactivateAllMenus-------------------------------------------");
+}
+
+//--------------------------------------------------------------
+void ofApp::activateAllMenus(){
+//    menuMoviePrintSettings.setMenuActive();
+//    menuSettings.setMenuActive();
+//    menuMovieInfo.setMenuActive();
+//    menuHelp.setMenuActive();
+//    ofLog(OF_LOG_VERBOSE, "activateAllMenus-------------------------------------------");
+}
+
+//--------------------------------------------------------------
+void ofApp::setResourcePath(){
+    CFURLRef appUrl = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+    CFStringRef appPath = CFURLCopyFileSystemPath(appUrl, kCFURLPOSIXPathStyle);
+    char appPathChars[PATH_MAX];
+    CFStringGetCString(appPath, appPathChars, FILENAME_MAX, kCFStringEncodingASCII );
+    appPathStr = string(appPathChars);
+    appPathUpStr = appPathStr.substr(0,appPathStr.find_last_of("\\/"));
+    CFRelease(appUrl);
+    CFRelease(appPath);
+
+    CFURLRef resourceUrl = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
+    CFStringRef resourcePath = CFURLCopyFileSystemPath(resourceUrl, kCFURLPOSIXPathStyle);
+    char resourcePathChars[PATH_MAX];
+    CFStringGetCString(resourcePath, resourcePathChars, FILENAME_MAX, kCFStringEncodingASCII );
+    string resourcePathStr = string(resourcePathChars);
+    CFRelease(resourcePath);
+    CFRelease(resourceUrl);
+
+    string newPath = appPathStr + "/" + resourcePathStr + "/"; // the absolute path to the resources folder
+    ofLog(OF_LOG_VERBOSE, "appPathStr: " + ofToString(appPathStr) );
+    ofLog(OF_LOG_VERBOSE, "appPathUpStr: " + ofToString(appPathUpStr) );
+    ofLog(OF_LOG_VERBOSE, "newDataPath: " + ofToString(newPath) );
+    ofSetDataPathRoot(newPath); // tell OF to look for resources here
+}
+
+//--------------------------------------------------------------
+bool ofApp::fequal(float _x, float _y, float _t){
+    float diff = abs(_x-_y);
+    if (diff < _t) {
+        return TRUE;
+    } else  {
+        return FALSE;
+    }
 }
