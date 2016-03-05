@@ -149,7 +149,8 @@ void ofApp::setup(){
 
 
     // load standard movie
-    loadedFile = "movies/FrameTestMovie_4zu3_v001.mov";
+//    loadedFile = "movies/FrameTestMovie_4zu3_v001.mov";
+    loadedFile = "";
     saveMoviePrintPath = appPathUpStr + "/MoviePrints/";
 
     loadedMovie.gmUpperLimitY = headerHeight;
@@ -224,7 +225,7 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-//    loadedMovie.update();
+    loadedMovie.update();
 
     tweenTimelineInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimelineInOut.initialTime, (tweenTimelineInOut.initialTime + tweenTimelineInOut.duration), tweenTimelineInOut.minValue, tweenTimelineInOut.maxValue, &ofxeasing::exp::easeInOut);
     tweenListInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenListInOut.initialTime, (tweenListInOut.initialTime + tweenListInOut.duration), tweenListInOut.minValue, tweenListInOut.maxValue, &ofxeasing::exp::easeInOut);

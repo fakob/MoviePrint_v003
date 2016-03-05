@@ -627,18 +627,26 @@ public:
             } else {
                 if (f==0) {
                     gmMovie.setFrame(0);
+                    gmMovie.update();
                     if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
                         ofSleepMillis(TimeToWaitForMovie);
                     }
+//                    while (!gmMovie.isFrameNew()) {
+//                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready - isFrameNew()" + ofToString(gmMovie.isFrameNew()));
+//                    }
                 } else {
                     gmMovie.setFrame(f);
+                    gmMovie.update();
                     if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
                         ofSleepMillis(TimeToWaitForMovie);
                     }
+//                    while (!gmMovie.isFrameNew()) {
+//                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready");
+//                    }
                 }
             }
             if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
-                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
+                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixels());
                 grabbedStill[i].gsToBeGrabbed = FALSE;
             } else {
                 ofLog(OF_LOG_VERBOSE, "CRASH AVOIDED grabbedStill[i].gsImage.isAllocated() FALSE _______________________________");
