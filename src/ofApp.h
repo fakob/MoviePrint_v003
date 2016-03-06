@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "fakgrabbedmovie.h"
+#include "fakmenu.h"
 
 #include "ofxNotify.h"
 #include "ofxEasing.h"
@@ -83,6 +84,12 @@ public:
     void setGUITimeline();
     void setGUISettingsMoviePrint();
     void setGUISettings();
+    void drawUI(int _scaleFactor, bool _hideInPrint);
+    void menuIsOpened(int &e);
+    void menuIsClosed(int &e);
+    void menuIsClicked(int &e);
+    void setVisibilityMoviePrintPreview(bool _visibility);
+    void toggleMoviePrintPreview();
 
     // Movie
     fakGrabbedMovie loadedMovie;
@@ -282,13 +289,13 @@ public:
     float scrubWindowW, scrubWindowH;
     int printHeaderHeight;
 
-//    // Menu
-//    fakMenu menuMovieInfo;
-//    fakMenu menuSettings;
-//    fakMenu menuMoviePrintSettings;
-//    fakMenu menuHelp;
-//    fakMenu menuTimeline;
-//    fakMenu menuMoveToList;
+    // Menu
+    fakMenu menuMovieInfo;
+    fakMenu menuSettings;
+    fakMenu menuMoviePrintSettings;
+    fakMenu menuHelp;
+    fakMenu menuTimeline;
+    fakMenu menuMoveToList;
 
 //    ofxFontStash fontStashHelveticaLight;
 //    ofxFontStash fontStashHelveticaMedium;

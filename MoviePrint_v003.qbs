@@ -14,6 +14,7 @@ Project{
         files: [
             "src/fakgrabbedmovie.h",
             "src/fakgrabbedmoviestill.h",
+            "src/fakmenu.h",
             "src/main.cpp",
             "src/ofApp.cpp",
             "src/ofApp.h",

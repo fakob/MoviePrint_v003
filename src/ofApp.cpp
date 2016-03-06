@@ -187,25 +187,25 @@ void ofApp::setup(){
 //    guiSettingsMoviePrint->loadSettings("guiMoviePrintSettings.xml");
 
 
-//    menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, 'T', false);
-//    menuMovieInfo.registerMouseEvents();
-//    ofAddListener(menuMovieInfo.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
-//    ofAddListener(menuMovieInfo.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
+    menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, 'T', false);
+    menuMovieInfo.registerMouseEvents();
+    ofAddListener(menuMovieInfo.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
+    ofAddListener(menuMovieInfo.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
-//    menuMoviePrintSettings.setupMenu(5,0,0,0,0,headerHeight, true, 'T', false);
-//    menuMoviePrintSettings.registerMouseEvents();
-//    ofAddListener(menuMoviePrintSettings.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
-//    ofAddListener(menuMoviePrintSettings.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
+    menuMoviePrintSettings.setupMenu(5,0,0,0,0,headerHeight, true, 'T', false);
+    menuMoviePrintSettings.registerMouseEvents();
+    ofAddListener(menuMoviePrintSettings.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
+    ofAddListener(menuMoviePrintSettings.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
-//    menuSettings.setupMenu(3,0,0,0,0,headerHeight, true, 'T', false);
-//    menuSettings.registerMouseEvents();
-//    ofAddListener(menuSettings.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
-//    ofAddListener(menuSettings.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
+    menuSettings.setupMenu(3,0,0,0,0,headerHeight, true, 'T', false);
+    menuSettings.registerMouseEvents();
+    ofAddListener(menuSettings.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
+    ofAddListener(menuSettings.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
-//    menuHelp.setupMenu(2,0,0,0,0,headerHeight, true, 'T', false);
-//    menuHelp.registerMouseEvents();
-//    ofAddListener(menuHelp.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
-//    ofAddListener(menuHelp.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
+    menuHelp.setupMenu(2,0,0,0,0,headerHeight, true, 'T', false);
+    menuHelp.registerMouseEvents();
+    ofAddListener(menuHelp.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
+    ofAddListener(menuHelp.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
 //    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, 'B', false);
 //    menuTimeline.registerMouseEvents();
@@ -816,7 +816,7 @@ void ofApp::draw(){
 
 //    }
 
-//    drawUI(1, FALSE);
+    drawUI(1, FALSE);
 
 //    if(showLoadMovieScreen){
 //        drawLoadMovieScreen();
@@ -829,6 +829,172 @@ void ofApp::draw(){
 //    }
 
     ofxNotify::draw(drawNotify);
+}
+
+//--------------------------------------------------------------
+void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
+    ofPushMatrix();
+    ofPushStyle();
+    ofSetColor(255);
+
+    // overlay von MoviePrintPreview
+    ofPushStyle();
+    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
+    ofSetColor(0, 0, 0, tweenMoviePrintPreview.value * 100);
+    ofDrawRectangle(ofGetWindowWidth()/2, (ofGetWindowHeight()-headerHeight-footerHeight/2)/2 + headerHeight, ofGetWindowWidth(), (ofGetWindowHeight()-headerHeight-footerHeight/2));
+    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
+    ofPopStyle();
+
+//    if (droppedFiles.size() > 1) { // draw
+//        if (loadedMovie.isMovieLoaded) {
+//            if (showListView == FALSE) {
+//                menuMoveToList.setPosition(0, 0);
+//                menuMoveToList.setSize(leftMargin*2, ofGetWindowHeight());
+//                menuMoveToList.drawMenu();
+//            }
+//        }
+//    }
+
+    layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
+
+    ofPushStyle();
+    for(int i=0; i<gridColumns; i++)
+    {
+        switch (i%5) {
+            case 0:
+                ofSetColor(FAK_ORANGE1);
+                break;
+            case 1:
+                ofSetColor(FAK_ORANGE2);
+                break;
+            case 2:
+                ofSetColor(FAK_ORANGE3);
+                break;
+            case 3:
+                ofSetColor(FAK_ORANGE4);
+                break;
+            case 4:
+                ofSetColor(FAK_ORANGE5);
+                break;
+            default:
+                ofSetColor(255, 255, 255, 255);
+                break;
+        }
+        // draw orange stripes
+        ofDrawRectangle((0 + displayGridMargin + (thumbWidth+displayGridMargin) * i) * _scaleFactor, (0 + headerHeight*0.7) * _scaleFactor, thumbWidth * _scaleFactor, headerHeight* 0.2 * _scaleFactor);
+    }
+    ofPopStyle();
+
+    float tempY = 0;
+    int tempXPos = 0;
+    int menuHeightInRows = 4;
+    int originalThumbHeight = 144;
+
+    tempXPos = gridColumns/2;
+    menuSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*2 - displayGridMargin);
+    menuSettings.drawMenu();
+
+    if (loadedMovie.isMovieLoaded()) {
+        tempXPos = 0;
+        menuMovieInfo.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+        menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+        menuMovieInfo.drawMenu();
+//        drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
+//        fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
+    }
+
+    tempXPos = gridColumns-2;
+    menuHelp.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+    menuHelp.drawMenu();
+    ofSetColor(255, 255, 255, menuHelp.getRelSizeH() * 255);
+    helpMenuImage.draw((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*1, helpMenuImage.getWidth(), helpMenuImage.getHeight() * menuHelp.getRelSizeH());
+
+
+    tempXPos = gridColumns-1;
+
+    ofSetColor(255, 255, 255, 255);
+    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
+    float tempXPosLerp = ofLerp((ofGetWindowWidth()-scrollBarWidth)/2.0, ((leftMargin + (thumbWidth + displayGridMargin)*tempXPos)/2.0) * _scaleFactor, menuMoviePrintSettings.getRelSizeH());
+//        fboToPreview.draw(tempXPosLerp, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
+    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
+
+    menuMoviePrintSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+    menuMoviePrintSettings.drawMenu();
+
+
+    ofSetColor(255, 255, 255, 255);
+
+    if (!showListView) {
+        if (loadedMovie.isMovieLoaded()) {
+            menuTimeline.setPosition(0, ofGetWindowHeight());
+            menuTimeline.setSize(ofGetWindowWidth(), footerHeight/2);
+            menuTimeline.drawMenu();
+        }
+    }
+
+    ofPopStyle();
+    ofPopMatrix();
+}
+
+//--------------------------------------------------------------
+void ofApp::toggleMoviePrintPreview(){
+    showMoviePrintPreview = !showMoviePrintPreview;
+//    if (showMoviePrintPreview) {
+//        tweenMoviePrintPreview.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,300,0);
+//    } else {
+//        tweenMoviePrintPreview.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,300,0);
+//    }
+}
+
+//--------------------------------------------------------------
+void ofApp::setVisibilityMoviePrintPreview(bool _visibility){
+    if (showMoviePrintPreview != _visibility) {
+        toggleMoviePrintPreview();
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::menuIsOpened(int &e){
+//    ofLog(OF_LOG_VERBOSE, "menuIsOpened:" + ofToString(e));
+    if (e == 5) {
+        setVisibilityMoviePrintPreview(true);
+    }
+    if (e == 3) {
+        setVisibilityMoviePrintPreview(false);
+    }
+    allMenusAreClosed = false;
+    allMenusAreClosedOnce = 1;
+}
+
+//--------------------------------------------------------------
+void ofApp::menuIsClosed(int &e){
+//    ofLog(OF_LOG_VERBOSE, "menuIsClosed:" + ofToString(e));
+    if (e == 5) {
+        setVisibilityMoviePrintPreview(false);
+    }
+    if (!menuMovieInfo.getMenuActivated() && !menuMoviePrintSettings.getMenuActivated() && !menuHelp.getMenuActivated() && !menuSettings.getMenuActivated()) {
+        allMenusAreClosed = true;
+        allMenusAreClosedOnce = 0;
+//        ofLog(OF_LOG_VERBOSE, "allMenusAreClosed:" + ofToString(allMenusAreClosedOnce));
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::menuIsClicked(int &e){
+//    ofLog(OF_LOG_VERBOSE, "menuIsClicked:" + ofToString(e));
+    if (e == 6) {
+        if (droppedFiles.size() > 1) {
+            if (loadedMovie.isMovieLoaded()) {
+                showListView = !showListView;
+                if (showListView == TRUE) {
+                    moveToList();
+                }
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------
