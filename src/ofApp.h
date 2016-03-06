@@ -6,6 +6,7 @@
 #include "ofxNotify.h"
 #include "ofxEasing.h"
 #include "ofxMSATimer.h"
+#include "ofxImgui.h"
 
 class ofApp : public ofBaseApp{
 
@@ -55,7 +56,6 @@ public:
         float maxValue;
     };
 
-
     moviePrintDataStruct moviePrintDataSet;
     deque<moviePrintDataStruct> previousMoviePrintDataSet;
     int undoPosition;
@@ -80,6 +80,9 @@ public:
     void closeAllMenus();
     void handlingEventOverlays();
     void moveToList();
+    void setGUITimeline();
+    void setGUISettingsMoviePrint();
+    void setGUISettings();
 
     // Movie
     fakGrabbedMovie loadedMovie;
@@ -154,6 +157,9 @@ public:
 
 
     int totalFrames;
+
+
+    ofxImGui gui;
 
 //    // ofxUI Design
 //    ofxUICanvas *guiTimeline;

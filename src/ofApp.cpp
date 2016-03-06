@@ -6,7 +6,9 @@ void ofApp::setup(){
     drawNotify = true; // ofxNotify
     showPlaceHolder = false; // added for developing
 
-//    setResourcePath();
+    gui.setup();
+
+    //    setResourcePath();
 
     setupFinished = FALSE;
     updateNewPrintGrid = FALSE;
@@ -220,7 +222,137 @@ void ofApp::setup(){
     undoPosition = 0;
 //    addMoviePrintDataSet(undoPosition); // add loaded settings as first undo step
 
+    uiSliderValueHigh = 1000;    // added this temporarily until new timeline slider is in place
+
     setupFinished = TRUE;
+}
+
+//--------------------------------------------------------------
+void ofApp::setGUITimeline(){
+
+//    // setup gui
+//    guiTimeline = new ofxUICanvas(ofGetWidth()/2-displayGridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, ofGetHeight()-(footerHeight/2) - timeSliderHeight/2, ofGetWidth(),footerHeight); //ofxUICanvas(float x, float y, float width, float height)
+//    drawPadding = FALSE;
+//    guiTimeline->setDrawBack(FALSE);
+
+//	guiTimeline->addWidgetDown(new ofxUIRangeSlider("RSLIDER", 0.0, (float)totalFrames, 0.0, 100.0, displayGridWidth, timeSliderHeight));
+//    uiRangeSliderTimeline = (ofxUIRangeSlider *) guiTimeline->getWidget("RSLIDER");
+//    uiRangeSliderTimeline->setLabelPrecision(0);
+//    uiRangeSliderTimeline->setLabelVisible(FALSE);
+
+//    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_OUTLINE, ofColor(0,0,0,0));
+//    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_OUTLINE_HIGHLIGHT, ofColor(0,0,0,0));
+//    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL, FAK_ORANGE1);
+//    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL_HIGHLIGHT, FAK_ORANGE1);
+
+//    uiRangeSliderTimeline->setColorBack(FAK_ORANGE5);
+
+//    uiRangeSliderTimeline->setColorPadded(FAK_ORANGE5);
+
+//    ofAddListener(guiTimeline->newGUIEvent, this, &testApp::guiEvent);
+
+}
+
+//--------------------------------------------------------------
+void ofApp::setGUISettingsMoviePrint(){
+
+//	float dim = 16;
+//	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING*2;
+//    float length = menuWidth-xInit;
+
+//    guiSettingsMoviePrint = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
+//    guiSettingsMoviePrint->setFont("HelveticaNeueLTCom-LtCn.ttf");
+//    guiSettingsMoviePrint->setWidgetSpacing(10);
+
+//    guiSettingsMoviePrint->addLabelButton("Select Output Folder", false,length-xInit,dim);
+//    guiSettingsMoviePrint->addLabel("SelectedOutputFolder", saveMoviePrintPath, OFX_UI_FONT_SMALL);
+//    uiLabelOutputFolder = (ofxUILabel *) guiSettingsMoviePrint->getWidget("SelectedOutputFolder");
+//    uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
+
+//    guiSettingsMoviePrint->addToggle("Overwrite MoviePrint", &overwriteMoviePrint, dim*1.5, dim);
+//    uiToggleOverwriteMoviePrint = (ofxUIToggle *) guiSettingsMoviePrint->getWidget("Overwrite MoviePrint");
+
+//    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+////    guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
+//	guiSettingsMoviePrint->addIntSlider("PrintColumns", 1, 10, &moviePrintDataSet.printGridColumns, length-xInit,dim);
+//	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, &moviePrintDataSet.printGridRows, length-xInit,dim);
+//    uiSliderPrintColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
+//    uiSliderPrintRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
+//    guiSettingsMoviePrint->addSpacer(length-xInit, 0);
+//   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 30, &moviePrintDataSet.printGridMargin, length-xInit,dim);
+//    uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
+
+//    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+////    guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
+
+//    guiSettingsMoviePrint->addToggle("Display Header", &moviePrintDataSet.printDisplayVideoAudioInfo, dim*1.5, dim);
+//    uiToggleHeaderDisplay = (ofxUIToggle *) guiSettingsMoviePrint->getWidget("Display Header");
+
+//    vector<string> names;
+//	names.push_back("Display Frames");
+//	names.push_back("Display TimeCode");
+//	names.push_back("off");
+//    uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
+
+//    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+
+//    guiSettingsMoviePrint->addToggle("Save also individual frames", &moviePrintDataSet.printSingleFrames, dim*1.5, dim);
+//    uiToggleSingleFrames = (ofxUIToggle *) guiSettingsMoviePrint->getWidget("Save also individual frames");
+
+//    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+
+////    guiSettingsMoviePrint->addLabel("Choose Output Format", OFX_UI_FONT_MEDIUM);
+//    vector<string> names3;
+//    names3.push_back("png with alpha");
+//    names3.push_back("jpg");
+////    names3.push_back("gif");
+//    guiSettingsMoviePrint->addRadio("Choose Output Format", names3, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
+//    uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("Choose Output Format");
+
+//    vector<string> names4;
+//    names4.push_back("1024px width");
+//    names4.push_back("2048px width");
+//    names4.push_back("3072px width");
+//    names4.push_back("4096px width");
+//    guiSettingsMoviePrint->addRadio("MoviePrint Width", names4, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
+//    uiRadioPrintOutputWidth =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("MoviePrint Width");
+
+
+//    guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
+//	ofAddListener(guiSettingsMoviePrint->newGUIEvent,this,&testApp::guiEvent);
+}
+
+//--------------------------------------------------------------
+void ofApp::setGUISettings(){
+
+//    float dim = 16;
+//    float xInit = OFX_UI_GLOBAL_WIDGET_SPACING*2;
+//    float length = menuWidth-xInit;
+
+//    guiSettings = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
+//    guiSettings->setFont("HelveticaNeueLTCom-LtCn.ttf");
+//    guiSettings->setWidgetSpacing(10);
+
+
+//    guiSettings->addLabelButton("Save MoviePrint", false,length-xInit,dim*8);
+//    guiSettings->addSpacer(length-xInit, 1);
+
+//    guiSettings->addLabelButton("Refresh", false,length-xInit,dim);
+
+//    guiSettings->addLabelButton("Undo", false,length/2-xInit*1,dim);
+//    guiSettings->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+//    guiSettings->addLabelButton("Redo", false,length/2-OFX_UI_GLOBAL_WIDGET_SPACING*3,dim);
+//    guiSettings->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+
+//    uiButtonUndo =(ofxUIButton *) guiSettings->getWidget("Undo");
+//    uiButtonRedo =(ofxUIButton *) guiSettings->getWidget("Redo");
+
+//    guiSettings->addLabelButton("Show MoviePrint Preview", false,length-xInit,dim);
+
+//    guiSettings->setColorBack(FAK_TRANSPARENT);
+//    ofAddListener(guiSettings->newGUIEvent,this,&testApp::guiEvent);
+
+
 }
 
 //--------------------------------------------------------------
@@ -544,6 +676,77 @@ void ofApp::update(){
 void ofApp::draw(){
 
 
+    // gui
+    gui.begin();
+//    bool* opened;
+    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiSetCond_Always);
+    ImGui::Begin("Another Window");
+
+    if(ImGui::Button("Select Output Folder")) {
+        string movieFileName = loadedMovie.gmMovie.getMoviePath();
+        movieFileName = loadedFilePath.getFileName(movieFileName, TRUE) + "_MoviePrint";
+
+        string formatExtension;
+        if (moviePrintDataSet.printFormat == OF_IMAGE_FORMAT_JPEG) {
+            formatExtension = "jpg";
+        } else {
+            formatExtension = "png";
+        }
+
+        ofFileDialogResult saveFileResult = ofSystemSaveDialog(movieFileName + "." + formatExtension, "Select a Folder");
+        if (saveFileResult.bSuccess){
+            vector<string> tempVectorString = ofSplitString(saveFileResult.getPath(), "/");
+            tempVectorString.pop_back();
+            saveMoviePrintPath = ofJoinString(tempVectorString, "/") + "/";
+            ofLogVerbose("User selected saveMoviePrintPath: "  + ofToString(saveMoviePrintPath));
+        } else {
+            ofLogVerbose("User hit cancel");
+        }
+    }
+    ImGui::Text("Path: %s", &saveMoviePrintPath);
+    ImGui::Checkbox("Overwrite MoviePrint", &overwriteMoviePrint);
+    ImGui::Separator();
+    ImGui::SliderInt("PrintColumns", &moviePrintDataSet.printGridColumns, 1,10);
+    ImGui::SliderInt("PrintRows", &moviePrintDataSet.printGridRows, 1,20);
+    ImGui::SliderInt("PrintMargin", &moviePrintDataSet.printGridMargin, 0,30);
+    ImGui::Separator();
+    ImGui::Checkbox("Display Header", &moviePrintDataSet.printDisplayVideoAudioInfo);
+    ImGui::RadioButton("Display Frames", &moviePrintDataSet.printDisplayTimecodeFramesOff, 0);
+    ImGui::RadioButton("Display TimeCode", &moviePrintDataSet.printDisplayTimecodeFramesOff, 1);
+    ImGui::RadioButton("off", &moviePrintDataSet.printDisplayTimecodeFramesOff, 2);
+    ImGui::Separator();
+    ImGui::Checkbox("Save also individual frames", &moviePrintDataSet.printSingleFrames);
+    ImGui::Separator();
+
+
+    // has problem as it does not load moviePrintDataSet.printFormat -> see int and enum for solution
+    static int tempR = 0;
+    if (ImGui::RadioButton("png with alpha", &tempR, 0)) {
+        moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
+    }
+    if (ImGui::RadioButton("jpg", &tempR, 1)) {
+        moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_JPEG;
+    }
+    ImGui::Separator();
+    static int tempS = 0;
+    if (ImGui::RadioButton("1024px width", &tempS, 0)) {
+        moviePrintDataSet.printSizeWidth = 1024;
+    }
+    if (ImGui::RadioButton("2048px width", &tempS, 1)) {
+        moviePrintDataSet.printSizeWidth = 2048;
+    }
+    if (ImGui::RadioButton("3072px width", &tempS, 2)) {
+        moviePrintDataSet.printSizeWidth = 3072;
+    }
+    if (ImGui::RadioButton("4096px width", &tempS, 3)) {
+        moviePrintDataSet.printSizeWidth = 4096;
+    }
+
+    ImGui::End();
+
+
+    gui.end();
+
 //    if (!(tweenListInOut.update() == 0.0)) { // stop drawing when position is at showMovieView
 
 //        drawList(scrollListAmountRel);
@@ -638,7 +841,7 @@ void ofApp::writeFboToPreview(float _scaleFactor, bool _showPlaceHolder){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+    ofLogVerbose(__FUNCTION__);
 }
 
 //--------------------------------------------------------------

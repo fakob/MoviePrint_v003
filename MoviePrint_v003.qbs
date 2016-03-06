@@ -22,7 +22,8 @@ Project{
         of.addons: [
             "ofxNotify",
             "ofxEasing",
-            "ofxMSATimer"
+            "ofxMSATimer",
+            "ofxImgui"
         ]
 
         // additional flags for the project. the of module sets some
