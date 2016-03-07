@@ -55,13 +55,13 @@ public:
         mMenuHeight = _mMenuHeight;
         mMenuRollOverDimension = _mMenuRollOverDimension;
 //        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
-        tweenMenuInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 300);
-        tweenMenuInOut.duration = ofRandom(600, 1000);
+        tweenMenuInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 0.3);
+        tweenMenuInOut.duration = ofRandom(0.6, 1.0);
         tweenMenuInOut.minValue = 1.0;
         tweenMenuInOut.maxValue = 0.0;
 //        tweenMenuInOut2.setParameters(1,easingelastic,ofxTween::easeOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
-        tweenMenuInOut2.initialTime = ofGetElapsedTimef() + ofRandom(0, 300);
-        tweenMenuInOut2.duration = ofRandom(600, 1000);
+        tweenMenuInOut2.initialTime = ofGetElapsedTimef() + ofRandom(0, 0.3);
+        tweenMenuInOut2.duration = ofRandom(0.6, 1.0);
         tweenMenuInOut2.minValue = 1.0;
         tweenMenuInOut2.maxValue = 0.0;
         mMenuOffsetX = 2;
@@ -110,12 +110,12 @@ public:
     void setTweenIn(){
 //        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,500,0);
         tweenMenuInOut.initialTime = ofGetElapsedTimef();
-        tweenMenuInOut.duration = 500;
+        tweenMenuInOut.duration = 0.5;
         tweenMenuInOut.minValue = 0.0;
         tweenMenuInOut.maxValue = 1.0;
 //        tweenMenuInOut2.setParameters(1,easingexpo,ofxTween::easeOut,0.0,1.0,300,0);
         tweenMenuInOut2.initialTime = ofGetElapsedTimef();
-        tweenMenuInOut2.duration = 300;
+        tweenMenuInOut2.duration = 0.3;
         tweenMenuInOut2.minValue = 0.0;
         tweenMenuInOut2.maxValue = 1.0;
         ofNotifyEvent(mMenuIsBeingOpened, mMenuID, this);
@@ -124,12 +124,12 @@ public:
     void setTweenOut(){
 //        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,500,0);
         tweenMenuInOut.initialTime = ofGetElapsedTimef();
-        tweenMenuInOut.duration = 500;
+        tweenMenuInOut.duration = 0.5;
         tweenMenuInOut.minValue = 1.0;
         tweenMenuInOut.maxValue = 0.0;
 //        tweenMenuInOut2.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,300,0);
         tweenMenuInOut2.initialTime = ofGetElapsedTimef();
-        tweenMenuInOut2.duration = 300;
+        tweenMenuInOut2.duration = 0.3;
         tweenMenuInOut2.minValue = 1.0;
         tweenMenuInOut2.maxValue = 0.0;
         ofNotifyEvent(mMenuIsBeingClosed, mMenuID, this);

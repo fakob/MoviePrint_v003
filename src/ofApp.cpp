@@ -120,16 +120,16 @@ void ofApp::setup(){
 //    tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
 //    tweenBlendStartDropImageCounter.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,100,0);
 
-    tweenTimelineInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 300);
-    tweenTimelineInOut.duration = ofRandom(600, 1000);
+    tweenTimelineInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 0.3);
+    tweenTimelineInOut.duration = ofRandom(0.6, 1.0);
     tweenTimelineInOut.minValue = 1.0;
     tweenTimelineInOut.maxValue = 0.0;
-    tweenListInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 300);
-    tweenListInOut.duration = ofRandom(600, 1000);
+    tweenListInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 0.3);
+    tweenListInOut.duration = ofRandom(0.6, 1.0);
     tweenListInOut.minValue = 1.0;
     tweenListInOut.maxValue = 0.0;
     tweenBlendStartDropImageCounter.initialTime = ofGetElapsedTimef();
-    tweenBlendStartDropImageCounter.duration = 100.0;
+    tweenBlendStartDropImageCounter.duration = 0.1;
     tweenBlendStartDropImageCounter.minValue = 0.0;
     tweenBlendStartDropImageCounter.maxValue = 1.0;
 
@@ -1131,7 +1131,7 @@ void ofApp::moveToMovie(){
     if (tweenListInOut.value != 0.0) {
     //        tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
         tweenListInOut.initialTime = ofGetElapsedTimef();
-        tweenListInOut.duration = ofRandom(600, 1000);
+        tweenListInOut.duration = ofRandom(0.6, 1.0);
         tweenListInOut.minValue = 1.0;
         tweenListInOut.maxValue = 0.0;
     }
@@ -1143,13 +1143,13 @@ void ofApp::moveInOutTimeline(){
 
     if (showTimeline) {
         tweenTimelineInOut.initialTime = ofGetElapsedTimef();
-        tweenTimelineInOut.duration = ofRandom(600, 1000);
+        tweenTimelineInOut.duration = ofRandom(0.6, 1.0);
         tweenTimelineInOut.minValue = 1.0;
         tweenTimelineInOut.maxValue = 0.0;
 
     } else {
         tweenTimelineInOut.initialTime = ofGetElapsedTimef();
-        tweenTimelineInOut.duration = ofRandom(600, 1000);
+        tweenTimelineInOut.duration = ofRandom(0.6, 1.0);
         tweenTimelineInOut.minValue = 0.0;
         tweenTimelineInOut.maxValue = 1.0;
     }
@@ -1384,7 +1384,7 @@ void ofApp::calculateNewPrintGrid(){
     updateNewPrintGrid = true;
 //    tweenTimeDelay.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
     tweenTimeDelay.initialTime = ofGetElapsedTimef();
-    tweenTimeDelay.duration = 500.0;
+    tweenTimeDelay.duration = 0.5;
     tweenTimeDelay.minValue = 255.0;
     tweenTimeDelay.maxValue = 0.0;
 
@@ -1541,7 +1541,7 @@ void ofApp::moveToList(){
     if (tweenListInOut.value != 1.0) {
     //        tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
         tweenListInOut.initialTime = ofGetElapsedTimef();
-        tweenListInOut.duration = ofRandom(600, 1000);
+        tweenListInOut.duration = ofRandom(0.6, 1.0);
         tweenListInOut.minValue = 0.0;
         tweenListInOut.maxValue = 1.0;
     }
@@ -1574,29 +1574,29 @@ void ofApp::handlingEventOverlays(){
 
 //--------------------------------------------------------------
 void ofApp::closeAllMenus(){
-//    menuMoviePrintSettings.closeMenuManually();
-//    menuSettings.closeMenuManually();
-//    menuMovieInfo.closeMenuManually();
-//    menuHelp.closeMenuManually();
-//    ofLog(OF_LOG_VERBOSE, "closeMenuManually-------------------------------------------");
+    menuMoviePrintSettings.closeMenuManually();
+    menuSettings.closeMenuManually();
+    menuMovieInfo.closeMenuManually();
+    menuHelp.closeMenuManually();
+    ofLog(OF_LOG_VERBOSE, "closeMenuManually-------------------------------------------");
 }
 
 //--------------------------------------------------------------
 void ofApp::inactivateAllMenus(){
-//    menuMoviePrintSettings.setMenuInactive();
-//    menuSettings.setMenuInactive();
-//    menuMovieInfo.setMenuInactive();
-//    menuHelp.setMenuInactive();
-//    ofLog(OF_LOG_VERBOSE, "inactivateAllMenus-------------------------------------------");
+    menuMoviePrintSettings.setMenuInactive();
+    menuSettings.setMenuInactive();
+    menuMovieInfo.setMenuInactive();
+    menuHelp.setMenuInactive();
+    ofLog(OF_LOG_VERBOSE, "inactivateAllMenus-------------------------------------------");
 }
 
 //--------------------------------------------------------------
 void ofApp::activateAllMenus(){
-//    menuMoviePrintSettings.setMenuActive();
-//    menuSettings.setMenuActive();
-//    menuMovieInfo.setMenuActive();
-//    menuHelp.setMenuActive();
-//    ofLog(OF_LOG_VERBOSE, "activateAllMenus-------------------------------------------");
+    menuMoviePrintSettings.setMenuActive();
+    menuSettings.setMenuActive();
+    menuMovieInfo.setMenuActive();
+    menuHelp.setMenuActive();
+    ofLog(OF_LOG_VERBOSE, "activateAllMenus-------------------------------------------");
 }
 
 //--------------------------------------------------------------
