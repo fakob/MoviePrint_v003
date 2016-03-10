@@ -6,6 +6,9 @@ void ofApp::setup(){
     drawNotify = true; // ofxNotify
     showPlaceHolder = false; // added for developing
 
+
+    ImGuiIO * io = &ImGui::GetIO();
+    io->Fonts->AddFontFromFileTTF(&ofToDataPath("fonts/HelveticaNeueLTCom-Lt.ttf")[0], 14.f);
     gui.setup();
 
     //    setResourcePath();
@@ -444,6 +447,8 @@ void ofApp::update(){
 //    // calculate rollout of ofxUI pos, scal
 //    guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
 //    guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
+    ImGui::SetWindowPos("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()), ImGuiSetCond_Always);
+    ImGui::SetWindowSize("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getSizeW(), menuMoviePrintSettings.getSizeH()-headerHeight), ImGuiSetCond_Always);
 
 //    guiSettings->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
 //    guiSettings->setHeight(menuSettings.getSizeH()-headerHeight);
@@ -675,78 +680,6 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-
-    // gui
-    gui.begin();
-//    bool* opened;
-    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiSetCond_Always);
-    ImGui::Begin("Another Window");
-
-    if(ImGui::Button("Select Output Folder")) {
-        string movieFileName = loadedMovie.gmMovie.getMoviePath();
-        movieFileName = loadedFilePath.getFileName(movieFileName, TRUE) + "_MoviePrint";
-
-        string formatExtension;
-        if (moviePrintDataSet.printFormat == OF_IMAGE_FORMAT_JPEG) {
-            formatExtension = "jpg";
-        } else {
-            formatExtension = "png";
-        }
-
-        ofFileDialogResult saveFileResult = ofSystemSaveDialog(movieFileName + "." + formatExtension, "Select a Folder");
-        if (saveFileResult.bSuccess){
-            vector<string> tempVectorString = ofSplitString(saveFileResult.getPath(), "/");
-            tempVectorString.pop_back();
-            saveMoviePrintPath = ofJoinString(tempVectorString, "/") + "/";
-            ofLogVerbose("User selected saveMoviePrintPath: "  + ofToString(saveMoviePrintPath));
-        } else {
-            ofLogVerbose("User hit cancel");
-        }
-    }
-    ImGui::Text("Path: %s", &saveMoviePrintPath);
-    ImGui::Checkbox("Overwrite MoviePrint", &overwriteMoviePrint);
-    ImGui::Separator();
-    ImGui::SliderInt("PrintColumns", &moviePrintDataSet.printGridColumns, 1,10);
-    ImGui::SliderInt("PrintRows", &moviePrintDataSet.printGridRows, 1,20);
-    ImGui::SliderInt("PrintMargin", &moviePrintDataSet.printGridMargin, 0,30);
-    ImGui::Separator();
-    ImGui::Checkbox("Display Header", &moviePrintDataSet.printDisplayVideoAudioInfo);
-    ImGui::RadioButton("Display Frames", &moviePrintDataSet.printDisplayTimecodeFramesOff, 0);
-    ImGui::RadioButton("Display TimeCode", &moviePrintDataSet.printDisplayTimecodeFramesOff, 1);
-    ImGui::RadioButton("off", &moviePrintDataSet.printDisplayTimecodeFramesOff, 2);
-    ImGui::Separator();
-    ImGui::Checkbox("Save also individual frames", &moviePrintDataSet.printSingleFrames);
-    ImGui::Separator();
-
-
-    // has problem as it does not load moviePrintDataSet.printFormat -> see int and enum for solution
-    static int tempR = 0;
-    if (ImGui::RadioButton("png with alpha", &tempR, 0)) {
-        moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
-    }
-    if (ImGui::RadioButton("jpg", &tempR, 1)) {
-        moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_JPEG;
-    }
-    ImGui::Separator();
-    static int tempS = 0;
-    if (ImGui::RadioButton("1024px width", &tempS, 0)) {
-        moviePrintDataSet.printSizeWidth = 1024;
-    }
-    if (ImGui::RadioButton("2048px width", &tempS, 1)) {
-        moviePrintDataSet.printSizeWidth = 2048;
-    }
-    if (ImGui::RadioButton("3072px width", &tempS, 2)) {
-        moviePrintDataSet.printSizeWidth = 3072;
-    }
-    if (ImGui::RadioButton("4096px width", &tempS, 3)) {
-        moviePrintDataSet.printSizeWidth = 4096;
-    }
-
-    ImGui::End();
-
-
-    gui.end();
-
 //    if (!(tweenListInOut.update() == 0.0)) { // stop drawing when position is at showMovieView
 
 //        drawList(scrollListAmountRel);
@@ -913,7 +846,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
 
     tempXPos = gridColumns-1;
-
     ofSetColor(255, 255, 255, 255);
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
     float tempXPosLerp = ofLerp((ofGetWindowWidth()-scrollBarWidth)/2.0, ((leftMargin + (thumbWidth + displayGridMargin)*tempXPos)/2.0) * _scaleFactor, menuMoviePrintSettings.getRelSizeH());
@@ -923,6 +855,88 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuMoviePrintSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
+
+
+    // gui MoviePrint settings
+    gui.begin();
+//    bool* opened;
+//    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiSetCond_Always);
+    ImGui::Begin("SettingsMoviePrint", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
+    ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.00f, 1.00f, 0.00f, 0.50f));
+//    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.0);
+
+
+    if ((menuMoviePrintSettings.getSizeH()-headerHeight)>1) {
+
+
+        if(ImGui::Button("Select Output Folder")) {
+            string movieFileName = loadedMovie.gmMovie.getMoviePath();
+            movieFileName = loadedFilePath.getFileName(movieFileName, TRUE) + "_MoviePrint";
+
+            string formatExtension;
+            if (moviePrintDataSet.printFormat == OF_IMAGE_FORMAT_JPEG) {
+                formatExtension = "jpg";
+            } else {
+                formatExtension = "png";
+            }
+
+            ofFileDialogResult saveFileResult = ofSystemSaveDialog(movieFileName + "." + formatExtension, "Select a Folder");
+            if (saveFileResult.bSuccess){
+                vector<string> tempVectorString = ofSplitString(saveFileResult.getPath(), "/");
+                tempVectorString.pop_back();
+                saveMoviePrintPath = ofJoinString(tempVectorString, "/") + "/";
+                ofLogVerbose("User selected saveMoviePrintPath: "  + ofToString(saveMoviePrintPath));
+            } else {
+                ofLogVerbose("User hit cancel");
+            }
+        }
+        ImGui::Text("Path: %s", &saveMoviePrintPath);
+        ImGui::Checkbox("Overwrite MoviePrint", &overwriteMoviePrint);
+        ImGui::Separator();
+        ImGui::SliderInt("PrintColumns", &moviePrintDataSet.printGridColumns, 1,10);
+        ImGui::SliderInt("PrintRows", &moviePrintDataSet.printGridRows, 1,20);
+        ImGui::SliderInt("PrintMargin", &moviePrintDataSet.printGridMargin, 0,30);
+        ImGui::Separator();
+        ImGui::Checkbox("Display Header", &moviePrintDataSet.printDisplayVideoAudioInfo);
+        ImGui::RadioButton("Display Frames", &moviePrintDataSet.printDisplayTimecodeFramesOff, 0);
+        ImGui::RadioButton("Display TimeCode", &moviePrintDataSet.printDisplayTimecodeFramesOff, 1);
+        ImGui::RadioButton("off", &moviePrintDataSet.printDisplayTimecodeFramesOff, 2);
+        ImGui::Separator();
+        ImGui::Checkbox("Save also individual frames", &moviePrintDataSet.printSingleFrames);
+        ImGui::Separator();
+
+
+        // has problem as it does not load moviePrintDataSet.printFormat -> see int and enum for solution
+        static int tempR = 0;
+        if (ImGui::RadioButton("png with alpha", &tempR, 0)) {
+            moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
+        }
+        if (ImGui::RadioButton("jpg", &tempR, 1)) {
+            moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_JPEG;
+        }
+        ImGui::Separator();
+        static int tempS = 0;
+        if (ImGui::RadioButton("1024px width", &tempS, 0)) {
+            moviePrintDataSet.printSizeWidth = 1024;
+        }
+        if (ImGui::RadioButton("2048px width", &tempS, 1)) {
+            moviePrintDataSet.printSizeWidth = 2048;
+        }
+        if (ImGui::RadioButton("3072px width", &tempS, 2)) {
+            moviePrintDataSet.printSizeWidth = 3072;
+        }
+        if (ImGui::RadioButton("4096px width", &tempS, 3)) {
+            moviePrintDataSet.printSizeWidth = 4096;
+        }
+    }
+
+    ImGui::PopStyleColor();
+//    ImGui::PopStyleVar();
+    ImGui::End();
+
+
+    gui.end();
+
 
 
     ofSetColor(255, 255, 255, 255);

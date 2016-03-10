@@ -77,27 +77,27 @@ public:
 
         switch (mMenuID) {
             case 1:
-                mMenuImage.load("MoviePrint_Layout_Menu1_v001_00001.png");
+                mMenuImage.load("images/MoviePrint_Layout_Menu1_v001_00001.png");
                 mBackgroundColor = FAK_ORANGE1;
                 break;
             case 4:
-                mMenuImage.load("MoviePrint_Layout_Menu2_v001_00001.png");
+                mMenuImage.load("images/MoviePrint_Layout_Menu2_v001_00001.png");
                 mBackgroundColor = FAK_ORANGE4;
                 break;
             case 3:
-                mMenuImage.load("MoviePrint_Layout_Menu3_v001_00001.png");
+                mMenuImage.load("images/MoviePrint_Layout_Menu3_v001_00001.png");
                 mBackgroundColor = FAK_ORANGE3;
                 break;
             case 2:
-                mMenuImage.load("MoviePrint_Layout_Menu4_v001_00001.png");
+                mMenuImage.load("images/MoviePrint_Layout_Menu4_v001_00001.png");
                 mBackgroundColor = FAK_ORANGE2;
                 break;
             case 5:
-                mMenuImage.load("MoviePrint_Layout_Menu5_v001_00001.png");
+                mMenuImage.load("images/MoviePrint_Layout_Menu5_v001_00001.png");
                 mBackgroundColor = FAK_ORANGE5;
                 break;
             case 6:
-                mMenuImage.load("MoviePrint_Layout_Menu6_v001_00001.png");
+                mMenuImage.load("images/MoviePrint_Layout_Menu6_v001_00001.png");
                 mBackgroundColor = FAK_ORANGE3;
                 break;
             default:
