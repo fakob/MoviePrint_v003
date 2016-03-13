@@ -51,6 +51,7 @@ void ofApp::setup(){
     topMargin = 5;
     bottomMargin = 5;
     headerHeight = 40;
+    headerHeightMinusLine = headerHeight - 13;
     footerHeight = 40;
     displayGridMargin = 5;
     loaderBarHeight = 20;
@@ -447,8 +448,8 @@ void ofApp::update(){
 //    // calculate rollout of ofxUI pos, scal
 //    guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
 //    guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
-    ImGui::SetWindowPos("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()), ImGuiSetCond_Always);
-    ImGui::SetWindowSize("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getSizeW(), menuMoviePrintSettings.getSizeH()-headerHeight), ImGuiSetCond_Always);
+    ImGui::SetWindowPos("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
+    ImGui::SetWindowSize("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getSizeW(), menuMoviePrintSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
 
 //    guiSettings->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
 //    guiSettings->setHeight(menuSettings.getSizeH()-headerHeight);
@@ -861,13 +862,19 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     gui.begin();
 //    bool* opened;
 //    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiSetCond_Always);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuMoviePrintSettings.getSizeH()-headerHeight)/10));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.00f, 0.00f, 0.00f, 0.10f));
+
+    ofLog(OF_LOG_VERBOSE, "menuMoviePrintSettings.getSizeH(): " + ofToString((menuMoviePrintSettings.getSizeH()-headerHeight)));
+
     ImGui::Begin("SettingsMoviePrint", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
-    ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.00f, 1.00f, 0.00f, 0.50f));
-//    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.0);
 
 
-    if ((menuMoviePrintSettings.getSizeH()-headerHeight)>1) {
+    if ((menuMoviePrintSettings.getSizeH()-headerHeight)>0) {
 
+//    ImGui::Dummy(ImVec2(100,100));
 
         if(ImGui::Button("Select Output Folder")) {
             string movieFileName = loadedMovie.gmMovie.getMoviePath();
@@ -905,7 +912,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         ImGui::Checkbox("Save also individual frames", &moviePrintDataSet.printSingleFrames);
         ImGui::Separator();
 
-
         // has problem as it does not load moviePrintDataSet.printFormat -> see int and enum for solution
         static int tempR = 0;
         if (ImGui::RadioButton("png with alpha", &tempR, 0)) {
@@ -930,9 +936,11 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         }
     }
 
-    ImGui::PopStyleColor();
-//    ImGui::PopStyleVar();
     ImGui::End();
+
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
 
 
     gui.end();

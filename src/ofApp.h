@@ -268,6 +268,7 @@ public:
     bool drawPadding;
     int leftMargin, topMargin, rightMargin, bottomMargin;
     int headerHeight;
+    int headerHeightMinusLine;
     int footerHeight;
     int displayGridMargin;
     int scrollBarWidth;
