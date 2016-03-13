@@ -446,14 +446,13 @@ void ofApp::update(){
     }
 
 //    // calculate rollout of ofxUI pos, scal
-//    guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
-//    guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
     ImGui::SetWindowPos("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
     ImGui::SetWindowSize("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getSizeW(), menuMoviePrintSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
 
 //    guiSettings->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
 //    guiSettings->setHeight(menuSettings.getSizeH()-headerHeight);
-//    //    guiSettings->setHeight(menuSettings.getSizeH()-headerHeight);
+    ImGui::SetWindowPos("moviePrintMenu", ImVec2(menuSettings.getPositionX(), menuSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
+    ImGui::SetWindowSize("moviePrintMenu", ImVec2(menuSettings.getSizeW(), menuSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
 
 //    guiTimeline->setPosition(leftMargin - OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
 
@@ -863,7 +862,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
 //    bool* opened;
 //    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiSetCond_Always);
 
-    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuMoviePrintSettings.getSizeH()-headerHeight)/10));
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuMoviePrintSettings.getSizeH()-headerHeight)/30));
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.00f, 0.00f, 0.00f, 0.10f));
 
@@ -937,6 +936,41 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     }
 
     ImGui::End();
+
+
+    ImGui::PopStyleVar();
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuSettings.getSizeH()-headerHeight)/30));
+
+
+    ImGui::Begin("moviePrintMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
+    //    guiSettings = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
+    //    guiSettings->setFont("HelveticaNeueLTCom-LtCn.ttf");
+    //    guiSettings->setWidgetSpacing(10);
+
+
+    //    guiSettings->addLabelButton("Save MoviePrint", false,length-xInit,dim*8);
+    //    guiSettings->addSpacer(length-xInit, 1);
+
+    //    guiSettings->addLabelButton("Refresh", false,length-xInit,dim);
+
+    //    guiSettings->addLabelButton("Undo", false,length/2-xInit*1,dim);
+    //    guiSettings->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    //    guiSettings->addLabelButton("Redo", false,length/2-OFX_UI_GLOBAL_WIDGET_SPACING*3,dim);
+    //    guiSettings->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+
+    //    uiButtonUndo =(ofxUIButton *) guiSettings->getWidget("Undo");
+    //    uiButtonRedo =(ofxUIButton *) guiSettings->getWidget("Redo");
+
+    //    guiSettings->addLabelButton("Show MoviePrint Preview", false,length-xInit,dim);
+
+    ImGui::Text("Path: %s", &saveMoviePrintPath);
+    ImGui::Checkbox("Overwrite MoviePrint", &overwriteMoviePrint);
+    ImGui::Separator();
+
+
+    ImGui::End();
+
+
 
     ImGui::PopStyleColor();
     ImGui::PopStyleColor();
