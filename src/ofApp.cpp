@@ -449,8 +449,6 @@ void ofApp::update(){
     ImGui::SetWindowPos("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
     ImGui::SetWindowSize("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getSizeW(), menuMoviePrintSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
 
-//    guiSettings->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
-//    guiSettings->setHeight(menuSettings.getSizeH()-headerHeight);
     ImGui::SetWindowPos("moviePrintMenu", ImVec2(menuSettings.getPositionX(), menuSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
     ImGui::SetWindowSize("moviePrintMenu", ImVec2(menuSettings.getSizeW(), menuSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
 
@@ -866,8 +864,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.00f, 0.00f, 0.00f, 0.10f));
 
-    ofLog(OF_LOG_VERBOSE, "menuMoviePrintSettings.getSizeH(): " + ofToString((menuMoviePrintSettings.getSizeH()-headerHeight)));
-
     ImGui::Begin("SettingsMoviePrint", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
 
 
@@ -899,14 +895,47 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         ImGui::Text("Path: %s", &saveMoviePrintPath);
         ImGui::Checkbox("Overwrite MoviePrint", &overwriteMoviePrint);
         ImGui::Separator();
-        ImGui::SliderInt("PrintColumns", &moviePrintDataSet.printGridColumns, 1,10);
-        ImGui::SliderInt("PrintRows", &moviePrintDataSet.printGridRows, 1,20);
-        ImGui::SliderInt("PrintMargin", &moviePrintDataSet.printGridMargin, 0,30);
+        if (ImGui::SliderInt("PrintColumns", &moviePrintDataSet.printGridColumns, 1,10)) {
+            if (printGridSetWithColumnsAndRows) {
+                printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
+                calculateNewPrintGrid();
+            } else {
+                moviePrintDataSet.printGridRows = ceil(numberOfStills/(float)moviePrintDataSet.printGridColumns);
+                calculateNewPrintSize();
+            }
+            addToUndo = true;
+        }
+        if (ImGui::SliderInt("PrintRows", &moviePrintDataSet.printGridRows, 1,20)) {
+            printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
+            calculateNewPrintGrid();
+            addToUndo = true;
+        }
+        if (ImGui::SliderInt("PrintMargin", &moviePrintDataSet.printGridMargin, 0,30)) {
+            calculateNewPrintSize();
+            addToUndo = true;
+        }
         ImGui::Separator();
-        ImGui::Checkbox("Display Header", &moviePrintDataSet.printDisplayVideoAudioInfo);
-        ImGui::RadioButton("Display Frames", &moviePrintDataSet.printDisplayTimecodeFramesOff, 0);
-        ImGui::RadioButton("Display TimeCode", &moviePrintDataSet.printDisplayTimecodeFramesOff, 1);
-        ImGui::RadioButton("off", &moviePrintDataSet.printDisplayTimecodeFramesOff, 2);
+        if (ImGui::Checkbox("Display Header", &moviePrintDataSet.printDisplayVideoAudioInfo)) {
+            calculateNewPrintSize();
+            addToUndo = true;
+        }
+        if (ImGui::RadioButton("Display Frames", &moviePrintDataSet.printDisplayTimecodeFramesOff, 0)) {
+            moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
+            loadedMovie.gmShowFramesUI = TRUE;
+            loadedMovie.vfFramesToTimeSwitch = FALSE;
+            addToUndo = true;
+        }
+        if (ImGui::RadioButton("Display TimeCode", &moviePrintDataSet.printDisplayTimecodeFramesOff, 1)) {
+            moviePrintDataSet.printDisplayTimecodeFramesOff = 1;
+            loadedMovie.gmShowFramesUI = TRUE;
+            loadedMovie.vfFramesToTimeSwitch = TRUE;
+            addToUndo = true;
+        }
+        if (ImGui::RadioButton("off", &moviePrintDataSet.printDisplayTimecodeFramesOff, 2)) {
+            moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
+            loadedMovie.gmShowFramesUI = FALSE;
+            addToUndo = true;
+        }
         ImGui::Separator();
         ImGui::Checkbox("Save also individual frames", &moviePrintDataSet.printSingleFrames);
         ImGui::Separator();
@@ -942,31 +971,36 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuSettings.getSizeH()-headerHeight)/30));
 
 
-    ImGui::Begin("moviePrintMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
-    //    guiSettings = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    //    guiSettings->setFont("HelveticaNeueLTCom-LtCn.ttf");
-    //    guiSettings->setWidgetSpacing(10);
+    ImGui::Begin("moviePrintMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoScrollbar);
 
-
-    //    guiSettings->addLabelButton("Save MoviePrint", false,length-xInit,dim*8);
-    //    guiSettings->addSpacer(length-xInit, 1);
-
-    //    guiSettings->addLabelButton("Refresh", false,length-xInit,dim);
-
-    //    guiSettings->addLabelButton("Undo", false,length/2-xInit*1,dim);
-    //    guiSettings->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-    //    guiSettings->addLabelButton("Redo", false,length/2-OFX_UI_GLOBAL_WIDGET_SPACING*3,dim);
-    //    guiSettings->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-
-    //    uiButtonUndo =(ofxUIButton *) guiSettings->getWidget("Undo");
-    //    uiButtonRedo =(ofxUIButton *) guiSettings->getWidget("Redo");
-
-    //    guiSettings->addLabelButton("Show MoviePrint Preview", false,length-xInit,dim);
-
-    ImGui::Text("Path: %s", &saveMoviePrintPath);
-    ImGui::Checkbox("Overwrite MoviePrint", &overwriteMoviePrint);
+    if (ImGui::Button("Save MoviePrint", ImVec2(menuSettings.getSizeW(),100))) {
+        if (loadedMovie.isMovieLoaded() || showListView) {
+            closeAllMenus();
+            finishedPrinting = FALSE;
+            showPrintScreen = TRUE;
+        }
+    }
     ImGui::Separator();
-
+    if (ImGui::Button("Refresh")) {
+        if (loadedMovie.isMovieLoaded() || showListView) {
+            updateAllStills();
+        }
+    }
+    if (ImGui::Button("Undo")) {
+        if (loadedMovie.isMovieLoaded() || showListView) {
+            undoStep();
+        }
+    }
+    if (ImGui::Button("Redo")) {
+        if (loadedMovie.isMovieLoaded() || showListView) {
+            redoStep();
+        }
+    }
+    ImGui::Separator();
+    if (ImGui::Button("Show MoviePrint Preview", ImVec2(menuSettings.getSizeW(),100))) {
+        menuSettings.closeMenuManually();
+        toggleMoviePrintPreview();
+    }
 
     ImGui::End();
 
@@ -1064,16 +1098,212 @@ void ofApp::writeFboToPreview(float _scaleFactor, bool _showPlaceHolder){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     ofLogVerbose(__FUNCTION__);
+
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
+
+        currentKey = key;
+        ofLog(OF_LOG_VERBOSE, "currentKey:" + ofToString(currentKey));
+
+        switch (key) {
+            case OF_KEY_LEFT_SUPER:
+            case OF_KEY_RIGHT_SUPER:
+                superKeyPressed = TRUE;
+                break;
+            case OF_KEY_LEFT_SHIFT:
+            case OF_KEY_RIGHT_SHIFT:
+                shiftKeyPressed = TRUE;
+                break;
+            default:
+                break;
+        }
+
+        switch (key)
+        {
+
+            case 'l':
+            {
+                if (droppedFiles.size() > 1) {
+                    if (loadedMovie.isMovieLoaded()) {
+                        showListView = !showListView;
+                        if (showListView == FALSE) {
+                            moveToMovie();
+                        }
+                        if (showListView == TRUE) {
+                            moveToList();
+                        }
+                    }
+                }
+
+            }
+                break;
+
+            case 'p':
+            {
+                if (loadedMovie.isMovieLoaded() || showListView) {
+                    finishedPrinting = FALSE;
+                    showPrintScreen = TRUE;
+                }
+            }
+                break;
+
+            case 'x':
+            {
+                redoStep();
+            }
+                break;
+
+            case 'z':
+            {
+                undoStep();
+            }
+                break;
+
+    //            case 'v':
+    //            {
+    //                logPreviousMoviePrintDataSet();
+    //            }
+    //                break;
+    //
+    //            case 'c':
+    //            {
+    //                    string tempString = "";
+    //                    for (int j=0; j < numberOfStills; j++) {
+    //                        tempString = tempString + ", " + ofToString(moviePrintDataSet.gridTimeArray[j]);
+    //                    }
+    //                    ofLog(OF_LOG_VERBOSE, "MoviePrintDataSet" +  tempString);
+    //            }
+    //                break;
+    //
+    //            case 'w':
+    //            {
+    //                if (setupFinished) {
+    //
+    //                    printListNotImage = FALSE;
+    //                    showListView = FALSE;
+    //                    finishedLoadingMovie = FALSE;
+    //                    showLoadMovieScreen = TRUE;
+    ////                    loadNewMovie("/Users/fakob/Movies/Daft Punk - Get Lucky by Shortology.mp4", TRUE, FALSE, TRUE);
+    //                    loadNewMovie("/Users/fakob/Movies/FrameTestMovie_v001.mov", TRUE, FALSE, TRUE);
+    //                    if (loadedMovie.isMovieLoaded) {
+    //                        moveToMovie();
+    //                    }
+    //                    updateMovieFromDrop = FALSE;
+    //
+    //                }
+    //
+    //            }
+    //                break;
+
+            case 'r':
+            {
+                updateAllStills();
+            }
+                break;
+
+            case ' ':
+            {
+                toggleMoviePrintPreview();
+            }
+                break;
+
+            default:
+                break;
+        }
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
+//    if (!lockedDueToInteraction && !lockedDueToPrinting) {
 
+//        currentKey = -1;
+
+//        if (uiRangeSliderTimeline->getState()) {
+
+//            if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == OF_KEY_UP || key == OF_KEY_DOWN) {
+//                uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
+//                uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
+//                updateGridTimeArrayWithAutomaticInterval();
+//                updateAllStills();
+//                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+//                addToUndo = true;
+//                if (addToUndo) {
+//                    addMoviePrintDataSet(undoPosition);
+//                    addToUndo = false;
+//                }
+//                ofLog(OF_LOG_VERBOSE, "ArrowKey Manipulation of Timeline Slider" );
+
+//            }
+//        }
+//        if (!showListView && loadedMovie.isMovieLoaded) {
+//            if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == 105 || key == 111) {
+//                if (key == OF_KEY_LEFT){
+//                    rollOverButtonsClicked(rollOverMovieID, 1);
+//                } else if (key == OF_KEY_RIGHT){
+//                    rollOverButtonsClicked(rollOverMovieID, 2);
+//                } else if (key == 105){
+//                    rollOverButtonsClicked(rollOverMovieID, 3);
+//                } else if (key == 111){
+//                    rollOverButtonsClicked(rollOverMovieID, 4);
+//                }
+//                addToUndo = true;
+//                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+//                addToUndo = true;
+//                if (addToUndo) {
+//                    addMoviePrintDataSet(undoPosition);
+//                    addToUndo = false;
+//                }
+//                ofLog(OF_LOG_VERBOSE, "Key Manipulation over Thumb" );
+//            }
+//        }
+
+
+//        manipulateSlider = FALSE;
+//    //        loadedMovie.gmScrubMovie = FALSE; // deactivated so shiftKeyPressed and released works in scrubView
+//        loadedMovie.gmRollOver = FALSE;
+
+//        superKeyPressed = FALSE;
+//        shiftKeyPressed = FALSE;
+//    } else {
+//        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
+//    }
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
 
+        if (y > ofGetHeight() - footerHeight/1.2) {
+            if (!showTimeline) {
+                ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
+                finishedTimeline = FALSE;
+                showTimeline = TRUE;
+                moveInOutTimeline();
+            }
+        } else {
+            if (!ofGetMousePressed()) {
+                timer.setStartTime();
+                finishedTimeline = TRUE;
+            }
+        }
+
+        if (!showListView && loadedMovie.isMovieLoaded()) {
+            if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) || menuSettings.getMenuActivated()) {
+                if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
+
+                    rollOverMovieID = loadedMovie.gmRollOverMovieID;
+                    rollOverMovieButtonID = loadedMovie.gmRollOverMovieButtonID;
+//                    ofLog(OF_LOG_VERBOSE, "moved in rolloverstate ID =" + ofToString(loadedMovie.gmRollOverMovieID));
+
+                }
+            }
+        }
+
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
+    }
 }
 
 //--------------------------------------------------------------
@@ -1083,12 +1313,100 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
+    //        ofLog(OF_LOG_VERBOSE, "which button is clicked:" + ofToString(button));
 
+        if (loadedMovie.isMovieLoaded() && loadedMovie.gmMovieScrub.isLoaded()) {
+            if(button == 0){
+                if (y > ofGetHeight() - footerHeight/1.2) {
+                    if (showTimeline) {
+                        ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
+                        finishedTimeline = FALSE;
+                        showTimeline = TRUE;
+                        //                    moveInOutTimeline();
+                    }
+                }
+
+                if (showTimeline) {
+                    if (finishedTimeline) {
+                        if (timer.getElapsedSeconds() > 0.5) {
+                            showTimeline = FALSE;
+                            moveInOutTimeline();
+                        }
+                    }
+                }
+
+
+                if (!showListView) {
+                    if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) || menuSettings.getMenuActivated()) {
+                        if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
+
+                            rollOverMovieID = loadedMovie.gmRollOverMovieID;
+                            rollOverMovieButtonID = loadedMovie.gmRollOverMovieButtonID;
+                            rollOverClicked = TRUE;
+                            ofLog(OF_LOG_VERBOSE, "clicked in rolloverstate ID =" + ofToString(loadedMovie.gmRollOverMovieID));
+
+                        }
+                        updateInOut = FALSE;
+                        ofLog(OF_LOG_VERBOSE, "the mouse was clicked" );
+//                        tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,255.0,200,0);
+
+                    }
+                }
+            }
+        }
+
+    //        ofLog(OF_LOG_VERBOSE, "mousePressed - Button:" + ofToString(button) );
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
+        if (loadedMovie.isMovieLoaded()) {
+            ofLog(OF_LOG_VERBOSE, "mouseReleased" );
 
+            if (!showListView) {
+                if (loadedMovie.isThreadRunning()) {
+                    loadedMovie.stop(false);
+                }
+                if (updateInOut) {
+                    ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
+//                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+                    updateGridTimeArrayWithAutomaticInterval();
+                    updateAllStills();
+                    addToUndo = true;
+                }
+                if (updateScrub) {
+//                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+
+                    int i = loadedMovie.gmScrubID;
+                    if (scrubInitialFrame != loadedMovie.grabbedStill[i].gsFrameNumber) {
+//                        updateOneThumb(i, loadedMovie.grabbedStill[i].gsFrameNumber);
+                        addToUndo = true;
+                    }
+
+                }
+                if (rollOverClicked) {
+//                    rollOverButtonsClicked(rollOverMovieID, rollOverMovieButtonID);
+                    addToUndo = true;
+                }
+            }
+        }
+        if (addToUndo) {
+//            addMoviePrintDataSet(undoPosition);
+            addToUndo = false;
+        }
+        manipulateSlider = FALSE;
+        loadedMovie.gmScrubMovie = FALSE;
+        loadedMovie.gmRollOver = FALSE;
+        scrollGrid = FALSE;
+        scrollList = FALSE;
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
+    }
 }
 
 //--------------------------------------------------------------
@@ -1103,7 +1421,12 @@ void ofApp::mouseExited(int x, int y){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
+    listWidth = w;
+    if (!currPrintingList) {
+        updateDisplayGrid();
+    //        windowWasResized = true;
+        windowResizedOnce++;
+    }
 }
 
 //--------------------------------------------------------------
@@ -1690,3 +2013,637 @@ bool ofApp::fequal(float _x, float _y, float _t){
         return FALSE;
     }
 }
+
+//--------------------------------------------------------------
+void ofApp::undoStep(){
+//    if (undoPosition > 0) {
+//        undoPosition = fmin((undoPosition-1), previousMoviePrintDataSet.size() - 1);
+//        applyMoviePrintDataSet(previousMoviePrintDataSet[undoPosition]);
+//    }
+//    ofLog(OF_LOG_VERBOSE, "UNDO undoPosition:" + ofToString(undoPosition));
+//    logPreviousMoviePrintDataSet();
+}
+
+//--------------------------------------------------------------
+void ofApp::redoStep(){
+//    if (undoPosition < (previousMoviePrintDataSet.size() - 1)) {
+//        undoPosition = fmax(0, (undoPosition+1));
+//        applyMoviePrintDataSet(previousMoviePrintDataSet[undoPosition]);
+//    }
+//    ofLog(OF_LOG_VERBOSE, "REDO undoPosition:" + ofToString(undoPosition));
+//    logPreviousMoviePrintDataSet();
+}
+
+//--------------------------------------------------------------
+void ofApp::exit(){
+
+    loadedMovie.stop(false);
+
+//    delete guiTimeline;
+
+//    delete guiSettings;
+
+
+//    guiSettingsMoviePrint->saveSettings("guiMoviePrintSettings.xml");
+//    delete guiSettingsMoviePrint;
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////--------------------------------------------------------------
+//void ofApp::drawList(float _scrollAmountRel){
+//    if (droppedFiles.size() > 1){
+//    float _scrollAmount = 0;
+//    if (scrollBarList.sbActive) {
+//    //        _scrollAmount = ((droppedList.getListHeight()-scrollBarList.sbAreaHeight)+(bottomMargin+topMargin)*2)*(1-_scrollAmountRel)+(ofGetHeight()/2 - droppedList.getListHeight()/2)-(bottomMargin+topMargin);
+//        _scrollAmount = ((droppedList.getListHeight()-scrollBarList.sbScrollAreaHeight)+(bottomMargin+topMargin+headerHeight)*2)*-1*(_scrollAmountRel)+topMargin;
+//    }
+//    if (isnan(_scrollAmount)) {
+//        _scrollAmount = 0;
+//    }
+
+//        ofPushStyle();
+//    ofSetColor(255, 255, 255, 255);
+//    backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
+//    ofPopStyle();
+
+//    droppedList.draw(leftMargin - listWidth + listWidth * tweenListInOut.update(), topMargin + headerHeight, ofGetWidth() - scrollBarWidth - rightMargin - leftMargin, _scrollAmount);
+
+//    }
+//}
+
+////--------------------------------------------------------------
+//void ofApp::drawMovieInfo(float _x, float _y, float _fade){
+//    float tempFontHeightSmall = 14;
+
+//    ofPushStyle();
+//    ofEnableAlphaBlending();
+//    ofSetColor(255, 255, 255, _fade * 255);
+
+//    for (int i=0; i<stringMovieInfo.size(); i++) {
+//        float tempWidthOfPath = fontStashHelveticaLight.getBBox(stringMovieInfo[i], tempFontHeightSmall, 0, 0).getWidth();
+//        fontStashHelveticaLight.draw(stringMovieInfo[i],tempFontHeightSmall, _x, (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
+//        fontStashHelveticaMedium.draw(stringMovieData[i], tempFontHeightSmall, (int)(_x + tempWidthOfPath), (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
+//    }
+
+//    ofPopStyle();
+
+
+
+//}
+
+
+////--------------------------------------------------------------
+//void ofApp::drawPrintScreen(){
+//    ofPushStyle();
+//    ofPushMatrix();
+//    if (showListView) {
+//        ofTranslate(-ofGetWindowWidth(), 0);
+//    }
+//    ofEnableAlphaBlending();
+//    ofSetColor(255, 255, 255, 127);
+//    backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
+//    ofSetColor(255, 255, 255, 255);
+//    if (currPrintingList) {
+//        printListImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-printImage.getHeight()/2);
+//    } else {
+//        printImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-printImage.getHeight()/2);
+
+//    }
+//    ofPopMatrix();
+//    ofPopStyle();
+//}
+
+////--------------------------------------------------------------
+//void ofApp::drawStartScreen(){
+//    ofPushMatrix();
+//    ofPushStyle();
+//    if (tweenBlendStartDropImageCounter.update() > 0.99) {
+//        if (switchFromLogoToDropZone) {
+//            tweenBlendStartDropImage.setParameters(1,easingsine,ofxTween::easeInOut,1.0,0.0,1000,0);
+//            tweenBlendStartDropImageCounter.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,1.0,3000,0);
+//        } else {
+//            tweenBlendStartDropImage.setParameters(1,easingsine,ofxTween::easeInOut,0.0,1.0,1000,0);
+//            tweenBlendStartDropImageCounter.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,1.0,6000,0);
+//        }
+//        switchFromLogoToDropZone = !switchFromLogoToDropZone;
+//    }
+
+//    ofSetColor(255, 255, 255, 255);
+//    backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
+//    ofSetColor(255, 255, 255, 255 * tweenBlendStartDropImage.update());
+//    startImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-startImage.getHeight()/2);
+//    ofSetColor(255, 255, 255, 255 * (1-tweenBlendStartDropImage.update()));
+//    dropZoneImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-startImage.getHeight()/2);
+
+//    ofPopStyle();
+//    ofPopMatrix();
+//}
+
+////--------------------------------------------------------------
+//void ofApp::drawUpdateScreen(){
+
+//    ofPushStyle();
+//    ofEnableAlphaBlending();
+//    ofSetColor(255, 255, 255, 100);
+//    backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
+//    int tempLoaderBarWidth = 262;
+//    int tempLoaderBarHeight = 20;
+//    int tempOffsetY = 155;
+//    float tempX = ofGetWidth()/2 - tempLoaderBarWidth/2 + listWidth * tweenListInOut.update();
+//    float tempY = ofGetHeight()/2 - tempLoaderBarHeight/2;
+//        // draw the percentage loaded bar
+//        // the background
+//        ofSetColor(100);
+//        ofRect(tempX, tempY + tempOffsetY, tempLoaderBarWidth, tempLoaderBarHeight);
+//        // draw the percentage
+//        ofSetColor(238, 71, 0);
+//        ofRect(tempX, tempY + tempOffsetY, tempLoaderBarWidth*loadValue, tempLoaderBarHeight);
+
+//    ofSetColor(255, 255, 255, 255);
+//    updatingImage.draw(ofGetWidth()/2-updatingImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-updatingImage.getHeight()/2);
+//    ofPopStyle();
+
+//}
+
+////--------------------------------------------------------------
+//void ofApp::drawLoadMovieScreen(){
+
+//    ofPushStyle();
+//    ofSetColor(255, 255, 255, 200);
+//    backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
+//    ofSetColor(255, 255, 255, 255);
+//    loadMovieImage.draw(ofGetWidth()/2-loadMovieImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-loadMovieImage.getHeight()/2);
+//    ofPopStyle();
+
+//}
+
+////--------------------------------------------------------------
+//void ofApp::drawScrubScreen(float _scaleFactor){
+//    ofPushStyle();
+//    ofEnableAlphaBlending();
+//    ofSetColor(0,(tweenFading.update()/255)*100);
+//    ofRect(0, 0, ofGetWidth(), ofGetHeight()-footerHeight/2);
+
+//    // draw the scrubMovie
+//    ofSetColor(255,(int)tweenFading.update());
+//    int j = loadedMovie.gmScrubID;
+//    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+//    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(tweenFading.update()/255));
+
+//    // drawing frame
+//    float tempX = ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update();
+//    float tempY = ofGetHeight()/2-scrubWindowH/2;
+//    float tempFrameWidth = 3;
+//    ofSetColor(220,(int)tweenFading.update());
+//    ofRect(tempX, tempY - tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
+//    ofRect(tempX - tempFrameWidth, tempY - tempFrameWidth, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth);
+//    ofRect(tempX + _scaleFactor * scrubWindowW, tempY, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth);
+//    ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * scrubWindowH, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
+//    // drawing shadow
+//    ofSetColor(0,200*(tweenFading.update()/255.0));
+//    ofRect(tempX + _scaleFactor * scrubWindowW + tempFrameWidth, tempY, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth*2);
+//    ofRect(tempX, tempY + _scaleFactor * scrubWindowH + tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
+
+//    // draw the scrubSpeed
+//    ofSetColor(FAK_GRAY,255*(tweenFading.update()/255.0));
+//    ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * scrubWindowH + tempFrameWidth*2, _scaleFactor * scrubWindowW + tempFrameWidth*2, loaderBarHeight - tempFrameWidth);
+//    // drawing shadow
+//    ofSetColor(0,200*(tweenFading.update()/255.0));
+//    ofRect(tempX + _scaleFactor * scrubWindowW + tempFrameWidth, tempY + _scaleFactor * scrubWindowH + tempFrameWidth*2, tempFrameWidth, loaderBarHeight - tempFrameWidth);
+//    ofRect(tempX, tempY + _scaleFactor * scrubWindowH + tempFrameWidth*2 + loaderBarHeight - tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth*2, tempFrameWidth);
+//    float tempScrubWidth = ofClamp(scrubMouseDelta*3.0, -scrubWindowW/2, scrubWindowW/2);
+//    ofColor tempScrubColor(FAK_ORANGECOLOR);
+//    tempScrubColor.setSaturation(ofMap(abs(scrubMouseDelta),0.0,110.0,0.0,255.0));
+//    ofSetColor(tempScrubColor,(int)tweenFading.update());
+//    ofRect(ofGetWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2+tempFrameWidth*3, tempScrubWidth, loaderBarHeight/2);
+//    ofSetColor(255,255,255,(int)tweenFading.update());
+
+//    ofDisableAlphaBlending();
+//    ofSetColor(255);
+//    if(tweenFading.update() < 5){
+//        updateScrub = FALSE;
+//        loadedMovie.gmScrubMovie = FALSE;
+//        scrubbingJustStarted = true;
+//    }
+//    ofPopStyle();
+
+//}
+
+////--------------------------------------------------------------
+//void ofApp::printImageToFile(int _printSizeWidth){
+
+//    // if folder doesnt exist, create standard
+//    ofDirectory dir(saveMoviePrintPath);
+//    if((saveMoviePrintPath == "") || !dir.exists()){
+//        saveMoviePrintPath = appPathUpStr + "/MoviePrints/";
+//        uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
+//        dir.open(saveMoviePrintPath);
+//        if(!dir.exists()){
+//            dir.create(true);
+//        }
+//    }
+
+//    //now you can be sure that path exists
+//    ofLog(OF_LOG_VERBOSE, dir.getOriginalDirectory() );
+
+//    ofPixels gmPixToSave;
+//    ofFbo fboToSave;
+
+//    if (loadedMovie.isMovieLoaded) {
+//        float _newScaleFactor = (float)_printSizeWidth / (float)(printGridWidth);
+//        int outputWidth = printGridWidth * _newScaleFactor;
+//        int outputHeight = printGridHeight * _newScaleFactor;
+//        ofLog(OF_LOG_VERBOSE, "outputSize before: " + ofToString(outputWidth) + "x" + ofToString(outputHeight));
+//        int tempMaxDimension = 16000;
+//        if (outputWidth > outputHeight) {
+//            if (outputWidth > tempMaxDimension) {
+//                _newScaleFactor = tempMaxDimension / printGridWidth;
+//                outputWidth = tempMaxDimension;
+//                outputHeight = printGridHeight * _newScaleFactor;
+//            }
+//        } else {
+//            if (outputHeight > tempMaxDimension) {
+//                _newScaleFactor = tempMaxDimension / printGridHeight;
+//                outputHeight = tempMaxDimension;
+//                outputWidth = printGridWidth * _newScaleFactor;
+//            }
+//        }
+
+//        if (moviePrintDataSet.printFormat == OF_IMAGE_FORMAT_JPEG) {
+//            // make sure that the jpg size can be divided by 4
+//            if ((outputWidth%2) == 1) {
+//                outputWidth = outputWidth + 1;
+//            }
+//            if ((outputWidth%4) == 2) {
+//                outputWidth = outputWidth + 2;
+//            }
+//            if ((outputHeight%2) == 1) {
+//                outputHeight = outputHeight + 1;
+//            }
+//            if ((outputHeight%4) == 2) {
+//                outputHeight = outputHeight + 2;
+//            }
+//            ofLog(OF_LOG_VERBOSE, "outputSize: " + ofToString(outputWidth) + "x" + ofToString(outputHeight));
+//            fboToSave.allocate(outputWidth, outputHeight, GL_RGB);
+//            gmPixToSave.allocate(outputWidth, outputHeight, OF_PIXELS_RGB);
+//        }
+//        else {
+//            ofLog(OF_LOG_VERBOSE, "outputSize: " + ofToString(outputWidth) + "x" + ofToString(outputHeight));
+//            fboToSave.allocate(outputWidth, outputHeight, GL_RGBA);
+//            gmPixToSave.allocate(outputWidth, outputHeight, OF_PIXELS_RGB);
+//        }
+
+//        ofPushMatrix();
+//        ofPushStyle();
+//        fboToSave.begin();
+//        ofClear(0,0,0,0);
+//        ofBackground(0, 0, 0, 0);
+//        ofSetColor(255, 255, 255, 255);
+
+//        loadedMovie.drawMoviePrint(0, 0, moviePrintDataSet.printGridColumns, moviePrintDataSet.printGridRows, moviePrintDataSet.printGridMargin, _newScaleFactor, 1, showPlaceHolder, printHeaderHeight, moviePrintDataSet.printDisplayVideoAudioInfo, false);
+
+//        fboToSave.end();
+//        fboToSave.readToPixels(gmPixToSave);
+//                ofLog(OF_LOG_VERBOSE, "gmPixToSave:getImageType" + ofToString(gmPixToSave.getImageType()));
+//        ofPopStyle();
+//        ofPopMatrix();
+
+//        string pathName = loadedMovie.gmMovie.getMoviePath();
+//        string fileName = loadedFilePath.getFileName(pathName, TRUE);
+//        string formatExtension;
+//        if (moviePrintDataSet.printFormat == OF_IMAGE_FORMAT_JPEG) {
+//            formatExtension = "jpg";
+//        } else {
+//            formatExtension = "png";
+//        }
+//        string imageName = fileName + "_MoviePrint" + "." + formatExtension;
+//        imageName = saveMoviePrintPath + imageName;
+
+//        if (!overwriteMoviePrint) {
+//            ofFile fileToSave;
+//            if (fileToSave.doesFileExist(imageName)) {
+//                for (int i=1; i<1000; i++) {
+//                    imageName = fileName + "_MoviePrint copy " + ofToString(i) + "." + formatExtension;
+//                    imageName = saveMoviePrintPath + imageName;
+//                    if (!fileToSave.doesFileExist(imageName)) {
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+
+//        if (moviePrintDataSet.printSingleFrames) {
+//            string singleImagePath = saveMoviePrintPath+fileName+"/";
+//            ofDirectory dir2(singleImagePath);
+//            if(!dir2.exists()){
+//                dir2.create(true);
+//            }
+//            for (int i=0; i<loadedMovie.gmNumberOfStills; i++) {
+//                string singleImageName = fileName + "_" + ofToString(i, 3, '0') + "." + formatExtension;
+//                singleImageName = singleImagePath + singleImageName;
+//                ofSaveImage(loadedMovie.grabbedStill[i].gsImage, singleImageName, OF_IMAGE_QUALITY_HIGH);
+//            }
+//        }
+
+
+//        ofSaveImage(gmPixToSave, imageName, OF_IMAGE_QUALITY_HIGH);
+//        ofLog(OF_LOG_VERBOSE, "Finished saving" + ofToString(imageName) );
+//    }
+
+//    if (!currPrintingList) {
+//        stopPrinting();
+//    } else {
+//        ofLog(OF_LOG_VERBOSE, "Finished Printing file in list------------------------------- currPrintingList" + ofToString(currPrintingList));
+//    }
+
+//}
+
+////--------------------------------------------------------------
+//void ofApp::printListToFile(){
+
+//    if (!droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint && itemToPrint == 0 && !movieIsBeingGrabbed && !currPrintingList) {
+//        currPrintingList = TRUE;
+//        droppedList.disableMouseEvents(droppedFiles.size());
+//        droppedList.setActiveItem(itemToPrint);
+//        loadNewMovie(droppedList.glDroppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
+//    }
+//    if (!droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint && !movieIsBeingGrabbed && currPrintingList) {
+//        ofLog(OF_LOG_VERBOSE, "printImageToFile: " + ofToString(itemToPrint) );
+//        if (loadedMovie.isMovieLoaded){
+//            calculateNewPrintGrid();
+//            printImageToFile(moviePrintDataSet.printSizeWidth);
+//            droppedList.glDroppedItem[itemToPrint].itemProperties.ipPrinted = TRUE;
+//        }
+//        droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint = TRUE;
+//        ofLog(OF_LOG_VERBOSE, "ipTriedToPrint: " + ofToString(droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint) );
+//        ofLog(OF_LOG_VERBOSE, "ipPrinted: " + ofToString(droppedList.glDroppedItem[itemToPrint].itemProperties.ipPrinted) );
+//        for (int i=0; i < droppedList.glDroppedItem.size(); i++) {
+//            if (!droppedList.glDroppedItem[i].itemProperties.ipTriedToPrint){
+//                itemToPrint = i;
+//                i = droppedList.glDroppedItem.size();
+//            }
+//        }
+//        droppedList.setActiveItem(itemToPrint);
+//        loadNewMovie(droppedList.glDroppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
+//    }
+
+//    int tempIterator = 0;
+//    for (int i=0; i < droppedList.glDroppedItem.size(); i++) {
+//        if (droppedList.glDroppedItem[i].itemProperties.ipTriedToPrint){
+//            tempIterator++;
+//        }
+//    }
+//    if (tempIterator >= droppedList.glDroppedItem.size()) {
+//        stopListPrinting();
+//    }
+
+//    timer.setStartTime();
+//    finishedPrinting = TRUE;
+
+//}
+
+////--------------------------------------------------------------
+//void ofApp::resetItemsToPrint(){
+//    for (int i=0; i < droppedList.glDroppedItem.size(); i++) {
+//        droppedList.glDroppedItem[i].itemProperties.ipTriedToPrint = FALSE;
+//        droppedList.glDroppedItem[i].itemProperties.ipPrinted = FALSE;
+//    }
+//}
+
+
+////--------------------------------------------------------------
+//void ofApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieButtonID){
+//    if (_rollOverMovieButtonID == 3) {
+//        setInPoint(loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber);
+//        loadedMovie.gmRollOver = FALSE;
+//        ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+
+//    } else if (_rollOverMovieButtonID == 4) {
+//        setOutPoint(loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber);
+//        loadedMovie.gmRollOver = FALSE;
+//        ofLog(OF_LOG_VERBOSE, "manipulated OutPoint" );
+
+//    } else if (_rollOverMovieButtonID == 1) {
+//        ofLog(OF_LOG_VERBOSE, "frame backwards" );
+//        int j = loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber;
+//        if(shiftKeyPressed) {
+//            j = j - 10;
+//        } else if(superKeyPressed){
+//            j = j - 100;
+//        } else {
+//            j = j - 1;
+//        }
+//        if (j < 0) {
+//            j = 0;
+//        } else if (j > (totalFrames-1)) {
+//            j = (totalFrames-1);
+//        }
+//    //        if (_rollOverMovieID == 0) {
+//    //            setInPoint(j);
+//    //        } else if (_rollOverMovieID == (numberOfStills-1)) {
+//    //            setOutPoint(j);
+//    //        } else {
+//    //            updateOneThumb(_rollOverMovieID, j);
+//    //        }
+//        updateOneThumb(_rollOverMovieID, j);
+//    } else if (_rollOverMovieButtonID == 2) {
+//        ofLog(OF_LOG_VERBOSE, "frame forward" );
+//        int j = loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber;
+//        if(shiftKeyPressed) {
+//            j = j + 10;
+//        } else if(superKeyPressed){
+//            j = j + 100;
+//        } else {
+//            j = j + 1;
+//        }
+//        if (j < 0) {
+//            j = 0;
+//        } else if (j > (totalFrames-1)) {
+//            j = (totalFrames-1);
+//        }
+//    //        if (_rollOverMovieID == 0) {
+//    //            setInPoint(j);
+//    //        } else if (_rollOverMovieID == (numberOfStills-1)) {
+//    //            setOutPoint(j);
+//    //        } else {
+//    //            updateOneThumb(_rollOverMovieID, j);
+//    //        }
+//        updateOneThumb(_rollOverMovieID, j);
+//    }
+//    rollOverClicked = FALSE;
+//}
+
+////--------------------------------------------------------------
+//int ofApp::getLowestFrameNumber(){
+//    return *min_element(moviePrintDataSet.gridTimeArray.begin(), moviePrintDataSet.gridTimeArray.end());
+//}
+
+////--------------------------------------------------------------
+//int ofApp::getHighestFrameNumber(){
+//    return *max_element(moviePrintDataSet.gridTimeArray.begin(), moviePrintDataSet.gridTimeArray.end());
+//}
+
+////--------------------------------------------------------------
+//void ofApp::updateOneThumb(int _thumbID, int _newFrameNumber){
+//    moviePrintDataSet.gridTimeArray[_thumbID] = _newFrameNumber;
+//    loadedMovie.grabbedStill[_thumbID].gsFrameNumber = _newFrameNumber;
+//    loadedMovie.grabbedStill[_thumbID].gsManipulated = TRUE;
+//    loadedMovie.grabbedStill[_thumbID].gsToBeGrabbed = TRUE;
+//    loadedMovie.grabbedStill[_thumbID].gsToBeUpdated = TRUE;
+//    loadedMovie.updateOrderNumber();
+
+//    if (!loadedMovie.isThreadRunning()) {
+//        loadedMovie.start();
+//    }
+
+//    uiRangeSliderTimeline->setValueLow(getLowestFrameNumber());
+//    uiRangeSliderTimeline->setValueHigh(getHighestFrameNumber());
+
+//    ofLog(OF_LOG_VERBOSE, "manipulated one thumb" );
+//}
+
+////--------------------------------------------------------------
+//void ofApp::setInPoint(int _inPoint){
+//    int i = _inPoint;
+//    int j = uiRangeSliderTimeline->getScaledValueHigh();
+//    if ((uiRangeSliderTimeline->getScaledValueHigh()-i < numberOfStills)) {
+//        j = i + (numberOfStills - 1);
+//        if (j > (totalFrames-1)) {
+//            j = (totalFrames-1);
+//            i = j - (numberOfStills - 1);
+//        }
+//    }
+//    uiRangeSliderTimeline->setValueLow(i);
+//    uiRangeSliderTimeline->setValueHigh(j);
+//    uiSliderValueLow = i;
+//    uiSliderValueHigh = j;
+//    updateGridTimeArrayWithAutomaticInterval();
+//    updateAllStills();
+//    ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+//}
+
+////--------------------------------------------------------------
+//void ofApp::setOutPoint(int _outPoint){
+//    int i = uiRangeSliderTimeline->getScaledValueLow();
+//    int j = _outPoint;
+//    if ((j - uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
+//        i = j - (numberOfStills - 1);
+//        if (i < 0) {
+//            i = 0;
+//            j = (numberOfStills - 1);
+
+//        }
+//    }
+//    uiRangeSliderTimeline->setValueLow(i);
+//    uiRangeSliderTimeline->setValueHigh(j);
+//    uiSliderValueLow = i;
+//    uiSliderValueHigh = j;
+//    updateGridTimeArrayWithAutomaticInterval();
+//    updateAllStills();
+//    ofLog(OF_LOG_VERBOSE, "manipulated OutPoint" );
+//}
+
+////--------------------------------------------------------------
+//void ofApp::updateTimeSlider(bool _wholeRange) {
+
+//    uiRangeSliderTimeline->setMax(totalFrames-1);
+//    uiRangeSliderTimeline->setValueLow(0);
+
+//    if (_wholeRange) {
+//        if (totalFrames > 250) {
+//            uiRangeSliderTimeline->setValueLow(25);
+//            uiRangeSliderTimeline->setValueHigh(totalFrames-26);
+//        } else {
+//            uiRangeSliderTimeline->setValueHigh(totalFrames-1);
+//        }
+//    } else {
+//        uiRangeSliderTimeline->setValueHigh(numberOfStills);
+//    }
+//    uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
+//    uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
+//}
+
+////--------------------------------------------------------------
+//void ofApp::updateGridTimeArrayWithAutomaticInterval(){
+
+//    if (uiSliderValueLow < 0) {
+//        uiSliderValueLow = 0;
+//    }
+//    if (uiSliderValueHigh > (totalFrames-1)) {
+//        uiSliderValueHigh = (totalFrames-1);
+//    }
+
+//    for (int i=0; i<numberOfStills; i++) {
+//        if (numberOfStills == 1) {
+//            moviePrintDataSet.gridTimeArray[i] = ofMap(0.5, 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+
+//        } else {
+//            moviePrintDataSet.gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+//        }
+//    }
+//}
+
+////--------------------------------------------------------------
+//void ofApp::startPrinting(){
+//    lockedDueToPrinting = true;
+//    inactivateAllMenus();
+//    ofLog(OF_LOG_VERBOSE, "Start Printing------------------------------------------------");
+//    printImageToFile(moviePrintDataSet.printSizeWidth);
+//}
+
+////--------------------------------------------------------------
+//void ofApp::stopPrinting(){
+//    timer.setStartTime();
+//    finishedPrinting = TRUE;
+//    activateAllMenus();
+//    lockedDueToPrinting = false;
+//    ofLog(OF_LOG_VERBOSE, "Finished Printing-------------------------------------------- ");
+//}
+
+////--------------------------------------------------------------
+//void ofApp::startListPrinting(){
+//    lockedDueToPrinting = true;
+//    inactivateAllMenus();
+//    ofLog(OF_LOG_VERBOSE, "Start Printing List-------------------------------------------");
+//    itemToPrint = 0;
+//    droppedList.disableMouseEvents(droppedFiles.size());
+//    resetItemsToPrint();
+//    printListToFile();
+//}
+
+////--------------------------------------------------------------
+//void ofApp::stopListPrinting(){
+//    currPrintingList = FALSE;
+//    moveToList();
+//    activateAllMenus();
+//    droppedList.enableMouseEvents();
+//    lockedDueToPrinting = false;
+//    ofLog(OF_LOG_VERBOSE, "Finished Printing List-------------------------------------------");
+//}
+
+////--------------------------------------------------------------
+//void ofApp::activateAllMenus(){
+//    menuMoviePrintSettings.setMenuActive();
+//    menuSettings.setMenuActive();
+//    menuMovieInfo.setMenuActive();
+//    menuHelp.setMenuActive();
+//    ofLog(OF_LOG_VERBOSE, "activateAllMenus-------------------------------------------");
+//}

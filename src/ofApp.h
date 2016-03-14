@@ -90,6 +90,10 @@ public:
     void menuIsClicked(int &e);
     void setVisibilityMoviePrintPreview(bool _visibility);
     void toggleMoviePrintPreview();
+    void redoStep();
+    void undoStep();
+    void exit();
+
 
     // Movie
     fakGrabbedMovie loadedMovie;
