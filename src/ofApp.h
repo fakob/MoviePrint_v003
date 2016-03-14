@@ -93,7 +93,27 @@ public:
     void redoStep();
     void undoStep();
     void exit();
-
+    void drawList(float _scrollAmountRel);
+    void drawMovieInfo(float _x, float _y, float _fade);
+    void drawPrintScreen();
+    void drawStartScreen();
+    void drawUpdateScreen();
+    void drawLoadMovieScreen();
+    void drawScrubScreen(float _scaleFactor);
+    void printImageToFile(int _printSizeWidth);
+    void printListToFile();
+    void resetItemsToPrint();
+    int getLowestFrameNumber();
+    int getHighestFrameNumber();
+    void updateOneThumb(int _thumbID, int _newFrameNumber);
+    void setInPoint(int _inPoint);
+    void setOutPoint(int _inPoint);
+    void updateTimeSlider(bool _wholeRange);
+    void startPrinting();
+    void startListPrinting();
+    void stopPrinting();
+    void stopListPrinting();
+    string cropFrontOfString(string _inputString, int _length, string _substitute);
 
     // Movie
     fakGrabbedMovie loadedMovie;
