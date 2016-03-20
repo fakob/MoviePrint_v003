@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "fakgrabbedmovie.h"
 #include "fakmenu.h"
+#include "fakgrabbedlist.h"
 
 #include "ofxNotify.h"
 #include "ofxEasing.h"
@@ -82,8 +83,6 @@ public:
     void handlingEventOverlays();
     void moveToList();
     void setGUITimeline();
-    void setGUISettingsMoviePrint();
-    void setGUISettings();
     void drawUI(int _scaleFactor, bool _hideInPrint);
     void menuIsOpened(int &e);
     void menuIsClosed(int &e);
@@ -114,6 +113,11 @@ public:
     void stopPrinting();
     void stopListPrinting();
     string cropFrontOfString(string _inputString, int _length, string _substitute);
+    void addMoviePrintDataSet(int _addToPosition);
+    void addGridTimeArrayToMoviePrintDataSet();
+    bool hasChangedMoviePrintDataSet();
+    void applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet);
+    void logPreviousMoviePrintDataSet();
 
     // Movie
     fakGrabbedMovie loadedMovie;

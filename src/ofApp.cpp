@@ -221,10 +221,10 @@ void ofApp::setup(){
 //    moveInOutTimeline();
 
 
-//    previousMoviePrintDataSet.clear();
+    previousMoviePrintDataSet.clear();
     addToUndo = false;
     undoPosition = 0;
-//    addMoviePrintDataSet(undoPosition); // add loaded settings as first undo step
+    addMoviePrintDataSet(undoPosition); // add loaded settings as first undo step
 
     uiSliderValueHigh = 1000;    // added this temporarily until new timeline slider is in place
 
@@ -254,108 +254,6 @@ void ofApp::setGUITimeline(){
 //    uiRangeSliderTimeline->setColorPadded(FAK_ORANGE5);
 
 //    ofAddListener(guiTimeline->newGUIEvent, this, &testApp::guiEvent);
-
-}
-
-//--------------------------------------------------------------
-void ofApp::setGUISettingsMoviePrint(){
-
-//	float dim = 16;
-//	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING*2;
-//    float length = menuWidth-xInit;
-
-//    guiSettingsMoviePrint = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-//    guiSettingsMoviePrint->setFont("HelveticaNeueLTCom-LtCn.ttf");
-//    guiSettingsMoviePrint->setWidgetSpacing(10);
-
-//    guiSettingsMoviePrint->addLabelButton("Select Output Folder", false,length-xInit,dim);
-//    guiSettingsMoviePrint->addLabel("SelectedOutputFolder", saveMoviePrintPath, OFX_UI_FONT_SMALL);
-//    uiLabelOutputFolder = (ofxUILabel *) guiSettingsMoviePrint->getWidget("SelectedOutputFolder");
-//    uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
-
-//    guiSettingsMoviePrint->addToggle("Overwrite MoviePrint", &overwriteMoviePrint, dim*1.5, dim);
-//    uiToggleOverwriteMoviePrint = (ofxUIToggle *) guiSettingsMoviePrint->getWidget("Overwrite MoviePrint");
-
-//    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-////    guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
-//	guiSettingsMoviePrint->addIntSlider("PrintColumns", 1, 10, &moviePrintDataSet.printGridColumns, length-xInit,dim);
-//	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, &moviePrintDataSet.printGridRows, length-xInit,dim);
-//    uiSliderPrintColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
-//    uiSliderPrintRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
-//    guiSettingsMoviePrint->addSpacer(length-xInit, 0);
-//   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 30, &moviePrintDataSet.printGridMargin, length-xInit,dim);
-//    uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
-
-//    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-////    guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
-
-//    guiSettingsMoviePrint->addToggle("Display Header", &moviePrintDataSet.printDisplayVideoAudioInfo, dim*1.5, dim);
-//    uiToggleHeaderDisplay = (ofxUIToggle *) guiSettingsMoviePrint->getWidget("Display Header");
-
-//    vector<string> names;
-//	names.push_back("Display Frames");
-//	names.push_back("Display TimeCode");
-//	names.push_back("off");
-//    uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
-
-//    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-
-//    guiSettingsMoviePrint->addToggle("Save also individual frames", &moviePrintDataSet.printSingleFrames, dim*1.5, dim);
-//    uiToggleSingleFrames = (ofxUIToggle *) guiSettingsMoviePrint->getWidget("Save also individual frames");
-
-//    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-
-////    guiSettingsMoviePrint->addLabel("Choose Output Format", OFX_UI_FONT_MEDIUM);
-//    vector<string> names3;
-//    names3.push_back("png with alpha");
-//    names3.push_back("jpg");
-////    names3.push_back("gif");
-//    guiSettingsMoviePrint->addRadio("Choose Output Format", names3, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
-//    uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("Choose Output Format");
-
-//    vector<string> names4;
-//    names4.push_back("1024px width");
-//    names4.push_back("2048px width");
-//    names4.push_back("3072px width");
-//    names4.push_back("4096px width");
-//    guiSettingsMoviePrint->addRadio("MoviePrint Width", names4, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
-//    uiRadioPrintOutputWidth =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("MoviePrint Width");
-
-
-//    guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
-//	ofAddListener(guiSettingsMoviePrint->newGUIEvent,this,&testApp::guiEvent);
-}
-
-//--------------------------------------------------------------
-void ofApp::setGUISettings(){
-
-//    float dim = 16;
-//    float xInit = OFX_UI_GLOBAL_WIDGET_SPACING*2;
-//    float length = menuWidth-xInit;
-
-//    guiSettings = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-//    guiSettings->setFont("HelveticaNeueLTCom-LtCn.ttf");
-//    guiSettings->setWidgetSpacing(10);
-
-
-//    guiSettings->addLabelButton("Save MoviePrint", false,length-xInit,dim*8);
-//    guiSettings->addSpacer(length-xInit, 1);
-
-//    guiSettings->addLabelButton("Refresh", false,length-xInit,dim);
-
-//    guiSettings->addLabelButton("Undo", false,length/2-xInit*1,dim);
-//    guiSettings->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-//    guiSettings->addLabelButton("Redo", false,length/2-OFX_UI_GLOBAL_WIDGET_SPACING*3,dim);
-//    guiSettings->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-
-//    uiButtonUndo =(ofxUIButton *) guiSettings->getWidget("Undo");
-//    uiButtonRedo =(ofxUIButton *) guiSettings->getWidget("Redo");
-
-//    guiSettings->addLabelButton("Show MoviePrint Preview", false,length-xInit,dim);
-
-//    guiSettings->setColorBack(FAK_TRANSPARENT);
-//    ofAddListener(guiSettings->newGUIEvent,this,&testApp::guiEvent);
-
 
 }
 
@@ -2016,22 +1914,258 @@ bool ofApp::fequal(float _x, float _y, float _t){
 
 //--------------------------------------------------------------
 void ofApp::undoStep(){
-//    if (undoPosition > 0) {
-//        undoPosition = fmin((undoPosition-1), previousMoviePrintDataSet.size() - 1);
-//        applyMoviePrintDataSet(previousMoviePrintDataSet[undoPosition]);
-//    }
-//    ofLog(OF_LOG_VERBOSE, "UNDO undoPosition:" + ofToString(undoPosition));
-//    logPreviousMoviePrintDataSet();
+    if (undoPosition > 0) {
+        undoPosition = fmin((undoPosition-1), previousMoviePrintDataSet.size() - 1);
+        applyMoviePrintDataSet(previousMoviePrintDataSet[undoPosition]);
+    }
+    ofLog(OF_LOG_VERBOSE, "UNDO undoPosition:" + ofToString(undoPosition));
+    logPreviousMoviePrintDataSet();
 }
 
 //--------------------------------------------------------------
 void ofApp::redoStep(){
-//    if (undoPosition < (previousMoviePrintDataSet.size() - 1)) {
-//        undoPosition = fmax(0, (undoPosition+1));
-//        applyMoviePrintDataSet(previousMoviePrintDataSet[undoPosition]);
-//    }
-//    ofLog(OF_LOG_VERBOSE, "REDO undoPosition:" + ofToString(undoPosition));
-//    logPreviousMoviePrintDataSet();
+    if (undoPosition < (previousMoviePrintDataSet.size() - 1)) {
+        undoPosition = fmax(0, (undoPosition+1));
+        applyMoviePrintDataSet(previousMoviePrintDataSet[undoPosition]);
+    }
+    ofLog(OF_LOG_VERBOSE, "REDO undoPosition:" + ofToString(undoPosition));
+    logPreviousMoviePrintDataSet();
+}
+
+//--------------------------------------------------------------
+void ofApp::addMoviePrintDataSet(int _addToPosition){
+    ofLog(OF_LOG_VERBOSE, "addMoviePrintDataSet:" + ofToString(undoPosition));
+    ofLog(OF_LOG_VERBOSE, "moviePrintDataSet Adress" +  ofToString(moviePrintDataSet.gridTimeArray));
+    if (previousMoviePrintDataSet.size() == 0) { // save initial settings without increasing undoPosition
+        previousMoviePrintDataSet.push_back(moviePrintDataSet);
+    //        ofLog(OF_LOG_VERBOSE, "________________updateGridTimeArrayToMoviePrintDataSet " +  ofToString(updateGridTimeArrayToMoviePrintDataSet));
+    //        updateGridTimeArrayToMoviePrintDataSet = true;
+        addGridTimeArrayToMoviePrintDataSet();
+        ofLog(OF_LOG_VERBOSE, "ADD INIT undoPosition:" + ofToString(undoPosition));
+    } else {
+        if (hasChangedMoviePrintDataSet()) {
+            if (_addToPosition >= (previousMoviePrintDataSet.size()-1)) { // add undo step when undoPosition at end
+                previousMoviePrintDataSet.push_back(moviePrintDataSet);
+                undoPosition++;
+                ofLog(OF_LOG_VERBOSE, "ADD AT END undoPosition:" + ofToString(undoPosition));
+                if (previousMoviePrintDataSet.size() > maxUndoSteps) {
+                    previousMoviePrintDataSet.pop_front();
+                    undoPosition--;
+                    ofLog(OF_LOG_VERBOSE, "REMOVE FIRST undoPosition:" + ofToString(undoPosition));
+                }
+            } else { // if undoPosition lower than first delete all later undo Steps and then add new undo step
+                int tempStepsToDelete = (previousMoviePrintDataSet.size() - 1 - _addToPosition);
+                tempStepsToDelete = fmin(tempStepsToDelete, previousMoviePrintDataSet.size() - 1); // make sure not to delete more than whats there
+                previousMoviePrintDataSet.erase(previousMoviePrintDataSet.end() - tempStepsToDelete,previousMoviePrintDataSet.end());
+                previousMoviePrintDataSet.push_back(moviePrintDataSet);
+                undoPosition = previousMoviePrintDataSet.size()-1;
+                ofLog(OF_LOG_VERBOSE, "ADD INBETWEEN undoPosition:" + ofToString(undoPosition));
+            }
+    //            ofLog(OF_LOG_VERBOSE, "________________updateGridTimeArrayToMoviePrintDataSet " +  ofToString(updateGridTimeArrayToMoviePrintDataSet));
+    //            updateGridTimeArrayToMoviePrintDataSet = true;
+            addGridTimeArrayToMoviePrintDataSet();
+        }
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::addGridTimeArrayToMoviePrintDataSet(){ // adds the GridTimeArray to the last previousMoviePrintDataSet
+    ofLog(OF_LOG_VERBOSE, "addGridTimeArrayToMoviePrintDataSet:" + ofToString(undoPosition));
+    //    if (previousMoviePrintDataSet.size() != 0) { // first update the manipulated frames and get the frameNumbers into the gridTimeArray
+    //        getAllFrameNumbers();
+    //    }
+    previousMoviePrintDataSet.back().gridTimeArray.clear();
+    previousMoviePrintDataSet.back().gridTimeArray.resize(numberOfStills,0);
+    if (previousMoviePrintDataSet.back().gridTimeArray.empty()){
+        ofLog(OF_LOG_VERBOSE, "Error: memory could not be allocated" );
+    } else {
+        if ((!moviePrintDataSet.gridTimeArray.empty()) && loadedMovie.isMovieLoaded()){
+            for (int i=0; i<numberOfStills; i++) {
+    //                ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray[i]:" + ofToString(moviePrintDataSet.gridTimeArray[i]));
+    //                moviePrintDataSet.gridTimeArray[i] = loadedMovie.grabbedStill[i].gsFrameNumber;
+                previousMoviePrintDataSet.back().gridTimeArray[i] = moviePrintDataSet.gridTimeArray[i];
+    //                previousMoviePrintDataSet.back().gridTimeArray[i] = loadedMovie.grabbedStill[i].gsFrameNumber;
+            }
+        } else {
+            for (int i=0; i<numberOfStills; i++) {
+                previousMoviePrintDataSet.back().gridTimeArray[i] = i;
+            }
+        }
+    }
+    updateGridTimeArrayToMoviePrintDataSet = false;
+    ofLog(OF_LOG_VERBOSE, "________________updateGridTimeArrayToMoviePrintDataSet " +  ofToString(updateGridTimeArrayToMoviePrintDataSet));
+}
+
+//--------------------------------------------------------------
+bool ofApp::hasChangedMoviePrintDataSet(){
+    ofLog(OF_LOG_VERBOSE, "hasChangedMoviePrintDataSet:" + ofToString(undoPosition));
+    if (previousMoviePrintDataSet.size() > 0) {
+        if (
+            previousMoviePrintDataSet[undoPosition].printGridColumns == moviePrintDataSet.printGridColumns &&
+            previousMoviePrintDataSet[undoPosition].printGridRows == moviePrintDataSet.printGridRows &&
+            previousMoviePrintDataSet[undoPosition].printGridMargin == moviePrintDataSet.printGridMargin &&
+            previousMoviePrintDataSet[undoPosition].printDisplayVideoAudioInfo == moviePrintDataSet.printDisplayVideoAudioInfo &&
+            previousMoviePrintDataSet[undoPosition].printDisplayTimecodeFramesOff == moviePrintDataSet.printDisplayTimecodeFramesOff &&
+            previousMoviePrintDataSet[undoPosition].printSingleFrames == moviePrintDataSet.printSingleFrames &&
+            previousMoviePrintDataSet[undoPosition].printFormat == moviePrintDataSet.printFormat &&
+            previousMoviePrintDataSet[undoPosition].printSizeWidth == moviePrintDataSet.printSizeWidth
+            ) {
+            return true;
+    //            return false;
+        } else {
+            return true;
+        }
+    } else {
+        return false;
+    }
+
+}
+
+//--------------------------------------------------------------
+void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
+    string tempName;
+//    ofxUIWidget *tempWidget;
+    bool tempHasTheNumberOfThumbsChanged = false;
+
+    // printGridColumns
+    if (moviePrintDataSet.printGridColumns != _newMoviePrintDataSet.printGridColumns) {
+        moviePrintDataSet.printGridColumns = _newMoviePrintDataSet.printGridColumns;
+//        uiSliderPrintColumns->setValue(moviePrintDataSet.printGridColumns);
+//        tempWidget = guiSettingsMoviePrint->getWidget("PrintColumns");
+//        guiSettingsMoviePrint->triggerEvent(tempWidget);
+        tempHasTheNumberOfThumbsChanged = true;
+    }
+
+    // printGridRows
+    if (moviePrintDataSet.printGridRows != _newMoviePrintDataSet.printGridRows) {
+        moviePrintDataSet.printGridRows = _newMoviePrintDataSet.printGridRows;
+//        uiSliderPrintRows->setValue(moviePrintDataSet.printGridRows);
+//        tempWidget = guiSettingsMoviePrint->getWidget("PrintRows");
+//        guiSettingsMoviePrint->triggerEvent(tempWidget);
+        tempHasTheNumberOfThumbsChanged = true;
+    }
+
+    // printGridMargin
+    if(moviePrintDataSet.printGridMargin != _newMoviePrintDataSet.printGridMargin){
+        moviePrintDataSet.printGridMargin = _newMoviePrintDataSet.printGridMargin;
+//        uiSliderPrintMargin->setValue(moviePrintDataSet.printGridMargin);
+//        tempWidget = guiSettingsMoviePrint->getWidget("PrintMargin");
+//        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
+
+    // printDisplayVideoAudioInfo
+    if(moviePrintDataSet.printDisplayVideoAudioInfo != _newMoviePrintDataSet.printDisplayVideoAudioInfo){
+        moviePrintDataSet.printDisplayVideoAudioInfo = _newMoviePrintDataSet.printDisplayVideoAudioInfo;
+//        uiToggleHeaderDisplay->setValue(moviePrintDataSet.printDisplayVideoAudioInfo);
+//        tempWidget = guiSettingsMoviePrint->getWidget("Display Header");
+//        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
+
+    // printDisplayTimecodeFramesOff
+    if(moviePrintDataSet.printDisplayTimecodeFramesOff != _newMoviePrintDataSet.printDisplayTimecodeFramesOff){
+        moviePrintDataSet.printDisplayTimecodeFramesOff = _newMoviePrintDataSet.printDisplayTimecodeFramesOff;
+//        switch (moviePrintDataSet.printDisplayTimecodeFramesOff) {
+//            case 0:
+//                tempName = "off";
+//                break;
+//            case 1:
+//                tempName = "Display TimeCode";
+//                break;
+//            case 2:
+//                tempName = "Display Frames";
+//                break;
+//            default:
+//                tempName = "off";
+//                break;
+//        }
+//        uiRadioSetFrameDisplay->activateToggle(tempName);
+//        tempWidget = guiSettingsMoviePrint->getWidget(tempName);
+//        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
+
+    // printSingleFrames
+    if(moviePrintDataSet.printSingleFrames != _newMoviePrintDataSet.printSingleFrames){
+        moviePrintDataSet.printSingleFrames = _newMoviePrintDataSet.printSingleFrames;
+//        uiToggleSingleFrames->setValue(moviePrintDataSet.printSingleFrames);
+//        tempWidget = guiSettingsMoviePrint->getWidget("Save also individual frames");
+//        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
+
+    // printFormat
+    if(moviePrintDataSet.printFormat != _newMoviePrintDataSet.printFormat){
+        moviePrintDataSet.printFormat = _newMoviePrintDataSet.printFormat;
+//        switch (moviePrintDataSet.printFormat) {
+//            case OF_IMAGE_FORMAT_PNG:
+//                tempName = "png with alpha";
+//                break;
+//            case OF_IMAGE_FORMAT_JPEG:
+//                tempName = "jpg";
+//                break;
+//            default:
+//                tempName = "png with alpha";
+//                break;
+//        }
+//        uiRadioPrintOutputFormat->activateToggle(tempName);
+//        tempWidget = guiSettingsMoviePrint->getWidget(tempName);
+//        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
+
+    // printSizeWidth
+    if(moviePrintDataSet.printSizeWidth != _newMoviePrintDataSet.printSizeWidth){
+        moviePrintDataSet.printSizeWidth = _newMoviePrintDataSet.printSizeWidth;
+//        switch (moviePrintDataSet.printSizeWidth) {
+//            case 1024:
+//                tempName = "1024px width";
+//                break;
+//            case 2048:
+//                tempName = "2048px width";
+//                break;
+//            case 3072:
+//                tempName = "3072px width";
+//                break;
+//            case 4096:
+//                tempName = "4096px width";
+//                break;
+//            default:
+//                tempName = "1024px width";
+//                break;
+//        }
+//        uiRadioPrintOutputWidth->activateToggle(tempName);
+//        tempWidget = guiSettingsMoviePrint->getWidget(tempName);
+//        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
+    if (loadedMovie.isMovieLoaded()) {
+        for (int i = 0; i<numberOfStills; i++) {
+            if ((tempHasTheNumberOfThumbsChanged == true) || (moviePrintDataSet.gridTimeArray[i] != _newMoviePrintDataSet.gridTimeArray[i])) { // when the number of Thumbs has changed, all get updated - otherwise only the changed ones get updated
+                moviePrintDataSet.gridTimeArray[i] = _newMoviePrintDataSet.gridTimeArray[i];
+                loadedMovie.grabbedStill[i].gsFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
+                loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
+                loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
+                ofLog(OF_LOG_VERBOSE, "Still:" + ofToString(i) + " will be updated:" +  ofToString(_newMoviePrintDataSet.gridTimeArray[i]));
+            }
+        }
+        loadedMovie.updateOrderNumber();
+        if (!loadedMovie.isThreadRunning()) {
+            loadedMovie.start();
+        }
+
+//        uiRangeSliderTimeline->setValueLow(getLowestFrameNumber());
+//        uiRangeSliderTimeline->setValueHigh(getHighestFrameNumber());
+
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::logPreviousMoviePrintDataSet(){
+
+    for (int i=0; i < previousMoviePrintDataSet.size(); i++) {
+        if (undoPosition == i) {
+            ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet RECENT  " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+        } else {
+            ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Address " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+        }
+    }
+    ofLog(OF_LOG_VERBOSE, "moviePrintDataSet Address " +  ofToString(moviePrintDataSet.gridTimeArray));
 }
 
 //--------------------------------------------------------------
