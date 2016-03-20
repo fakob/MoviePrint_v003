@@ -599,15 +599,15 @@ void ofApp::draw(){
                 ofPushStyle();
 
                 ofEnableAlphaBlending();
-//                ofSetColor(0,(int)(tweenFading.value/255)*155);
+                ofSetColor(0,(int)(tweenFading.value/255)*155);
                 ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-//                ofSetColor(255,255,255,(int)tweenFading.value);
+                ofSetColor(255,255,255,(int)tweenFading.value);
 
                 loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-//                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * 1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+    //                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * 1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
                 loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (tweenFading.value/255));
 
-//                ofSetColor(255, 255, 255, (int)(tweenFading.value/255)*255);
+                ofSetColor(255, 255, 255, (int)(tweenFading.value/255)*255);
 
 //                if (uiRangeSliderTimeline->hitLow) {
 //                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
@@ -620,10 +620,10 @@ void ofApp::draw(){
 //                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
 //                }
 
-//                if(tweenFading.value < 5){
-//                    updateInOut = FALSE;
-//                    manipulateSlider = FALSE;
-//                }
+                if(tweenFading.value < 5){
+                    updateInOut = FALSE;
+                    manipulateSlider = FALSE;
+                }
 
                 ofSetColor(255);
 
@@ -644,17 +644,17 @@ void ofApp::draw(){
 
     drawUI(1, FALSE);
 
-//    if(showLoadMovieScreen){
-//        drawLoadMovieScreen();
-//    } else if (showPrintScreen) {
-//        drawPrintScreen();
-//    } else {
-//        if(showUpdateScreen && loadedMovie.isMovieLoaded()){
-//            drawUpdateScreen();
-//        }
-//    }
+    if(showLoadMovieScreen){
+        drawLoadMovieScreen();
+    } else if (showPrintScreen) {
+        drawPrintScreen();
+    } else {
+        if(showUpdateScreen && loadedMovie.isMovieLoaded()){
+            drawUpdateScreen();
+        }
+    }
 
-    ofxNotify::draw(drawNotify);
+//    ofxNotify::draw(drawNotify);
 }
 
 //--------------------------------------------------------------
@@ -671,15 +671,15 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     ofPopStyle();
 
-//    if (droppedFiles.size() > 1) { // draw
-//        if (loadedMovie.isMovieLoaded) {
-//            if (showListView == FALSE) {
-//                menuMoveToList.setPosition(0, 0);
-//                menuMoveToList.setSize(leftMargin*2, ofGetWindowHeight());
-//                menuMoveToList.drawMenu();
-//            }
-//        }
-//    }
+    if (droppedFiles.size() > 1) { // draw
+        if (loadedMovie.isMovieLoaded()) {
+            if (showListView == FALSE) {
+                menuMoveToList.setPosition(0, 0);
+                menuMoveToList.setSize(leftMargin*2, ofGetWindowHeight());
+                menuMoveToList.drawMenu();
+            }
+        }
+    }
 
     layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
 
@@ -1350,63 +1350,53 @@ void ofApp::gotMessage(ofMessage msg){
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){
-    ofLog(OF_LOG_VERBOSE, "Drag event------------------------------------------------");
-    ofxNotify() << "Drag event";
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
 
-//    if (!lockedDueToInteraction && !lockedDueToPrinting) {
-
-//        if (setupFinished) {
+        if (setupFinished) {
 
             if( dragInfo.files.size() > 0 ){
 
                 loadNewMovie("", FALSE, TRUE, FALSE);
 
-                ofxNotify() << "dragInfo.files[0]" + ofToString(dragInfo.files[0]);
-                ofxNotify() << "dragInfo.files[0]" + ofToString(ofToDataPath(dragInfo.files[0]));
-
-
-
-//                droppedList.disableMouseEvents(droppedFiles.size());
+                droppedList.disableMouseEvents(droppedFiles.size());
                 droppedFiles.clear();
                 for (int i=0; i<dragInfo.files.size(); i++) {
                     ofFile testFile(dragInfo.files[i]);
                     if (!testFile.isDirectory()) {
                         if (checkExtension(ofToString(testFile.getExtension()))){
-//                            droppedFiles.push_back(dragInfo.files[i]);
                             droppedFiles.push_back(testFile);
                         }
                     }
                 }
 
-//                droppedList.setup(droppedFiles);
+                droppedList.setup(droppedFiles);
 //                updateTheListScrollBar();
 
                 if(droppedFiles.size() > 1){
-//                    moveToList();
+                    moveToList();
                 } else if(droppedFiles.size() > 0){
                     ofLog(OF_LOG_VERBOSE, "Start LoadingMovie------------------------------------------------");
-                    ofxNotify() << "updateMovieFromDrop = TRUE";
                     updateMovieFromDrop = TRUE;
 
                 }
 
             }
-//        }
-//    } else {
-//        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
-//    }
+        }
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::moveToMovie(){
     ofLog(OF_LOG_VERBOSE, "moveToMovie()-------------------------------------------");
-//    lockedDueToInteraction = true;
-//    closeAllMenus();
+    lockedDueToInteraction = true;
+    closeAllMenus();
 
-//    showListView = FALSE;
+    showListView = FALSE;
 
-//    droppedList.disableMouseEvents(droppedFiles.size());
-//    loadedMovie.enableMouseEvents();
+    droppedList.disableMouseEvents(droppedFiles.size());
+    loadedMovie.enableMouseEvents();
 
 //    scrollBarList.unregisterMouseEvents();
 //    scrollBarList.unregisterTouchEvents();
@@ -1417,9 +1407,9 @@ void ofApp::moveToMovie(){
 //    menuTimeline.registerMouseEvents();
 //    menuTimeline.setMenuActive();
 
-//    printListNotImage = FALSE;
-//    updateInOut = FALSE;
-//    manipulateSlider = FALSE;
+    printListNotImage = FALSE;
+    updateInOut = FALSE;
+    manipulateSlider = FALSE;
 
     if (tweenListInOut.value != 0.0) {
     //        tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
@@ -1449,10 +1439,10 @@ void ofApp::moveInOutTimeline(){
 
     if (showTimeline){
         loadedMovie.setAllLimitsLower(ofGetHeight() - footerHeight);
-//        droppedList.setAllLimitsLower(ofGetHeight() - footerHeight);
+        droppedList.setAllLimitsLower(ofGetHeight() - footerHeight);
     } else {
         loadedMovie.setAllLimitsLower(ofGetHeight());
-//        droppedList.setAllLimitsLower(ofGetHeight());
+        droppedList.setAllLimitsLower(ofGetHeight());
     }
 
 }
@@ -1485,14 +1475,14 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
     updateGridTimeArrayWithAutomaticInterval();
     updateAllStills();
 
-//    if (_loadScrubMovie) {
-//        loadNewMovieToBeScrubbedBool = TRUE;
-//    }
+    if (_loadScrubMovie) {
+        loadNewMovieToBeScrubbedBool = TRUE;
+    }
 
-//    if (!_loadInBackground) {
-//        showListView = FALSE;
-//        droppedList.glUpdateMovieFromList = FALSE;
-//    }
+    if (!_loadInBackground) {
+        showListView = FALSE;
+        droppedList.glUpdateMovieFromList = FALSE;
+    }
     movieLoading = FALSE;
     if (movieProperlyLoaded){
         ofxNotify() << "Movie has finished to load";
@@ -1512,17 +1502,17 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
     ofLog(OF_LOG_VERBOSE, "_loadInBackground: " + ofToString(_loadInBackground));
     ofLog(OF_LOG_VERBOSE, "Finished Loading Movie--------------------------------------------");
 
-//    // reset all undo steps and save initial DataSet
-//    previousMoviePrintDataSet.clear();
-//    addToUndo = false;
-//    undoPosition = 0;
-//    addMoviePrintDataSet(0);
+    // reset all undo steps and save initial DataSet
+    previousMoviePrintDataSet.clear();
+    addToUndo = false;
+    undoPosition = 0;
+    addMoviePrintDataSet(0);
 
-//    if (!loadedMovie.isMovieLoaded()) {
+    if (!loadedMovie.isMovieLoaded()) {
 //        guiTimeline->setVisible(FALSE);
 //        scrollBar.unregisterMouseEvents();
-//        loadedMovie.disableMouseEvents();
-//    }
+        loadedMovie.disableMouseEvents();
+    }
 
 
 //    stringMovieInfo.clear();
@@ -1715,9 +1705,9 @@ void ofApp::updateAllStills(){
 
     loadedMovie.updateAllFrameNumbers(&moviePrintDataSet.gridTimeArray);
 
-//    if (updateGridTimeArrayToMoviePrintDataSet) {
-//        addGridTimeArrayToMoviePrintDataSet();
-//    }
+    if (updateGridTimeArrayToMoviePrintDataSet) {
+        addGridTimeArrayToMoviePrintDataSet();
+    }
 
     movieIsBeingGrabbed = TRUE;
     loadedMovie.start();
@@ -1795,7 +1785,7 @@ void ofApp::updateDisplayGrid(){
     //    ofLog(OF_LOG_VERBOSE, "displayGridHeight: " + ofToString(thumbHeight));
     //    ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(displayGridHeight));
 
-//    updateAllLimits();
+    updateAllLimits();
 //    updateTheScrollBar();
 //    updateTheListScrollBar();
 //    updateTimeline();
@@ -1828,7 +1818,7 @@ void ofApp::moveToList(){
 //    menuTimeline.unRegisterMouseEvents();
 //    menuTimeline.setMenuInactive();
 
-//    droppedList.enableMouseEvents();
+    droppedList.enableMouseEvents();
     printListNotImage = TRUE;
 
     if (tweenListInOut.value != 1.0) {
@@ -1843,26 +1833,26 @@ void ofApp::moveToList(){
 //--------------------------------------------------------------
 void ofApp::handlingEventOverlays(){
     // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs
-//    if (menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated() || menuSettings.getMenuActivated()) {
-//        if (loadedMovie.getMouseEventsEnabled()) {
-//            loadedMovie.disableMouseEvents();
-//        }
-//        if (showListView) {
-//            droppedList.disableMouseEvents(droppedFiles.size());
-//        }
-//    } else {
-//        if (allMenusAreClosedOnce == 0) {
-//            if (!lockedDueToInteraction && !lockedDueToPrinting) {
-//                allMenusAreClosedOnce++;
-//                if (!loadedMovie.getMouseEventsEnabled() && !showListView) {
-//                    loadedMovie.enableMouseEvents();
-//                }
-//                if (showListView) {
-//                    droppedList.enableMouseEvents();
-//                }
-//            }
-//        }
-//    }
+    if (menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated() || menuSettings.getMenuActivated()) {
+        if (loadedMovie.getMouseEventsEnabled()) {
+            loadedMovie.disableMouseEvents();
+        }
+        if (showListView) {
+            droppedList.disableMouseEvents(droppedFiles.size());
+        }
+    } else {
+        if (allMenusAreClosedOnce == 0) {
+            if (!lockedDueToInteraction && !lockedDueToPrinting) {
+                allMenusAreClosedOnce++;
+                if (!loadedMovie.getMouseEventsEnabled() && !showListView) {
+                    loadedMovie.enableMouseEvents();
+                }
+                if (showListView) {
+                    droppedList.enableMouseEvents();
+                }
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -2191,12 +2181,7 @@ void ofApp::exit(){
 
 //    delete guiTimeline;
 
-//    delete guiSettings;
-
-
 //    guiSettingsMoviePrint->saveSettings("guiMoviePrintSettings.xml");
-//    delete guiSettingsMoviePrint;
-
 
 }
 
@@ -2683,6 +2668,23 @@ void ofApp::updateOneThumb(int _thumbID, int _newFrameNumber){
 //    uiRangeSliderTimeline->setValueHigh(getHighestFrameNumber());
 
     ofLog(OF_LOG_VERBOSE, "manipulated one thumb" );
+}
+
+//--------------------------------------------------------------
+void ofApp::updateAllLimits(){
+    loadedMovie.setAllLimitsUpper(headerHeight);
+    droppedList.setAllLimitsUpper(headerHeight);
+    if (droppedFiles.size() > 1) { // Limit for menuMoveToList
+        ofLog(OF_LOG_VERBOSE, "setLeftLimits for menuMoveToList" + ofToString(leftMargin*4));
+        loadedMovie.setAllLimitsLeft(leftMargin*4);
+    } else {
+        loadedMovie.setAllLimitsLeft(leftMargin);
+    }
+    droppedList.setAllLimitsLeft(leftMargin);
+    loadedMovie.setAllLimitsLower(ofGetHeight());
+    droppedList.setAllLimitsLower(ofGetHeight());
+    loadedMovie.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
+    droppedList.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
 }
 
 //--------------------------------------------------------------

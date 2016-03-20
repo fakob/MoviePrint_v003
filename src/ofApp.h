@@ -118,6 +118,7 @@ public:
     bool hasChangedMoviePrintDataSet();
     void applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet);
     void logPreviousMoviePrintDataSet();
+    void updateAllLimits();
 
     // Movie
     fakGrabbedMovie loadedMovie;
