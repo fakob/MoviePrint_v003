@@ -347,6 +347,9 @@ void ofApp::update(){
     ImGui::SetWindowPos("moviePrintMenu", ImVec2(menuSettings.getPositionX(), menuSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
     ImGui::SetWindowSize("moviePrintMenu", ImVec2(menuSettings.getSizeW(), menuSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
 
+    ImGui::SetWindowPos("droppedList", ImVec2(leftMargin - listWidth + listWidth * tweenListInOut.value, topMargin + headerHeight), ImGuiSetCond_Always);
+    ImGui::SetWindowSize("droppedList", ImVec2(ofGetWidth() - scrollBarWidth - rightMargin - leftMargin, ofGetHeight() - (topMargin + headerHeight)), ImGuiSetCond_Always);
+
 //    guiTimeline->setPosition(leftMargin - OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
 
 
@@ -899,7 +902,29 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
     ImGui::End();
 
+    ImGui::PopStyleVar();
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0);
 
+    ImGui::Begin("droppedList", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
+
+    //        glFontStash.drawMultiLine("ID", tempSize, _x + tempFontMargin, _y + _scrollAmount + tempSize);
+    //        glFontStash.drawMultiLine("Name", tempSize, _x + glDroppedItem[0].gliIDWidth + tempFontMargin, _y + _scrollAmount + tempSize);
+        //        glFontStash.drawMultiLine("Tried", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth - 5, _y + _scrollAmount + tempSize);
+    //        glFontStash.drawMultiLine("Printed", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth + tempFontMargin - glFontStash.getBBox("Printed", tempSize,0,0).getMaxY(), _y + _scrollAmount + tempSize);
+    ImGui::Columns(4, "mycolumns");
+    ImGui::Separator();
+    ImGui::Text("ID"); ImGui::NextColumn();
+    ImGui::Text("Name"); ImGui::NextColumn();
+    ImGui::Text("Tried"); ImGui::NextColumn();
+    ImGui::Text("Printed"); ImGui::NextColumn();
+
+//    for(int k = 0; k < glDroppedItem.size(); k++){
+//        glDroppedItem[k].gliX = _x;
+//        glDroppedItem[k].gliY = _y + _scrollAmount + (glDroppedItem[k].gliHeight + glDroppedItem[k].gliPadding) * (k + 1);
+//        glDroppedItem[k].draw(glDroppedItem[k].gliX, glDroppedItem[k].gliY, _width);
+//    }
+
+    ImGui::End();
 
     ImGui::PopStyleColor();
     ImGui::PopStyleColor();
