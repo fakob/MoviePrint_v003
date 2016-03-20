@@ -919,10 +919,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ImGui::Text("Printed"); ImGui::NextColumn();
 
     for(int k = 0; k < droppedItem.size(); k++){
-//        droppedItem[k].gliX = _x;
-//        droppedItem[k].gliY = _y + _scrollAmount + (droppedItem[k].gliHeight + droppedItem[k].gliPadding) * (k + 1);
-//        droppedItem[k].draw(droppedItem[k].gliX, droppedItem[k].gliY, _width);
-
         static int selectedItem = -1;
         if (ImGui::Selectable(ofToString(droppedItem[k].itemProperties.ipID).c_str(), selectedItem == k, ImGuiSelectableFlags_SpanAllColumns))
             selectedItem = k;

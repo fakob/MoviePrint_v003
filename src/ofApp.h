@@ -4,6 +4,7 @@
 #include "fakgrabbedmovie.h"
 #include "fakmenu.h"
 #include "fakgrabbedlist.h"
+#include "fakgrabbedlistitem.h"
 
 #include "ofxNotify.h"
 #include "ofxEasing.h"
@@ -346,6 +347,7 @@ public:
     fakGrabbedList droppedList;
     bool printListNotImage;
     int itemToPrint;
+    vector<fakGrabbedListItem> droppedItem;
 
     //Grid Setup
     bool displayGridSetWithColumnsAndRows;
