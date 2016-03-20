@@ -124,18 +124,18 @@ void ofApp::setup(){
 //    tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
 //    tweenBlendStartDropImageCounter.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,100,0);
 
-    tweenTimelineInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 0.3);
-    tweenTimelineInOut.duration = ofRandom(0.6, 1.0);
     tweenTimelineInOut.minValue = 1.0;
     tweenTimelineInOut.maxValue = 0.0;
-    tweenListInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 0.3);
-    tweenListInOut.duration = ofRandom(0.6, 1.0);
+    tweenTimelineInOut.duration = ofRandom(0.6, 1.0);
+    tweenTimelineInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 0.3);
     tweenListInOut.minValue = 1.0;
     tweenListInOut.maxValue = 0.0;
-    tweenBlendStartDropImageCounter.initialTime = ofGetElapsedTimef();
-    tweenBlendStartDropImageCounter.duration = 0.1;
+    tweenListInOut.duration = ofRandom(0.6, 1.0);
+    tweenListInOut.initialTime = ofGetElapsedTimef() + ofRandom(0, 0.3);
     tweenBlendStartDropImageCounter.minValue = 0.0;
     tweenBlendStartDropImageCounter.maxValue = 1.0;
+    tweenBlendStartDropImageCounter.duration = 0.1;
+    tweenBlendStartDropImageCounter.initialTime = ofGetElapsedTimef();
 
     startImage.load("images/MoviePrint_StartBildschirm_v002_00000.png");
     dropZoneImage.load("images/MoviePrint_DropZone_v002_00000.png");
@@ -186,8 +186,6 @@ void ofApp::setup(){
 //    ofAddListener(scrollBarList.sbScrollingGoingOn, this, &ofApp::scrollEvent);
 
 //    setGUITimeline();
-//    setGUISettings();
-//    setGUISettingsMoviePrint();
 //    guiSettingsMoviePrint->loadSettings("guiMoviePrintSettings.xml");
 
 
@@ -214,9 +212,9 @@ void ofApp::setup(){
 //    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, 'B', false);
 //    menuTimeline.registerMouseEvents();
 
-//    menuMoveToList.setupMenu(6,0,0,0,0,leftMargin*2, true, 'L', false);
-//    menuMoveToList.registerMouseEvents();
-//    ofAddListener(menuMoveToList.mMenuIsBeingClicked, this, &ofApp::menuIsClicked);
+    menuMoveToList.setupMenu(6,0,0,0,0,leftMargin*2, true, 'L', false);
+    menuMoveToList.registerMouseEvents();
+    ofAddListener(menuMoveToList.mMenuIsBeingClicked, this, &ofApp::menuIsClicked);
 
 //    moveInOutTimeline();
 
@@ -264,17 +262,16 @@ void ofApp::update(){
     tweenTimelineInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimelineInOut.initialTime, (tweenTimelineInOut.initialTime + tweenTimelineInOut.duration), tweenTimelineInOut.minValue, tweenTimelineInOut.maxValue, &ofxeasing::exp::easeInOut);
     tweenListInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenListInOut.initialTime, (tweenListInOut.initialTime + tweenListInOut.duration), tweenListInOut.minValue, tweenListInOut.maxValue, &ofxeasing::exp::easeInOut);
     tweenBlendStartDropImageCounter.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenBlendStartDropImageCounter.initialTime, (tweenBlendStartDropImageCounter.initialTime + tweenBlendStartDropImageCounter.duration), tweenBlendStartDropImageCounter.minValue, tweenBlendStartDropImageCounter.maxValue, &ofxeasing::exp::easeInOut);
+    tweenBlendStartDropImage.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenBlendStartDropImage.initialTime, (tweenBlendStartDropImage.initialTime + tweenBlendStartDropImage.duration), tweenBlendStartDropImage.minValue, tweenBlendStartDropImage.maxValue, &ofxeasing::exp::easeInOut);
     tweenTimeDelay.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimeDelay.initialTime, (tweenTimeDelay.initialTime + tweenTimeDelay.duration), tweenTimeDelay.minValue, tweenTimeDelay.maxValue, &ofxeasing::exp::easeInOut);
 
     threadIsRunning = loadedMovie.isThreadRunning();
 
     // set window to minium width !!NOT WORKING
-//    if (windowWasResized && !ofGetMousePressed()) {
-//        ofSetWindowShape(fmin(ofGetWindowWidth(),1320),ofGetWindowHeight());
-//        windowWasResized = false;
-//    }
-
-//    loadedMovie.update();
+    //    if (windowWasResized && !ofGetMousePressed()) {
+    //        ofSetWindowShape(fmin(ofGetWindowWidth(),1320),ofGetWindowHeight());
+    //        windowWasResized = false;
+    //    }
 
     if (tweenListInOut.value == 0.0 || tweenListInOut.value == 1.0) {
         lockedDueToInteraction = false;
@@ -479,27 +476,27 @@ void ofApp::update(){
         }
     }
 
-//    if (droppedList.glUpdateMovieFromList) {
-//        printListNotImage = FALSE;
-//        showListView = FALSE;
-//        finishedLoadingMovie = FALSE;
-//        showLoadMovieScreen = TRUE;
-//        moveToMovie();
-//        counterToUpdate++;
-//        if (counterToUpdate > 1) {
-//            loadNewMovie(droppedList.glDroppedItem[droppedList.glActiveID].gliFile.path(), TRUE, FALSE, TRUE);
-//            droppedList.glUpdateMovieFromList = FALSE;
-//            counterToUpdate = 0;
-//        }
-//    }
-
-    if (updateMovieFromDrop) {
-//        printListNotImage = FALSE;
-//        showListView = FALSE;
+    if (droppedList.glUpdateMovieFromList) {
+        printListNotImage = FALSE;
+        showListView = FALSE;
         finishedLoadingMovie = FALSE;
         showLoadMovieScreen = TRUE;
-//        counterToUpdate++;
-//        if (counterToUpdate > 1) {
+        moveToMovie();
+        counterToUpdate++;
+        if (counterToUpdate > 1) {
+            loadNewMovie(droppedList.glDroppedItem[droppedList.glActiveID].gliFile.path(), TRUE, FALSE, TRUE);
+            droppedList.glUpdateMovieFromList = FALSE;
+            counterToUpdate = 0;
+        }
+    }
+
+    if (updateMovieFromDrop) {
+        printListNotImage = FALSE;
+        showListView = FALSE;
+        finishedLoadingMovie = FALSE;
+        showLoadMovieScreen = TRUE;
+        counterToUpdate++;
+        if (counterToUpdate > 1) {
             ofLog(OF_LOG_VERBOSE, "droppedFiles[0].path()" + ofToString(droppedFiles[0].path()));
 
             loadNewMovie(droppedFiles[0].path(), TRUE, FALSE, TRUE);
@@ -507,8 +504,8 @@ void ofApp::update(){
                 moveToMovie();
             }
             updateMovieFromDrop = FALSE;
-    //            counterToUpdate = 0;
-    //        }
+            counterToUpdate = 0;
+        }
     }
 
 //    if (scrollBar.sbActive) {
@@ -544,24 +541,24 @@ void ofApp::update(){
 //        scrollListAmountRel = 0;
 //    }
 
-//    if (currPrintingList) {
-//        updateScrub = FALSE;
-//        updateInOut = FALSE;
-//        printListToFile();
-//    }
+    if (currPrintingList) {
+        updateScrub = FALSE;
+        updateInOut = FALSE;
+        printListToFile();
+    }
 
-//    if (showPrintScreen && !finishedPrinting) {
-//        // to ensure that print screen is showing before printing starts
-//        counterToPrint++;
-//        if (counterToPrint > 1) {
-//            if (printListNotImage) {
-//                startListPrinting();
-//            } else {
-//                startPrinting();
-//            }
-//            counterToPrint = 0;
-//        }
-//    }
+    if (showPrintScreen && !finishedPrinting) {
+        // to ensure that print screen is showing before printing starts
+        counterToPrint++;
+        if (counterToPrint > 1) {
+            if (printListNotImage) {
+                startListPrinting();
+            } else {
+                startPrinting();
+            }
+            counterToPrint = 0;
+        }
+    }
 
 
     // sollte kurze wait schleife fuer das scrubvideoloading sein - leider funktioniert das nicht so ganz - man kann zwar das scrubvideo etwas spaeter loaden, waerenddessen haelt aber trotzdem alles an
@@ -576,19 +573,19 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-//    if (!(tweenListInOut.value == 0.0)) { // stop drawing when position is at showMovieView
+    if (!(tweenListInOut.value == 0.0)) { // stop drawing when position is at showMovieView
 
-//        drawList(scrollListAmountRel);
+        drawList(scrollListAmountRel);
 //        scrollBarList.draw();
 
-//    }
+    }
 
-//    if (!(tweenListInOut.value == 1.0)) { // stop drawing when position is at showListView
+    if (!(tweenListInOut.value == 1.0)) { // stop drawing when position is at showListView
 
         if (!loadedMovie.isMovieLoaded()) { // if no movie is loaded
             if (!showListView) { // if no List View
 //                guiTimeline->setVisible(FALSE);
-//                drawStartScreen();
+                drawStartScreen();
             }
 
         } else {
@@ -602,15 +599,15 @@ void ofApp::draw(){
                 ofPushStyle();
 
                 ofEnableAlphaBlending();
-//                ofSetColor(0,(int)(tweenFading.update()/255)*155);
+//                ofSetColor(0,(int)(tweenFading.value/255)*155);
                 ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-//                ofSetColor(255,255,255,(int)tweenFading.update());
+//                ofSetColor(255,255,255,(int)tweenFading.value);
 
-//                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * 1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-//                loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (tweenFading.update()/255));
+                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+//                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * 1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+                loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (tweenFading.value/255));
 
-//                ofSetColor(255, 255, 255, (int)(tweenFading.update()/255)*255);
+//                ofSetColor(255, 255, 255, (int)(tweenFading.value/255)*255);
 
 //                if (uiRangeSliderTimeline->hitLow) {
 //                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
@@ -623,7 +620,7 @@ void ofApp::draw(){
 //                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
 //                }
 
-//                if(tweenFading.update() < 5){
+//                if(tweenFading.value < 5){
 //                    updateInOut = FALSE;
 //                    manipulateSlider = FALSE;
 //                }
@@ -634,16 +631,16 @@ void ofApp::draw(){
 
             }
 
-//            // draw the scrubbed video
-//            if (updateScrub) {
-//                drawScrubScreen(1.0);
-//            }
+            // draw the scrubbed video
+            if (updateScrub) {
+                drawScrubScreen(1.0);
+            }
 
 //            scrollBar.draw();
 
         }
 
-//    }
+    }
 
     drawUI(1, FALSE);
 
@@ -1125,7 +1122,11 @@ void ofApp::keyReleased(int key){
 //                uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
 //                updateGridTimeArrayWithAutomaticInterval();
 //                updateAllStills();
-//                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+    //                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+//                tweenFading.minValue = 255.0;
+//                tweenFading.maxValue = 0.0;
+//                tweenFading.duration = 0.0;
+//                tweenFading.initialTime = ofGetElapsedTimef();
 //                addToUndo = true;
 //                if (addToUndo) {
 //                    addMoviePrintDataSet(undoPosition);
@@ -1147,7 +1148,11 @@ void ofApp::keyReleased(int key){
 //                    rollOverButtonsClicked(rollOverMovieID, 4);
 //                }
 //                addToUndo = true;
-//                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+    //                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+//                tweenFading.minValue = 255.0;
+//                tweenFading.maxValue = 0.0;
+//                tweenFading.duration = 0.0;
+//                tweenFading.initialTime = ofGetElapsedTimef();
 //                addToUndo = true;
 //                if (addToUndo) {
 //                    addMoviePrintDataSet(undoPosition);
@@ -1247,8 +1252,11 @@ void ofApp::mousePressed(int x, int y, int button){
                         }
                         updateInOut = FALSE;
                         ofLog(OF_LOG_VERBOSE, "the mouse was clicked" );
-//                        tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,255.0,200,0);
-
+    //                        tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,255.0,200,0);
+                        tweenFading.minValue = 0.0;
+                        tweenFading.maxValue = 255.0;
+                        tweenFading.duration = 0.2;
+                        tweenFading.initialTime = ofGetElapsedTimef();
                     }
                 }
             }
@@ -1272,13 +1280,21 @@ void ofApp::mouseReleased(int x, int y, int button){
                 }
                 if (updateInOut) {
                     ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
-//                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+    //                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+                    tweenFading.minValue = 255.0;
+                    tweenFading.maxValue = 0.0;
+                    tweenFading.duration = 0.5;
+                    tweenFading.initialTime = ofGetElapsedTimef();
                     updateGridTimeArrayWithAutomaticInterval();
                     updateAllStills();
                     addToUndo = true;
                 }
                 if (updateScrub) {
-//                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+    //                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+                    tweenFading.minValue = 255.0;
+                    tweenFading.maxValue = 0.0;
+                    tweenFading.duration = 0.5;
+                    tweenFading.initialTime = ofGetElapsedTimef();
 
                     int i = loadedMovie.gmScrubID;
                     if (scrubInitialFrame != loadedMovie.grabbedStill[i].gsFrameNumber) {
@@ -2268,22 +2284,38 @@ void ofApp::drawPrintScreen(){
 void ofApp::drawStartScreen(){
     ofPushMatrix();
     ofPushStyle();
-//    if (tweenBlendStartDropImageCounter.update() > 0.99) {
-//        if (switchFromLogoToDropZone) {
-//            tweenBlendStartDropImage.setParameters(1,easingsine,ofxTween::easeInOut,1.0,0.0,1000,0);
-//            tweenBlendStartDropImageCounter.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,1.0,3000,0);
-//        } else {
-//            tweenBlendStartDropImage.setParameters(1,easingsine,ofxTween::easeInOut,0.0,1.0,1000,0);
-//            tweenBlendStartDropImageCounter.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,1.0,6000,0);
-//        }
-//        switchFromLogoToDropZone = !switchFromLogoToDropZone;
-//    }
+    if (tweenBlendStartDropImageCounter.value > 0.99) {
+        if (switchFromLogoToDropZone) {
+    //            tweenBlendStartDropImage.setParameters(1,easingsine,ofxTween::easeInOut,1.0,0.0,1000,0);
+            tweenBlendStartDropImage.minValue = 1.0;
+            tweenBlendStartDropImage.maxValue = 0.0;
+            tweenBlendStartDropImage.duration = 1.0;
+            tweenBlendStartDropImage.initialTime = ofGetElapsedTimef();
+    //            tweenBlendStartDropImageCounter.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,1.0,3000,0);
+            tweenBlendStartDropImageCounter.minValue = 0.0;
+            tweenBlendStartDropImageCounter.maxValue = 1.0;
+            tweenBlendStartDropImageCounter.duration = 3.0;
+            tweenBlendStartDropImageCounter.initialTime = ofGetElapsedTimef();
+        } else {
+    //            tweenBlendStartDropImage.setParameters(1,easingsine,ofxTween::easeInOut,0.0,1.0,1000,0);
+            tweenBlendStartDropImage.minValue = 0.0;
+            tweenBlendStartDropImage.maxValue = 1.0;
+            tweenBlendStartDropImage.duration = 1.0;
+            tweenBlendStartDropImage.initialTime = ofGetElapsedTimef();
+    //            tweenBlendStartDropImageCounter.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,1.0,6000,0);
+            tweenBlendStartDropImageCounter.minValue = 0.0;
+            tweenBlendStartDropImageCounter.maxValue = 1.0;
+            tweenBlendStartDropImageCounter.duration = 6.0;
+            tweenBlendStartDropImageCounter.initialTime = ofGetElapsedTimef();
+        }
+        switchFromLogoToDropZone = !switchFromLogoToDropZone;
+    }
 
     ofSetColor(255, 255, 255, 255);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
-//    ofSetColor(255, 255, 255, 255 * tweenBlendStartDropImage.update());
+    ofSetColor(255, 255, 255, 255 * tweenBlendStartDropImage.value);
     startImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-startImage.getHeight()/2);
-//    ofSetColor(255, 255, 255, 255 * (1-tweenBlendStartDropImage.update()));
+    ofSetColor(255, 255, 255, 255 * (1-tweenBlendStartDropImage.value));
     dropZoneImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-startImage.getHeight()/2);
 
     ofPopStyle();
@@ -2332,46 +2364,46 @@ void ofApp::drawLoadMovieScreen(){
 void ofApp::drawScrubScreen(float _scaleFactor){
     ofPushStyle();
     ofEnableAlphaBlending();
-//    ofSetColor(0,(tweenFading.update()/255)*100);
+//    ofSetColor(0,(tweenFading.value/255)*100);
     ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight()-footerHeight/2);
 
     // draw the scrubMovie
-//    ofSetColor(255,(int)tweenFading.update());
+//    ofSetColor(255,(int)tweenFading.value);
     int j = loadedMovie.gmScrubID;
     loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-//    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(tweenFading.update()/255));
+//    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(tweenFading.value/255));
 
     // drawing frame
     float tempX = ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value;
     float tempY = ofGetHeight()/2-scrubWindowH/2;
     float tempFrameWidth = 3;
-//    ofSetColor(220,(int)tweenFading.update());
+//    ofSetColor(220,(int)tweenFading.value);
     ofDrawRectangle(tempX, tempY - tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
     ofDrawRectangle(tempX - tempFrameWidth, tempY - tempFrameWidth, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth);
     ofDrawRectangle(tempX + _scaleFactor * scrubWindowW, tempY, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth);
     ofDrawRectangle(tempX - tempFrameWidth, tempY + _scaleFactor * scrubWindowH, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
     // drawing shadow
-//    ofSetColor(0,200*(tweenFading.update()/255.0));
+//    ofSetColor(0,200*(tweenFading.value/255.0));
     ofDrawRectangle(tempX + _scaleFactor * scrubWindowW + tempFrameWidth, tempY, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth*2);
     ofDrawRectangle(tempX, tempY + _scaleFactor * scrubWindowH + tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
 
     // draw the scrubSpeed
-//    ofSetColor(FAK_GRAY,255*(tweenFading.update()/255.0));
+//    ofSetColor(FAK_GRAY,255*(tweenFading.value/255.0));
     ofDrawRectangle(tempX - tempFrameWidth, tempY + _scaleFactor * scrubWindowH + tempFrameWidth*2, _scaleFactor * scrubWindowW + tempFrameWidth*2, loaderBarHeight - tempFrameWidth);
     // drawing shadow
-//    ofSetColor(0,200*(tweenFading.update()/255.0));
+//    ofSetColor(0,200*(tweenFading.value/255.0));
     ofDrawRectangle(tempX + _scaleFactor * scrubWindowW + tempFrameWidth, tempY + _scaleFactor * scrubWindowH + tempFrameWidth*2, tempFrameWidth, loaderBarHeight - tempFrameWidth);
     ofDrawRectangle(tempX, tempY + _scaleFactor * scrubWindowH + tempFrameWidth*2 + loaderBarHeight - tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth*2, tempFrameWidth);
     float tempScrubWidth = ofClamp(scrubMouseDelta*3.0, -scrubWindowW/2, scrubWindowW/2);
     ofColor tempScrubColor(FAK_ORANGECOLOR);
     tempScrubColor.setSaturation(ofMap(abs(scrubMouseDelta),0.0,110.0,0.0,255.0));
-//    ofSetColor(tempScrubColor,(int)tweenFading.update());
+//    ofSetColor(tempScrubColor,(int)tweenFading.value);
     ofDrawRectangle(ofGetWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2+scrubWindowH/2+tempFrameWidth*3, tempScrubWidth, loaderBarHeight/2);
-//    ofSetColor(255,255,255,(int)tweenFading.update());
+//    ofSetColor(255,255,255,(int)tweenFading.value);
 
     ofDisableAlphaBlending();
     ofSetColor(255);
-//    if(tweenFading.update() < 5){
+//    if(tweenFading.value < 5){
 //        updateScrub = FALSE;
 //        loadedMovie.gmScrubMovie = FALSE;
 //        scrubbingJustStarted = true;

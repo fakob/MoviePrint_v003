@@ -342,7 +342,7 @@ public:
     string loadedFile;
     ofFilePath loadedFilePath;
     vector<ofFile> droppedFiles;
-//    fakGrabbedList droppedList;
+    fakGrabbedList droppedList;
     bool printListNotImage;
     int itemToPrint;
 
