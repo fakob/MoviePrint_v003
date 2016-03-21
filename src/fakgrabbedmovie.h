@@ -602,7 +602,7 @@ public:
 
     void grabToImage(int i, int _frame){
 
-        ofLog(OF_LOG_VERBOSE, "grabToImage: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+        ofLog(OF_LOG_VERBOSE, "before grabToImage: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
         if (isMovieLoaded()) {
 
@@ -626,25 +626,30 @@ public:
                 ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
             } else {
-                if (_frame==0) {
-                    gmMovie.setFrame(0);
-                    gmMovie.update();
-                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-                        ofSleepMillis(TimeToWaitForMovie);
-                    }
-//                    while (!gmMovie.isFrameNew()) {
-//                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready - isFrameNew()" + ofToString(gmMovie.isFrameNew()));
+//                if (_frame==0) {
+//                    gmMovie.setFrame(0);
+//                    gmMovie.update();
+//                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+//                        ofSleepMillis(TimeToWaitForMovie);
 //                    }
-                } else {
-                    gmMovie.setFrame(_frame);
-                    gmMovie.update();
-                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-                        ofSleepMillis(TimeToWaitForMovie);
-                    }
-//                    while (!gmMovie.isFrameNew()) {
-//                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready");
+////                    while (!gmMovie.isFrameNew()) {
+////                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready - isFrameNew()" + ofToString(gmMovie.isFrameNew()));
+////                    }
+//                } else {
+//                    gmMovie.setFrame(_frame);
+//                    gmMovie.update();
+//                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+//                        ofSleepMillis(TimeToWaitForMovie);
 //                    }
-                }
+////                    while (!gmMovie.isFrameNew()) {
+////                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready");
+////                    }
+//                }
+                gmMovie.setFrame(_frame);
+                gmMovie.update();
+                ofSleepMillis(TimeToWaitForMovie);
+                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+
             }
             if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
                 grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixels());
@@ -653,6 +658,7 @@ public:
                 ofLog(OF_LOG_VERBOSE, "CRASH AVOIDED grabbedStill[i].gsImage.isAllocated() FALSE _______________________________");
             }
         }
+        ofLog(OF_LOG_VERBOSE, "after grabToImage: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
     }
 
     int numberLoaded(){
@@ -933,7 +939,7 @@ public:
                 for (int i = 0; i<gmOrderNumberVector.size(); i++) { // frames are being updated in the order of their framenumber
                     if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
                         gmThreadCounter++;
-                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
+//                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
                         grabToImage(gmOrderNumberVector.at(i).x, grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber);
                     }
                 }

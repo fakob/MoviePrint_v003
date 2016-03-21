@@ -194,7 +194,8 @@ public:
 
     int currentKey = -1;
 
-
+    int inPoint;
+    int outPoint;
     int totalFrames;
 
 

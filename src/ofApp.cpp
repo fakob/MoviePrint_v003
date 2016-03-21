@@ -61,6 +61,8 @@ void ofApp::setup(){
     printNumberOfThumbs = 9;
     menuWidth = 255;
     listWidth = 1320;
+    inPoint = 0;
+    outPoint = 0;
 
     overwriteMoviePrint = false;
 
@@ -865,10 +867,10 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             moviePrintDataSet.printSizeWidth = 4096;
         }
 
-        if (ImGui::SliderFloat("InPoint", &uiSliderValueLow, 0,totalFrames-1)) {
-            int i = uiSliderValueLow;
-            int j = uiSliderValueHigh;
-            if ((uiSliderValueHigh-i < numberOfStills)) {
+        if (ImGui::SliderInt("InPoint", &inPoint, 0,totalFrames-1)) {
+            int i = inPoint;
+            int j = outPoint;
+            if ((outPoint-i < numberOfStills)) {
                 j = i + (numberOfStills - 1);
                 if (j > (totalFrames-1)) {
                     j = (totalFrames-1);
@@ -877,17 +879,17 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             }
         //    uiRangeSliderTimeline->setValueLow(i);
         //    uiRangeSliderTimeline->setValueHigh(j);
-            uiSliderValueLow = i;
-            uiSliderValueHigh = j;
+            inPoint = i;
+            outPoint = j;
             updateGridTimeArrayWithAutomaticInterval();
             updateAllStills();
             ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
         }
 
-        if (ImGui::SliderFloat("OutPoint", &uiSliderValueHigh, 0,totalFrames-1)) {
-            int i = uiSliderValueLow;
-            int j = uiSliderValueHigh;
-            if ((j - uiSliderValueLow < numberOfStills)) {
+        if (ImGui::SliderInt("OutPoint", &outPoint, 0,totalFrames-1)) {
+            int i = inPoint;
+            int j = outPoint;
+            if ((j - inPoint < numberOfStills)) {
                 i = j - (numberOfStills - 1);
                 if (i < 0) {
                     i = 0;
@@ -897,8 +899,8 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             }
         //    uiRangeSliderTimeline->setValueLow(i);
         //    uiRangeSliderTimeline->setValueHigh(j);
-            uiSliderValueLow = i;
-            uiSliderValueHigh = j;
+            inPoint = i;
+            outPoint = j;
             updateGridTimeArrayWithAutomaticInterval();
             updateAllStills();
             ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
@@ -1779,22 +1781,24 @@ void ofApp::calculateNewPrintGrid(){
 //--------------------------------------------------------------
 void ofApp::updateGridTimeArrayWithAutomaticInterval(){
 
-    if (uiSliderValueLow < 0) {
-        uiSliderValueLow = 0;
+    if (inPoint < 0) {
+        inPoint = 0;
     }
-    if (uiSliderValueHigh > (totalFrames-1)) {
-        uiSliderValueHigh = (totalFrames-1);
+    if (outPoint > (totalFrames-1)) {
+        outPoint = (totalFrames-1);
     }
 
     for (int i=0; i<numberOfStills; i++) {
         if (numberOfStills == 1) {
-            moviePrintDataSet.gridTimeArray[i] = ofMap(0.5, 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+            moviePrintDataSet.gridTimeArray[i] = ofMap(0.5, 0.0, 1.0, inPoint, outPoint, TRUE);
 
         } else {
-            moviePrintDataSet.gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+//            moviePrintDataSet.gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, inPoint, outPoint, TRUE);
+            moviePrintDataSet.gridTimeArray[i] = ofMap(i, 0, (numberOfStills - 1), inPoint, outPoint, TRUE);
         }
-        ofLog(OF_LOG_VERBOSE, "uiSliderValueLow: " + ofToString(uiSliderValueLow) + " uiSliderValueHigh: " + ofToString(uiSliderValueHigh) + " totalFrames: " + ofToString(totalFrames));
+//        ofLog(OF_LOG_VERBOSE, "inPoint: " + ofToString(inPoint) + " outPoint: " + ofToString(outPoint) + " totalFrames: " + ofToString(totalFrames));
     }
+    ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray: " +  ofToString(moviePrintDataSet.gridTimeArray));
 }
 
 //--------------------------------------------------------------
