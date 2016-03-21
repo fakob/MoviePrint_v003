@@ -1469,7 +1469,6 @@ void ofApp::moveToMovie(){
     manipulateSlider = FALSE;
 
     if (tweenListInOut.value != 0.0) {
-    //        tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
         tweenListInOut.initialTime = ofGetElapsedTimef();
         tweenListInOut.duration = ofRandom(0.6, 1.0);
         tweenListInOut.minValue = 1.0;

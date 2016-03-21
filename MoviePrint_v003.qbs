@@ -17,6 +17,7 @@ Project{
             "src/fakgrabbedmovie.h",
             "src/fakgrabbedmoviestill.h",
             "src/fakmenu.h",
+            "src/fakscrollbar.h",
             "src/main.cpp",
             "src/ofApp.cpp",
             "src/ofApp.h",

@@ -4,6 +4,7 @@
 #include "fakgrabbedmovie.h"
 #include "fakmenu.h"
 #include "fakgrabbedlistitem.h"
+#include "fakscrollbar.h"
 
 #include "ofxNotify.h"
 #include "ofxEasing.h"
