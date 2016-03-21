@@ -3,7 +3,6 @@
 #include "ofMain.h"
 #include "fakgrabbedmovie.h"
 #include "fakmenu.h"
-#include "fakgrabbedlist.h"
 #include "fakgrabbedlistitem.h"
 
 #include "ofxNotify.h"
@@ -344,10 +343,11 @@ public:
     string loadedFile;
     ofFilePath loadedFilePath;
     vector<ofFile> droppedFiles;
-    fakGrabbedList droppedList;
     bool printListNotImage;
     int itemToPrint;
     vector<fakGrabbedListItem> droppedItem;
+//    bool updateMovieFromList;
+    int activeItemID;
 
     //Grid Setup
     bool displayGridSetWithColumnsAndRows;
