@@ -120,6 +120,8 @@ public:
     void applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet);
     void logPreviousMoviePrintDataSet();
     void updateAllLimits();
+    void scrollEvent(ofVec2f & e);
+    void updateTheScrollBar();
 
     // Movie
     fakGrabbedMovie loadedMovie;
@@ -356,7 +358,7 @@ public:
 
 
     // scroll Bars
-//    fakScrollBar scrollBar;
+    fakScrollBar scrollBar;
 //    fakScrollBar scrollBarList;
     float scrollAmountRel;
     float scrollListAmountRel;

@@ -108,14 +108,14 @@ public:
         ofUnregisterMouseEvents(this);
     }
 
-    void registerTouchEvents(){
-        ofAddListener(pad.update, this, &fakScrollBar::padUpdates);
-        ofAddListener(pad.touchRemoved, this, &fakScrollBar::removedTouch);
-    }
+//    void registerTouchEvents(){
+//        ofAddListener(pad.update, this, &fakScrollBar::padUpdates);
+//        ofAddListener(pad.touchRemoved, this, &fakScrollBar::removedTouch);
+//    }
 
-    void unregisterTouchEvents(){
-        ofRemoveListener(pad.update, this, &fakScrollBar::padUpdates);
-    }
+//    void unregisterTouchEvents(){
+//        ofRemoveListener(pad.update, this, &fakScrollBar::padUpdates);
+//    }
 
     bool insideScrollArea(float _x, float _y ){
         return _x >= sbScrollAreaX && _x < sbScrollAreaX + sbScrollAreaWidth && _y >= sbScrollAreaY && _y < sbScrollAreaY + sbScrollAreaHeight;
@@ -163,29 +163,38 @@ public:
         //        ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(args.x) + ":" + ofToString(args.y) );
         sbScrollBarDrag = false;
 
-        if (sbMaxNumberOfTouches > 0){ // check if touchmouse
-            if ((sbNumberOfTouches != 0)) {
-                sbMouseScrollVelocity = ofVec2f(args.x * scrollMultiplier, args.y * scrollMultiplier);
-                sbMouseIsScrolling = true;
-                sbCalculateScrollInertia = true;
-                ofNotifyEvent(sbScrollingGoingOn, args, this);
-                ofResetElapsedTimeCounter();
-            }
-        } else { // no touchmouse used
-            if ((ofGetElapsedTimeMillis() > 50) || (ofGetElapsedTimeMillis() < 10)) {
-                int noTouchMouseMultiplier = 2;
-                if (sbFirstNoTouchMouseEvent) {
-                    sbDecelarationConstant = sbDecelarationConstant / 2.0;
-                    sbFirstNoTouchMouseEvent = false;
-                }
-                sbMouseScrollVelocity = ofVec2f(args.x * scrollMultiplier * noTouchMouseMultiplier, args.y * scrollMultiplier * noTouchMouseMultiplier);
-                sbMouseIsScrolling = true;
-                sbCalculateScrollInertia = true;
-                ofNotifyEvent(sbScrollingGoingOn, args, this);
-                ofResetElapsedTimeCounter();
-            }
-        }
+//        if (sbMaxNumberOfTouches > 0){ // check if touchmouse
+//            if ((sbNumberOfTouches != 0)) {
+//                sbMouseScrollVelocity = ofVec2f(args.x * scrollMultiplier, args.y * scrollMultiplier);
+//                sbMouseIsScrolling = true;
+//                sbCalculateScrollInertia = true;
+//                ofNotifyEvent(sbScrollingGoingOn, args, this);
+//                ofResetElapsedTimeCounter();
+//            }
+//        } else { // no touchmouse used
+//            if ((ofGetElapsedTimeMillis() > 50) || (ofGetElapsedTimeMillis() < 10)) {
+//                int noTouchMouseMultiplier = 2;
+//                if (sbFirstNoTouchMouseEvent) {
+//                    sbDecelarationConstant = sbDecelarationConstant / 2.0;
+//                    sbFirstNoTouchMouseEvent = false;
+//                }
+//                sbMouseScrollVelocity = ofVec2f(args.x * scrollMultiplier * noTouchMouseMultiplier, args.y * scrollMultiplier * noTouchMouseMultiplier);
+//                sbMouseIsScrolling = true;
+//                sbCalculateScrollInertia = true;
+//                ofNotifyEvent(sbScrollingGoingOn, args, this);
+//                ofResetElapsedTimeCounter();
+//            }
+//        }
+
+        sbMouseScrollVelocity = ofVec2f(args.scrollX * scrollMultiplier, args.scrollY * scrollMultiplier);
+        sbMouseIsScrolling = true;
+        sbCalculateScrollInertia = true;
+        ofNotifyEvent(sbScrollingGoingOn, args, this);
+        ofResetElapsedTimeCounter();
     }
+
+    void mouseEntered(ofMouseEventArgs & args){}
+    void mouseExited(ofMouseEventArgs & args){}
 
     void padUpdates(int & t) {
         sbNumberOfTouches = t;
@@ -293,9 +302,9 @@ public:
             ofPushStyle();
             ofEnableAlphaBlending();
             ofSetColor(255, 255, 255, 15);
-            ofRect(sbScrollAreaX, sbScrollAreaY, sbScrollAreaWidth, sbScrollAreaHeight);
+            ofDrawRectangle(sbScrollAreaX, sbScrollAreaY, sbScrollAreaWidth, sbScrollAreaHeight);
             ofSetColor(238, 71, 0, 127);
-            ofRectRounded(sbScrollBarX, sbScrollBarY, sbScrollBarWidth, sbScrollBarHeight, sbScrollBarWidth);
+            ofDrawRectRounded(sbScrollBarX, sbScrollBarY, sbScrollBarWidth, sbScrollBarHeight, sbScrollBarWidth);
             ofPopStyle();
         }
     }
@@ -342,7 +351,7 @@ public:
     float sbMaxVelocity;
     int sbBounceBackTimeMs;
 
-    ofxMultiTouchPad pad;
+//    ofxMultiTouchPad pad;
     int sbNumberOfTouches;
     int sbMaxNumberOfTouches; //check if touchmouse is used
 };

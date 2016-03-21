@@ -97,7 +97,6 @@ public:
 //        gmSetTitleInfo = TRUE; //create new title size und umbruch
 
         loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills, _showPlaceHolder, false);
-//        loadNewMovieToBeGrabbed(vfMovieName);
 
         gmSetupFinished = TRUE;
         gmShowFramesUI = TRUE;
@@ -352,22 +351,22 @@ public:
                 ofLog(OF_LOG_VERBOSE, "allocateNewNumberOfStills is waiting for thread to stop");
             }
 
-////          unregister All Mouse Events of the Stills (old gmNumberOfStills)
-//            disableMouseEvents();
+            // unregister All Mouse Events of the Stills (old gmNumberOfStills)
+            disableMouseEvents();
 
             setNumberOfStills(_numberOfStills);
             grabbedStill.clear();
             grabbedStill.resize(_numberOfStills);
 
-//            if (_addListener) {
-//                enableMouseEvents();
-//            }
+            if (_addListener) {
+                enableMouseEvents();
+            }
             for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
             {
-//                if (_addListener) {
-//                    ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
-//                    ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabbedMovie::rollOverMovie);
-//                }
+                if (_addListener) {
+                    ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
+                    ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabbedMovie::rollOverMovie);
+                }
                 grabbedStill[i].gsID = i;
                 grabbedStill[i].gsX = 0;
                 grabbedStill[i].gsY = 0;
@@ -601,31 +600,33 @@ public:
         }
     }
 
-    void grabToImage(int i, int f){
+    void grabToImage(int i, int _frame){
+
+        ofLog(OF_LOG_VERBOSE, "grabToImage: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
         if (isMovieLoaded()) {
 
-            if (f < 0) {
-                f = 0;
+            if (_frame < 0) {
+                _frame = 0;
             }
-            if (f > gmTotalFrames-1) {
-                f = gmTotalFrames-1;
+            if (_frame > gmTotalFrames-1) {
+                _frame = gmTotalFrames-1;
             }
 
             if (gmHasNoFrames) { // movies die "keine frames haben" benoetigen setPosition, deshalb sind auch meist die ersten paar frames "kaputt"
-                if (f < 5) {
-                    f = 5;
+                if (_frame < 5) {
+                    _frame = 5;
                 }
-                gmMovie.setPosition((float)(f-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
+                gmMovie.setPosition((float)(_frame-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
                 gmMovie.nextFrame();
                 gmMovie.nextFrame();
                 if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
                     ofSleepMillis(TimeToWaitForMovie);
                 }
-                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
             } else {
-                if (f==0) {
+                if (_frame==0) {
                     gmMovie.setFrame(0);
                     gmMovie.update();
                     if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
@@ -635,7 +636,7 @@ public:
 //                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready - isFrameNew()" + ofToString(gmMovie.isFrameNew()));
 //                    }
                 } else {
-                    gmMovie.setFrame(f);
+                    gmMovie.setFrame(_frame);
                     gmMovie.update();
                     if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
                         ofSleepMillis(TimeToWaitForMovie);
@@ -932,7 +933,7 @@ public:
                 for (int i = 0; i<gmOrderNumberVector.size(); i++) { // frames are being updated in the order of their framenumber
                     if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
                         gmThreadCounter++;
-//                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
+                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
                         grabToImage(gmOrderNumberVector.at(i).x, grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber);
                     }
                 }
@@ -947,7 +948,6 @@ public:
 
     void start(){
 
-//        startThread(true, false);   // blocking, verbose
         startThread(true);   // blocking, verbose
         gmThreadCounter = 0;
 

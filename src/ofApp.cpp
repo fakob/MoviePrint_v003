@@ -172,12 +172,11 @@ void ofApp::setup(){
     manipulateSlider = FALSE;
     updateDropped = FALSE;
 
-//    scrollMultiplier = 50.0;
-//    scrollBar.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
+    scrollMultiplier = 50.0;
+    scrollBar.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
 
-//    scrollBar.setScrollHeight((float)displayGridHeight);
+    scrollBar.setScrollHeight((float)displayGridHeight);
 //    scrollBar.registerMouseEvents();
-//    scrollBar.registerTouchEvents();
 //    ofAddListener(scrollBar.sbScrollingGoingOn, this, &ofApp::scrollEvent);
 
 //    scrollBarList.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
@@ -224,7 +223,7 @@ void ofApp::setup(){
     undoPosition = 0;
     addMoviePrintDataSet(undoPosition); // add loaded settings as first undo step
 
-    uiSliderValueHigh = 1000;    // added this temporarily until new timeline slider is in place
+//    uiSliderValueHigh = 1000;    // added this temporarily until new timeline slider is in place
 
     setupFinished = TRUE;
 }
@@ -512,22 +511,22 @@ void ofApp::update(){
         }
     }
 
-//    if (scrollBar.sbActive) {
-//    //        ofLog(OF_LOG_VERBOSE, "scrollBar Active:" + ofToString(scrollAmountRel) );
-//        if (scrollGrid) {
-//    //            ofLog(OF_LOG_VERBOSE, "scrollGrid True:" + ofToString(scrollAmountRel) );
-//            if (!scrollBar.sbCalculateScrollInertia && !scrollBar.sbScrollBarDrag) {
-//                scrollGrid = false;
-//            } else {
-//            scrollBar.update();
-//            scrollAmountRel = scrollBar.getRelativePos();
-//    //            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
-//            }
-//        }
-//    } else {
-//        scrollAmountRel = 0;
+    if (scrollBar.sbActive) {
+    //        ofLog(OF_LOG_VERBOSE, "scrollBar Active:" + ofToString(scrollAmountRel) );
+        if (scrollGrid) {
+    //            ofLog(OF_LOG_VERBOSE, "scrollGrid True:" + ofToString(scrollAmountRel) );
+            if (!scrollBar.sbCalculateScrollInertia && !scrollBar.sbScrollBarDrag) {
+                scrollGrid = false;
+            } else {
+            scrollBar.update();
+            scrollAmountRel = scrollBar.getRelativePos();
+    //            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
+            }
+        }
+    } else {
+        scrollAmountRel = 0;
 
-//    }
+    }
 
 //    if (scrollBarList.sbActive) {
 //    //        ofLog(OF_LOG_VERBOSE, "scrollBarList Active:" + ofToString(scrollListAmountRel) );
@@ -640,7 +639,7 @@ void ofApp::draw(){
                 drawScrubScreen(1.0);
             }
 
-//            scrollBar.draw();
+            scrollBar.draw();
 
         }
 
@@ -764,10 +763,11 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.00f, 0.00f, 0.00f, 0.10f));
 
-    ImGui::Begin("SettingsMoviePrint", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
-
-
     if ((menuMoviePrintSettings.getSizeH()-headerHeight)>0) {
+
+        ImGui::Begin("SettingsMoviePrint", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
+
+
 
 //    ImGui::Dummy(ImVec2(100,100));
 
@@ -864,54 +864,97 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         if (ImGui::RadioButton("4096px width", &tempS, 3)) {
             moviePrintDataSet.printSizeWidth = 4096;
         }
+
+        if (ImGui::SliderFloat("InPoint", &uiSliderValueLow, 0,totalFrames-1)) {
+            int i = uiSliderValueLow;
+            int j = uiSliderValueHigh;
+            if ((uiSliderValueHigh-i < numberOfStills)) {
+                j = i + (numberOfStills - 1);
+                if (j > (totalFrames-1)) {
+                    j = (totalFrames-1);
+                    i = j - (numberOfStills - 1);
+                }
+            }
+        //    uiRangeSliderTimeline->setValueLow(i);
+        //    uiRangeSliderTimeline->setValueHigh(j);
+            uiSliderValueLow = i;
+            uiSliderValueHigh = j;
+            updateGridTimeArrayWithAutomaticInterval();
+            updateAllStills();
+            ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+        }
+
+        if (ImGui::SliderFloat("OutPoint", &uiSliderValueHigh, 0,totalFrames-1)) {
+            int i = uiSliderValueLow;
+            int j = uiSliderValueHigh;
+            if ((j - uiSliderValueLow < numberOfStills)) {
+                i = j - (numberOfStills - 1);
+                if (i < 0) {
+                    i = 0;
+                    j = (numberOfStills - 1);
+
+                }
+            }
+        //    uiRangeSliderTimeline->setValueLow(i);
+        //    uiRangeSliderTimeline->setValueHigh(j);
+            uiSliderValueLow = i;
+            uiSliderValueHigh = j;
+            updateGridTimeArrayWithAutomaticInterval();
+            updateAllStills();
+            ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+        }
+
+        ImGui::End();
+
     }
-
-    ImGui::End();
-
 
     ImGui::PopStyleVar();
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuSettings.getSizeH()-headerHeight)/30));
 
+    if ((menuSettings.getSizeH()-headerHeight)>0) {
 
-    ImGui::Begin("moviePrintMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoScrollbar);
+        ImGui::Begin("moviePrintMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoScrollbar);
 
-    if (ImGui::Button("Save MoviePrint", ImVec2(menuSettings.getSizeW(),100))) {
-        if (loadedMovie.isMovieLoaded() || showListView) {
-            closeAllMenus();
-            finishedPrinting = FALSE;
-            showPrintScreen = TRUE;
+        if (ImGui::Button("Save MoviePrint", ImVec2(menuSettings.getSizeW(),100))) {
+            if (loadedMovie.isMovieLoaded() || showListView) {
+                closeAllMenus();
+                finishedPrinting = FALSE;
+                showPrintScreen = TRUE;
+            }
         }
-    }
-    ImGui::Separator();
-    if (ImGui::Button("Refresh")) {
-        if (loadedMovie.isMovieLoaded() || showListView) {
-            updateAllStills();
+        ImGui::Separator();
+        if (ImGui::Button("Refresh")) {
+            if (loadedMovie.isMovieLoaded() || showListView) {
+                updateAllStills();
+            }
         }
-    }
-    if (ImGui::Button("Undo")) {
-        if (loadedMovie.isMovieLoaded() || showListView) {
-            undoStep();
+        if (ImGui::Button("Undo")) {
+            if (loadedMovie.isMovieLoaded() || showListView) {
+                undoStep();
+            }
         }
-    }
-    if (ImGui::Button("Redo")) {
-        if (loadedMovie.isMovieLoaded() || showListView) {
-            redoStep();
+        if (ImGui::Button("Redo")) {
+            if (loadedMovie.isMovieLoaded() || showListView) {
+                redoStep();
+            }
         }
-    }
-    ImGui::Separator();
-    if (ImGui::Button("Show MoviePrint Preview", ImVec2(menuSettings.getSizeW(),100))) {
-        menuSettings.closeMenuManually();
-        toggleMoviePrintPreview();
-    }
+        ImGui::Separator();
+        if (ImGui::Button("Show MoviePrint Preview", ImVec2(menuSettings.getSizeW(),100))) {
+            menuSettings.closeMenuManually();
+            toggleMoviePrintPreview();
+        }
 
-    ImGui::End();
+        ImGui::End();
+
+    }
 
     ImGui::PopStyleVar();
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0);
 
-    ImGui::Begin("droppedList", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
-
     if (!(tweenListInOut.value == 0.0)) { // stop drawing when position is at showMovieView
+
+        ImGui::Begin("droppedList", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
+
         //        glFontStash.drawMultiLine("ID", tempSize, _x + tempFontMargin, _y + _scrollAmount + tempSize);
         //        glFontStash.drawMultiLine("Name", tempSize, _x + glDroppedItem[0].gliIDWidth + tempFontMargin, _y + _scrollAmount + tempSize);
         //        glFontStash.drawMultiLine("Tried", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth - 5, _y + _scrollAmount + tempSize);
@@ -941,8 +984,8 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             ImGui::Text(ofToString(droppedItem[k].itemProperties.ipPrinted).c_str());
             ImGui::NextColumn();
         }
+        ImGui::End();
     }
-    ImGui::End();
 
     ImGui::PopStyleColor();
     ImGui::PopStyleColor();
@@ -1548,7 +1591,7 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
         ofxNotify() << "Movie could not be loaded";
         ofxNotify() << "Movie could not be loaded";
     }
-//    updateTheScrollBar();
+    updateTheScrollBar();
 
     ofLog(OF_LOG_VERBOSE, "scrollAmountRel: " + ofToString(scrollAmountRel));
 
@@ -1566,7 +1609,7 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
 
     if (!loadedMovie.isMovieLoaded()) {
 //        guiTimeline->setVisible(FALSE);
-//        scrollBar.unregisterMouseEvents();
+        scrollBar.unregisterMouseEvents();
         loadedMovie.disableMouseEvents();
     }
 
@@ -1750,6 +1793,7 @@ void ofApp::updateGridTimeArrayWithAutomaticInterval(){
         } else {
             moviePrintDataSet.gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
         }
+        ofLog(OF_LOG_VERBOSE, "uiSliderValueLow: " + ofToString(uiSliderValueLow) + " uiSliderValueHigh: " + ofToString(uiSliderValueHigh) + " totalFrames: " + ofToString(totalFrames));
     }
 }
 
@@ -1776,14 +1820,14 @@ void ofApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPr
     ofPushMatrix();
     ofPushStyle();
     float _scrollAmount = 0;
-//    if (scrollBar.sbActive) {
-//        _scrollAmount = ((displayGridHeight - (ofGetWindowHeight() - headerHeight - topMargin - bottomMargin)) * -1) * _scrollAmountRel;
-//    }
-//    if (isnan(_scrollAmount)) {
-//        _scrollAmount = 0;
-//    }
-//    float tempX = (leftMargin + listWidth * tweenListInOut.value) * _scaleFactor;
-    float tempX = (leftMargin + listWidth * 0) * _scaleFactor;
+    if (scrollBar.sbActive) {
+        _scrollAmount = ((displayGridHeight - (ofGetWindowHeight() - headerHeight - topMargin - bottomMargin)) * -1) * _scrollAmountRel;
+    }
+    if (isnan(_scrollAmount)) {
+        _scrollAmount = 0;
+    }
+    float tempX = (leftMargin + listWidth * tweenListInOut.value) * _scaleFactor;
+//    float tempX = (leftMargin + listWidth * 0) * _scaleFactor;
     float tempY = (_scrollAmount + headerHeight + topMargin)  * _scaleFactor;
 //    ofLog(OF_LOG_VERBOSE, "tempX:"+ ofToString(tempX) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
     loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
@@ -1842,7 +1886,7 @@ void ofApp::updateDisplayGrid(){
     //    ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(displayGridHeight));
 
     updateAllLimits();
-//    updateTheScrollBar();
+    updateTheScrollBar();
 //    updateTheListScrollBar();
 //    updateTimeline();
 
@@ -1884,14 +1928,18 @@ void ofApp::handlingEventOverlays(){
     // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs
     if (menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated() || menuSettings.getMenuActivated()) {
         if (loadedMovie.getMouseEventsEnabled()) {
+            ofLog(OF_LOG_VERBOSE, "handlingEventOverlays() - mouseEvents disabled");
             loadedMovie.disableMouseEvents();
+            scrollBar.unregisterMouseEvents();
         }
     } else {
         if (allMenusAreClosedOnce == 0) {
             if (!lockedDueToInteraction && !lockedDueToPrinting) {
                 allMenusAreClosedOnce++;
                 if (!loadedMovie.getMouseEventsEnabled() && !showListView) {
+                    ofLog(OF_LOG_VERBOSE, "handlingEventOverlays() --- mouseEvents enabled");
                     loadedMovie.enableMouseEvents();
+                    scrollBar.registerMouseEvents();
                 }
             }
         }
@@ -2812,4 +2860,22 @@ string ofApp::cropFrontOfString(string _inputString, int _length, string _substi
         ofLog(OF_LOG_VERBOSE, "crop String to length:" + ofToString(_inputString.length()));
         return _substitute + _inputString.substr(_inputString.length()-_length - _substitute.length());
     }
+}
+
+//--------------------------------------------------------------
+void ofApp::scrollEvent(ofVec2f &e){
+    if (!updateScrub) {
+        if (showListView) {
+            scrollList = TRUE;
+        } else {
+            scrollGrid = TRUE;
+        }
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::updateTheScrollBar(){
+    scrollBar.updateScrollBar(ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, displayGridHeight);
+    scrollBar.setToTop();
+    scrollAmountRel = scrollBar.getRelativePos();
 }
