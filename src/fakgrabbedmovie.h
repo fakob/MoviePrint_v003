@@ -645,9 +645,11 @@ public:
 ////                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready");
 ////                    }
 //                }
+                gmMovie.play();
                 gmMovie.setFrame(_frame);
                 gmMovie.update();
-                ofSleepMillis(TimeToWaitForMovie);
+                gmMovie.stop();
+//                ofSleepMillis(TimeToWaitForMovie);
                 ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
             }
