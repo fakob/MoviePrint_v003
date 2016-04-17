@@ -5,7 +5,6 @@
 #include <iostream>
 #include "ofMain.h"
 #include "fakGrabbedMovieStill.h"
-#include "ofxFontStash.h"
 
 #define REsizeFactor 10.0
 #define TimeToWaitForMovie 500
@@ -86,16 +85,16 @@ public:
 
         setNumberOfStills(_numberOfStills);
 
-        gmFontStashUbuntu.setup("Ubuntu-Light.ttf", 1.03);
-        gmFontStashFranchise.setup("Franchise-Bold.ttf", 0.9);
-        gmFontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
-        gmFontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
+//        gmFontStashUbuntu.setup("Ubuntu-Light.ttf", 1.03);
+//        gmFontStashFranchise.setup("Franchise-Bold.ttf", 0.9);
+//        gmFontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
+//        gmFontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
 
 
-        franchiseFontRightSize = 0;
-        stringMargin = 2;
+//        franchiseFontRightSize = 0;
+//        stringMargin = 2;
 
-        gmSetTitleInfo = TRUE; //create new title size und umbruch
+//        gmSetTitleInfo = TRUE; //create new title size und umbruch
 
         loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills, _showPlaceHolder, false);
 
@@ -141,7 +140,7 @@ public:
         }
         allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
 
-        getMovieInformation(vfMovieName);
+//        getMovieInformation(vfMovieName);
 
         gmSetTitleInfo = TRUE;
 
@@ -429,9 +428,9 @@ public:
             drawStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
         }
 
-        if (_isBeingPrinted) {
-            gmSetTitleInfo = TRUE; //create new title size und umbruch
-        }
+//        if (_isBeingPrinted) {
+//            gmSetTitleInfo = TRUE; //create new title size und umbruch
+//        }
 
         ofPopMatrix();
         ofPopStyle();
@@ -492,9 +491,9 @@ public:
                 ofPopMatrix();
             }
 
-            if (gmShowFramesUI) { // drawing UI
-                drawStillUI(i, grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, _alpha);
-            }
+//            if (gmShowFramesUI) { // drawing UI
+//                drawStillUI(i, grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, _alpha);
+//            }
 
             // drawing overlay graphics
                 if (grabbedStill[i].gsRollOver) {
@@ -793,19 +792,19 @@ public:
                 float tempFontScale = _scaleFactor;
 
                 // get Width of Type
-                float tempWidthOfName = gmFontStashFranchise.getBBox("movieprint", tempFontHeightBig * _scaleFactor, 0, 0).getWidth();
-                float tempWidthOfPathName = gmFontStashHelveticaMedium.getBBox(ofToString(gmMovie.getMoviePath()), tempFontHeightSmall * _scaleFactor, 0, 0).getWidth();
+//                float tempWidthOfName = gmFontStashFranchise.getBBox("movieprint", tempFontHeightBig * _scaleFactor, 0, 0).getWidth();
+//                float tempWidthOfPathName = gmFontStashHelveticaMedium.getBBox(ofToString(gmMovie.getMoviePath()), tempFontHeightSmall * _scaleFactor, 0, 0).getWidth();
 
                 // when PathName width bigger then display width then downscale the PathName
-                if ((((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName) <= tempWidthOfPathName) {
-                    tempFontScale = tempFontScale * (((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName)/tempWidthOfPathName*0.75;
-                }
-                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, 0, 0).getWidth();
+//                if ((((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName) <= tempWidthOfPathName) {
+//                    tempFontScale = tempFontScale * (((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName)/tempWidthOfPathName*0.75;
+//                }
+//                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, 0, 0).getWidth();
 
                 ofSetColor(255, 255, 255, 255);
-                gmFontStashFranchise.draw("movieprint",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
-                gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
-                gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+//                gmFontStashFranchise.draw("movieprint",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+//                gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+//                gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
             }
 
             ofPopMatrix();
@@ -880,9 +879,9 @@ public:
             grabbedStill[i].gsTexture.draw(_x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
             shader.end();
 
-            if (gmShowFramesUI) { // drawing UI
-                drawStillUI(i, _x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, 1.0);
-            }
+//            if (gmShowFramesUI) { // drawing UI
+//                drawStillUI(i, _x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, 1.0);
+//            }
 
             ofPopStyle();
             ofSetColor(255);
@@ -905,7 +904,8 @@ public:
             ofPushStyle();
             ofEnableAlphaBlending();
 
-            ofRectangle rect = gmFontStashUbuntu.getBBox(dummyString, tempFontSize, 0, 0);
+//            ofRectangle rect = gmFontStashUbuntu.getBBox(dummyString, tempFontSize, 0, 0);
+            ofRectangle rect (0, 0, 100, 100); // substitute for not functional code
             if (grabbedStill[i].gsManipulated) {
                 ofSetColor(FAK_ORANGECOLOR, 200*_alpha);
             } else {
@@ -917,7 +917,7 @@ public:
             } else {
                 ofSetColor(255, 255 * _alpha);
             }
-            gmFontStashUbuntu.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
+//            gmFontStashUbuntu.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
 
             ofPopStyle();
 
@@ -1024,10 +1024,10 @@ public:
     ofImage emptyImage;
     ofImage scrubImage;
 
-    ofxFontStash gmFontStashHelveticaLight;
-    ofxFontStash gmFontStashHelveticaMedium;
-    ofxFontStash gmFontStashUbuntu;
-    ofxFontStash gmFontStashFranchise;
+    //ofxFontStash gmFontStashHelveticaLight;
+    //ofxFontStash gmFontStashHelveticaMedium;
+    //ofxFontStash gmFontStashUbuntu;
+    //ofxFontStash gmFontStashFranchise;
     int tempFontSize[24] = {6, 10, 14, 18, 22, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 80, 92, 108, 128, 256, 300};
 
     int franchiseFontRightSize;
