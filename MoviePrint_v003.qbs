@@ -27,7 +27,9 @@ Project{
             "ofxNotify",
             "ofxEasing",
             "ofxMSATimer",
-            "ofxImgui"
+            "ofxImgui",
+            "ofxFontStash",
+            "ofxUnicode-ofxFontStash"
         ]
 
         // additional flags for the project. the of module sets some

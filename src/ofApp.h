@@ -10,6 +10,7 @@
 #include "ofxEasing.h"
 #include "ofxMSATimer.h"
 #include "ofxImgui.h"
+#include "ofxFontStash.h"
 
 class ofApp : public ofBaseApp{
 
