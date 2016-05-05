@@ -1816,7 +1816,8 @@ void ofApp::updateAllStills(){
     }
 
     movieIsBeingGrabbed = TRUE;
-    loadedMovie.start();
+//    loadedMovie.start();
+    loadedMovie.grabToImageFunction();
 
     ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
 }

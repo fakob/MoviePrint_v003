@@ -6,8 +6,8 @@
 #include "ofMain.h"
 #include "fakGrabbedMovieStill.h"
 
-//#include "ofxAvAudioPlayer.h"
-//#include "ofxAvVideoPlayer.h"
+#include "ofxAvAudioPlayer.h"
+#include "ofxAvVideoPlayer.h"
 
 #define REsizeFactor 10.0
 #define TimeToWaitForMovie 500
@@ -156,9 +156,10 @@ public:
         return isMovieLoaded();
     }
 
-//    void audioOut( float * buffer, int nFrames, int nChannels ){
-//        gmMovie.audioOut( buffer, nFrames, nChannels );
-//    }
+    // used for ofxAvCodec addon
+//void audioOut( float * buffer, int nFrames, int nChannels ){
+//    gmMovie.audioOut( buffer, nFrames, nChannels );
+//}
 
     void loadNewMovieToBeScrubbed(string vfMovieName){
 
@@ -660,9 +661,10 @@ public:
 ////                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready");
 ////                    }
 //                }
-//                gmMovie.play();
+                gmMovie.play();
 //                gmMovie.setFrame(_frame);
                 gmMovie.setPosition(_frame/(float)gmTotalFrames);
+//                gmMovie.setPosition(0.5);
                 gmMovie.update();
 //                gmMovie.stop();
 //                ofSleepMillis(TimeToWaitForMovie);
@@ -940,33 +942,61 @@ public:
         }
     }
 
-    // Thread funcions
-
-    void threadedFunction(){
+    void grabToImageFunction(){
 
         if (gmSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
-            lock();
+//            lock();
             do {
-//                for (int i = 0; i<gmNumberOfStills; i++) {
-//                    if (grabbedStill[i].gsToBeGrabbed) {
-//                        gmThreadCounter++;
-//                        grabToImage(i, grabbedStill[i].gsFrameNumber);
-//                    }
-//                }
+                //                for (int i = 0; i<gmNumberOfStills; i++) {
+                //                    if (grabbedStill[i].gsToBeGrabbed) {
+                //                        gmThreadCounter++;
+                //                        grabToImage(i, grabbedStill[i].gsFrameNumber);
+                //                    }
+                //                }
 
                 for (int i = 0; i<gmOrderNumberVector.size(); i++) { // frames are being updated in the order of their framenumber
                     if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
                         gmThreadCounter++;
-                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
+                        ofLog(OF_LOG_VERBOSE, "In NoneThread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
                         grabToImage(gmOrderNumberVector.at(i).x, grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber);
                     }
                 }
 
             } while (!allGrabbed());
-            unlock();
+//            unlock();
         }
-        stop(TRUE);
-                ofLog(OF_LOG_VERBOSE, "Closing Thread Function-----------------------------------------------" );
+//        stop(TRUE);
+//        ofLog(OF_LOG_VERBOSE, "Closing Thread Function-----------------------------------------------" );
+
+    }
+
+    // Thread funcions
+
+    void threadedFunction(){
+
+//        if (gmSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
+//            lock();
+//            do {
+//    //                for (int i = 0; i<gmNumberOfStills; i++) {
+//    //                    if (grabbedStill[i].gsToBeGrabbed) {
+//    //                        gmThreadCounter++;
+//    //                        grabToImage(i, grabbedStill[i].gsFrameNumber);
+//    //                    }
+//    //                }
+
+//                for (int i = 0; i<gmOrderNumberVector.size(); i++) { // frames are being updated in the order of their framenumber
+//                    if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
+//                        gmThreadCounter++;
+//                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
+//                        grabToImage(gmOrderNumberVector.at(i).x, grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber);
+//                    }
+//                }
+
+//            } while (!allGrabbed());
+//            unlock();
+//        }
+//        stop(TRUE);
+//                ofLog(OF_LOG_VERBOSE, "Closing Thread Function-----------------------------------------------" );
 
     }
 
@@ -987,6 +1017,9 @@ public:
     }
 
     //properties
+
+    // used for ofxAvCodec addon
+//    ofxAvVideoPlayer gmMovie;
 
     ofVideoPlayer gmMovie;
     ofVideoPlayer gmMovieScrub;
@@ -1061,9 +1094,6 @@ public:
     // used for rounded corner mask
     ofShader shader;
     ofFbo maskFbo;
-
-    // used for ofxAvCodec addon
-//    ofxAvVideoPlayer gmMovie;
 
 };
 
