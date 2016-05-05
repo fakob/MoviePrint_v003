@@ -872,42 +872,11 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         }
 
         if (ImGui::SliderInt("InPoint", &inPoint, 0,totalFrames-1)) {
-            int i = inPoint;
-            int j = outPoint;
-            if ((outPoint-i < numberOfStills)) {
-                j = i + (numberOfStills - 1);
-                if (j > (totalFrames-1)) {
-                    j = (totalFrames-1);
-                    i = j - (numberOfStills - 1);
-                }
-            }
-        //    uiRangeSliderTimeline->setValueLow(i);
-        //    uiRangeSliderTimeline->setValueHigh(j);
-            inPoint = i;
-            outPoint = j;
-            updateGridTimeArrayWithAutomaticInterval();
-            updateAllStills();
-            ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+            setInPoint(inPoint);
         }
 
         if (ImGui::SliderInt("OutPoint", &outPoint, 0,totalFrames-1)) {
-            int i = inPoint;
-            int j = outPoint;
-            if ((j - inPoint < numberOfStills)) {
-                i = j - (numberOfStills - 1);
-                if (i < 0) {
-                    i = 0;
-                    j = (numberOfStills - 1);
-
-                }
-            }
-        //    uiRangeSliderTimeline->setValueLow(i);
-        //    uiRangeSliderTimeline->setValueHigh(j);
-            inPoint = i;
-            outPoint = j;
-            updateGridTimeArrayWithAutomaticInterval();
-            updateAllStills();
-            ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+            setOutPoint(outPoint);
         }
 
         ImGui::End();
@@ -2753,43 +2722,43 @@ void ofApp::updateAllLimits(){
 
 //--------------------------------------------------------------
 void ofApp::setInPoint(int _inPoint){
-//    int i = _inPoint;
-//    int j = uiRangeSliderTimeline->getScaledValueHigh();
-//    if ((uiRangeSliderTimeline->getScaledValueHigh()-i < numberOfStills)) {
-//        j = i + (numberOfStills - 1);
-//        if (j > (totalFrames-1)) {
-//            j = (totalFrames-1);
-//            i = j - (numberOfStills - 1);
-//        }
-//    }
-//    uiRangeSliderTimeline->setValueLow(i);
-//    uiRangeSliderTimeline->setValueHigh(j);
-//    uiSliderValueLow = i;
-//    uiSliderValueHigh = j;
-//    updateGridTimeArrayWithAutomaticInterval();
-//    updateAllStills();
-//    ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+    int i = _inPoint;
+    int j = outPoint;
+    if ((outPoint-i < numberOfStills)) {
+        j = i + (numberOfStills - 1);
+        if (j > (totalFrames-1)) {
+            j = (totalFrames-1);
+            i = j - (numberOfStills - 1);
+        }
+    }
+    //    uiRangeSliderTimeline->setValueLow(i);
+    //    uiRangeSliderTimeline->setValueHigh(j);
+    inPoint = i;
+    outPoint = j;
+    updateGridTimeArrayWithAutomaticInterval();
+    updateAllStills();
+    ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
 }
 
 //--------------------------------------------------------------
 void ofApp::setOutPoint(int _outPoint){
-//    int i = uiRangeSliderTimeline->getScaledValueLow();
-//    int j = _outPoint;
-//    if ((j - uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
-//        i = j - (numberOfStills - 1);
-//        if (i < 0) {
-//            i = 0;
-//            j = (numberOfStills - 1);
+    int i = inPoint;
+    int j = _outPoint;
+    if ((j - inPoint < numberOfStills)) {
+        i = j - (numberOfStills - 1);
+        if (i < 0) {
+            i = 0;
+            j = (numberOfStills - 1);
 
-//        }
-//    }
-//    uiRangeSliderTimeline->setValueLow(i);
-//    uiRangeSliderTimeline->setValueHigh(j);
-//    uiSliderValueLow = i;
-//    uiSliderValueHigh = j;
-//    updateGridTimeArrayWithAutomaticInterval();
-//    updateAllStills();
-//    ofLog(OF_LOG_VERBOSE, "manipulated OutPoint" );
+        }
+    }
+    //    uiRangeSliderTimeline->setValueLow(i);
+    //    uiRangeSliderTimeline->setValueHigh(j);
+    inPoint = i;
+    outPoint = j;
+    updateGridTimeArrayWithAutomaticInterval();
+    updateAllStills();
+    ofLog(OF_LOG_VERBOSE, "manipulated OutPoint" );
 }
 
 //--------------------------------------------------------------
