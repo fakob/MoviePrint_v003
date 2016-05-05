@@ -1,5 +1,7 @@
-#ifndef FAKGRABBEDMOVIE_H
-#define FAKGRABBEDMOVIE_H
+/*
+
+#ifndef FAKGRABFRAMES_H
+#define FAKGRABFRAMES_H
 
 #include <string>
 #include <iostream>
@@ -34,18 +36,10 @@
 #define FAK_SHADOW ofColor(0, 0, 0, 130)
 #define FAK_GRAY ofColor(59, 59, 59, 255)
 
-class fakGrabbedMovie : public ofThread
+class fakGrabFrames : public ofThread
 {
 public:
-    fakGrabbedMovie(){};
-
-    struct compareOnlyYValueStruct
-    {
-        bool operator()(const ofVec2f &a, const ofVec2f &b)
-        {
-            return a.y < b.y;
-        }
-    } compareYOperator;
+    fakGrabFrames(){};
 
     void setup(string vfMovieName, int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _showPlaceHolder){
 
@@ -160,23 +154,6 @@ public:
 //        gmMovie.audioOut( buffer, nFrames, nChannels );
 //    }
 
-    void loadNewMovieToBeScrubbed(string vfMovieName){
-
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function SCRUB");
-            gmMovieScrub.load(vfMovieName);
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function SCRUB");
-
-    }
-
-    string ReplaceString(string subject, const string& search, const string& replace) {
-        size_t pos = 0;
-        while ((pos = subject.find(search, pos)) != std::string::npos) {
-            subject.replace(pos, search.length(), replace);
-            pos += replace.length();
-        }
-        return subject;
-    }
-
     void getMovieInformation(string _vfMovieName){
 
         gmMIFilePathOhne = getMoviePathName();
@@ -248,45 +225,14 @@ public:
         return ofJoinString(tempVectorString, "/") + "/";
     }
 
-    int CountNewlines(string s){
-        int len = s.length();
-        int c = 0;
-        for (int i=0; i < len;  i++)
-        {
-            if (s[i] == '\n') c++;
-        }
-        return c;
-    }
-
-     void scrubMovie(int & i){
-        if (isMovieLoaded()) {
-            gmScrubID = i;
-//            ofLog(OF_LOG_VERBOSE, "rollOverMovieID" + ofToString(gmRollOverMovieID) + "gmRollOverMovieButtonID" + ofToString(gmRollOverMovieButtonID));
-            if (gmRollOverMovieButtonID == 0) {
-                gmScrubMovie = TRUE;
-            }
-        }
-    }
-
-    void rollOverMovie(ofVec2f & i){
-        if (isMovieLoaded()) {
-            gmRollOverMovieID = i.x;
-            gmRollOverMovieButtonID = i.y;
-            gmRollOver = TRUE;
-//            ofLog(OF_LOG_VERBOSE, "rollOverMovieID" + ofToString(gmRollOverMovieID) + "gmRollOverMovieButtonID" + ofToString(gmRollOverMovieButtonID));
-        }
-    }
-
     void update(){
         if (isMovieLoaded()) {
-//            ofLog(OF_LOG_VERBOSE, "____________gmMovie.update() ");
             gmMovie.update();
         }
     }
 
     void play(){
         if (isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "____________gmMovie.play() ");
             gmMovie.play();
         }
     }
@@ -294,26 +240,6 @@ public:
     bool isMovieLoaded(){
 //        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(gmMovie.isLoaded()));
         return gmMovie.isLoaded();
-    }
-
-    void disableMouseEvents(){
-        gmMouseEventsEnabled = false;
-        for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
-            grabbedStill[i].unregisterMouseEvents();
-        }
-    }
-
-    bool getMouseEventsEnabled(){
-        return gmMouseEventsEnabled;
-    }
-
-    void enableMouseEvents(){
-        if (isMovieLoaded()) {
-            gmMouseEventsEnabled = true;
-            for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
-                grabbedStill[i].registerMouseEvents();
-            }
-        }
     }
 
     void setNumberOfStills(int _numberOfStills){
@@ -379,8 +305,8 @@ public:
             for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
             {
                 if (_addListener) {
-                    ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
-                    ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabbedMovie::rollOverMovie);
+                    ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabFrames::scrubMovie);
+                    ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabFrames::rollOverMovie);
                 }
                 grabbedStill[i].gsID = i;
                 grabbedStill[i].gsX = 0;
@@ -427,184 +353,6 @@ public:
         gmCurrAllocating = false;
     }
 
-    void drawGridOfStills(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
-
-        // draw all frames
-        ofPushStyle();
-        ofPushMatrix();
-        ofEnableAlphaBlending();
-        ofSetColor(FAK_ORANGECOLOR); // draw title rect
-
-        ofSetColor(255, 255, 255, 255); // draw stills
-        for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
-        {
-            float tempX = (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
-            float tempY = (_y + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
-            drawStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
-        }
-
-//        if (_isBeingPrinted) {
-//            gmSetTitleInfo = TRUE; //create new title size und umbruch
-//        }
-
-        ofPopMatrix();
-        ofPopStyle();
-
-    }
-
-    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
-
-        if (isMovieLoaded()) {
-
-            ofPushStyle();
-            ofEnableAlphaBlending();
-            ofSetColor(255);
-
-            grabbedStill[i].gsX = _x;
-            grabbedStill[i].gsY = _y;
-            grabbedStill[i].gsDrawWidth = _w;
-            grabbedStill[i].gsDrawHeight = _h;
-            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
-
-            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
-                if (!grabbedStill[i].gsToBeGrabbed) {
-                    if (gmCalcResizeSwitch) {
-                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
-                    }
-                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
-                    grabbedStill[i].gsToBeUpdated = FALSE;
-                }
-            }
-
-            shader.begin(); // draw still with rounded corners
-//            shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
-            shader.setUniformTexture("maskTex", maskFbo.getTexture(), 1 );
-
-            ofSetColor(255, 255, 255, 255);
-            grabbedStill[i].gsTexture.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
-
-            shader.end();
-
-            // draw selection
-            ofPushStyle();
-            ofSetColor(255, 255, 255, 30);
-            if (grabbedStill[i].gsRollOver) {
-                int tempSelectionWidth = 2;
-                ofDrawRectangle(grabbedStill[i].gsX - tempSelectionWidth/2, grabbedStill[i].gsY - tempSelectionWidth/2, grabbedStill[i].gsDrawWidth + tempSelectionWidth, grabbedStill[i].gsDrawHeight + tempSelectionWidth);
-            }
-            ofPopStyle();
-
-            // draw update image
-            if (grabbedStill[i].gsToBeGrabbed) {
-                ofPushMatrix();
-                ofPushStyle();
-                ofSetColor(0, 0, 0, 130);
-                ofDrawRectangle(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
-                ofSetColor(255, 255, 255, 200);
-                updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.getWidth()/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.getHeight()/2 - grabbedStill[i].gsDrawHeight/2);
-                ofPopStyle();
-                ofPopMatrix();
-            }
-
-//            if (gmShowFramesUI) { // drawing UI
-//                drawStillUI(i, grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, _alpha);
-//            }
-
-            // drawing overlay graphics
-                if (grabbedStill[i].gsRollOver) {
-
-                    ofSetColor(255, 5);
-                    if (grabbedStill[i].gsRollOver3) {
-                        ofSetColor(255, 20);
-                    }
-                    ofDrawRectRounded(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
-                    ofSetColor(255, 50);
-                    if (grabbedStill[i].gsRollOver3) {
-                        ofSetColor(255);
-                    }
-                    setInPointImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-
-                    ofSetColor(255, 5);
-                    if (grabbedStill[i].gsRollOver4) {
-                        ofSetColor(255, 20);
-                    }
-                    ofDrawRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
-                    ofSetColor(255, 50);
-                    if (grabbedStill[i].gsRollOver4) {
-                        ofSetColor(255);
-                    }
-                    setOutPointImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-
-                    ofSetColor(255, 5);
-                    if (grabbedStill[i].gsRollOver0) {
-                        ofSetColor(255, 20);
-                    }
-                    ofDrawRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight, grabbedStill[i].gsDrawHeight, grabbedStill[0].gsDrawWidth/64);
-                    ofSetColor(255, 50);
-                    if (grabbedStill[i].gsRollOver0) {
-                        ofSetColor(255);
-                    }
-            //                    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-            //                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, scrubImage.getWidth()/2, scrubImage.getHeight()/2);
-            //                    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
-                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2 - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight, grabbedStill[i].gsDrawHeight);
-
-                    ofSetColor(255, 5);
-                    if (grabbedStill[i].gsRollOver1) {
-                        ofSetColor(255, 20);
-                    }
-                    ofDrawRectRounded(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
-                    ofSetColor(255, 50);
-                    if (grabbedStill[i].gsRollOver1) {
-                        ofSetColor(255);
-                    }
-                    if (_superKeyPressed) {
-                        frameBackward3Image.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-                    } else if(_shiftKeyPressed){
-                        frameBackward2Image.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-                    } else {
-                        frameBackwardImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-                    }
-
-                    ofSetColor(255, 5);
-                    if (grabbedStill[i].gsRollOver2) {
-                        ofSetColor(255, 20);
-                    }
-                    ofDrawRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
-                    ofSetColor(255, 50);
-                    if (grabbedStill[i].gsRollOver2) {
-                        ofSetColor(255);
-                    }
-                    if (_superKeyPressed) {
-                        frameForward3Image.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-                    } else if(_shiftKeyPressed){
-                        frameForward2Image.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-                    } else {
-                        frameForwardImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-                    }
-
-                }
-            ofPopStyle();
-            ofSetColor(255);
-        } else if (_drawPlaceHolder){
-            ofPushStyle();
-            ofEnableAlphaBlending();
-            ofSetColor(255);
-
-            ofPushMatrix();
-            ofPushStyle();
-            ofSetColor(FAK_MIDDLEGRAY);
-            // updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.width/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/2);
-
-            ofDrawRectangle(_x, _y, _w, _h);
-
-            ofPopStyle();
-            ofPopMatrix();
-
-            ofPopStyle();
-            ofSetColor(255);        }
-    }
-
     void setAllToBeGrabbedAndToBeUpdated(){
         if (isMovieLoaded()) {
             for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
@@ -638,7 +386,7 @@ public:
                 if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
                     ofSleepMillis(TimeToWaitForMovie);
                 }
-                ofLog(OF_LOG_VERBOSE, "setPosition1: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
             } else {
 //                if (_frame==0) {
@@ -660,13 +408,12 @@ public:
 ////                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready");
 ////                    }
 //                }
-//                gmMovie.play();
-//                gmMovie.setFrame(_frame);
-                gmMovie.setPosition(_frame/(float)gmTotalFrames);
+                gmMovie.play();
+                gmMovie.setFrame(_frame);
                 gmMovie.update();
-//                gmMovie.stop();
+                gmMovie.stop();
 //                ofSleepMillis(TimeToWaitForMovie);
-                ofLog(OF_LOG_VERBOSE, "setPosition2: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
             }
             if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
@@ -730,125 +477,6 @@ public:
 
     }
 
-    void setAllLimitsUpper(int _upperLimit){
-//        ofLog(OF_LOG_VERBOSE, "gmNumberOfStills" + ofToString(gmNumberOfStills));
-//        ofLog(OF_LOG_VERBOSE, "grabbedStill" + ofToString(grabbedStill.size()));
-        gmUpperLimitY = _upperLimit;
-        for (int i=0; i<grabbedStill.size(); i++) {
-            grabbedStill[i].gsUpperLimitY = gmUpperLimitY;
-        }
-    }
-
-    void setAllLimitsLower(int _LowerLimit){
-        gmLowerLimitY = _LowerLimit;
-        for (int i=0; i<grabbedStill.size(); i++) {
-            grabbedStill[i].gsLowerLimitY = gmLowerLimitY;
-        }
-    }
-
-    void setAllLimitsLeft(int _leftLimit){
-        gmLeftLimitX = _leftLimit;
-        for (int i=0; i<grabbedStill.size(); i++) {
-            grabbedStill[i].gsLeftLimitX = gmLeftLimitX;
-        }
-    }
-
-    void setAllLimitsRight(int _rightLimit){
-        gmRightLimitX = _rightLimit;
-        for (int i=0; i<grabbedStill.size(); i++) {
-            grabbedStill[i].gsRightLimitX = gmRightLimitX;
-        }
-    }
-
-    void drawMoviePrint(float _x, float _y, int _gridColumns, int _gridRows, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo, bool _drawPreview){
-
-        ofPushStyle();
-        ofPushMatrix();
-
-        if (_printDisplayVideoAudioInfo) { // draw info header
-            ofPushStyle();
-            ofPushMatrix();
-            ofEnableAlphaBlending();
-            ofSetColor(FAK_GRAY);
-            ofDrawRectangle(_x * _scaleFactor, _y * _scaleFactor, (_gridMargin + (gmThumbWidth+_gridMargin) * _gridColumns) * _scaleFactor, _printHeaderHeight * _scaleFactor);
-            for(int i=0; i<_gridColumns; i++)
-            {
-                switch (i%5) {
-                    case 0:
-                        ofSetColor(FAK_ORANGE1);
-                        break;
-                    case 1:
-                        ofSetColor(FAK_ORANGE2);
-                        break;
-                    case 2:
-                        ofSetColor(FAK_ORANGE3);
-                        break;
-                    case 3:
-                        ofSetColor(FAK_ORANGE4);
-                        break;
-                    case 4:
-                        ofSetColor(FAK_ORANGE5);
-                        break;
-                    default:
-                        ofSetColor(255, 255, 255, 255);
-                        break;
-                }
-                // draw orange stripes
-                ofDrawRectangle((_x + _gridMargin + (gmThumbWidth+_gridMargin) * i) * _scaleFactor, (_y + _printHeaderHeight*0.7) * _scaleFactor, gmThumbWidth * _scaleFactor, _printHeaderHeight* 0.15 * _scaleFactor);
-            }
-
-            if (_drawPreview) { // draw Info fake for preview
-                ofSetColor(255, 255, 255, 255);
-                ofDrawRectangle(((_x + _gridMargin) * _scaleFactor), ((_y +_printHeaderHeight*0.3) * _scaleFactor), (gmThumbWidth/4.0 - gmThumbWidth/40.0) * _scaleFactor, _printHeaderHeight*0.3 * _scaleFactor);
-                ofDrawRectangle(((_x + _gridMargin + gmThumbWidth/4.0) * _scaleFactor), ((_y + _printHeaderHeight*0.45) * _scaleFactor), ((gmThumbWidth/4)*3) * _scaleFactor, _printHeaderHeight*0.15 * _scaleFactor);
-            } else {
-                // draw Info text
-                float tempFontHeightBig = 20;
-                float tempFontHeightSmall = 10;
-                float tempFontScale = _scaleFactor;
-
-                // get Width of Type
-//                float tempWidthOfName = gmFontStashFranchise.getBBox("movieprint", tempFontHeightBig * _scaleFactor, 0, 0).getWidth();
-//                float tempWidthOfPathName = gmFontStashHelveticaMedium.getBBox(ofToString(gmMovie.getMoviePath()), tempFontHeightSmall * _scaleFactor, 0, 0).getWidth();
-
-                // when PathName width bigger then display width then downscale the PathName
-//                if ((((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName) <= tempWidthOfPathName) {
-//                    tempFontScale = tempFontScale * (((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName)/tempWidthOfPathName*0.75;
-//                }
-//                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, 0, 0).getWidth();
-
-                ofSetColor(255, 255, 255, 255);
-//                gmFontStashFranchise.draw("movieprint",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
-//                gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
-//                gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
-            }
-
-            ofPopMatrix();
-            ofPopStyle();
-
-            ofTranslate(0, (_printHeaderHeight) * _scaleFactor);
-        }
-
-        // draw all frames
-        ofEnableAlphaBlending();
-        ofSetColor(255, 255, 255, 255);
-        int tempNumberOfThumbsToDisplay;
-        tempNumberOfThumbsToDisplay = _gridColumns * _gridRows;
-
-        for(int i=0; i<tempNumberOfThumbsToDisplay; i++)
-        {
-            float tempX = (_x + _gridMargin + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
-            float tempY = (_y + _gridMargin + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
-            if (((_gridColumns * _gridRows) > gmNumberOfStills) || !isMovieLoaded()) {
-                printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, true);
-            } else {
-                printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, _drawPlaceHolder);
-            }
-        }
-        ofPopMatrix();
-        ofPopStyle();
-    }
-
     string framesToTime(int _frames){
 
         int frames  =    _frames % gmFrameRate;
@@ -859,86 +487,6 @@ public:
 
     }
 
-    void printStill(int i, float _x, float _y, float _w, float _h, bool _drawPlaceHolder){
-
-        if (_drawPlaceHolder){
-
-            ofPushStyle();
-            ofSetColor(FAK_MIDDLEGRAY);
-
-            ofDrawRectangle(_x, _y, _w, _h);
-
-            ofPopStyle();
-
-        } else if (isMovieLoaded()) {
-
-            ofPushStyle();
-            ofEnableAlphaBlending();
-            ofSetColor(255);
-
-            grabbedStill[i].gsDrawWidth = _w;
-            grabbedStill[i].gsDrawHeight = _h;
-            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
-
-            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
-                if (!grabbedStill[i].gsToBeGrabbed) {
-                    if (gmCalcResizeSwitch) {
-                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
-                    }
-                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
-                    grabbedStill[i].gsToBeUpdated = FALSE;
-                }
-            }
-
-            shader.begin(); // draw still with rounded corners
-            shader.setUniformTexture("maskTex", maskFbo.getTexture(), 1 );
-            grabbedStill[i].gsTexture.draw(_x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
-            shader.end();
-
-//            if (gmShowFramesUI) { // drawing UI
-//                drawStillUI(i, _x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, 1.0);
-//            }
-
-            ofPopStyle();
-            ofSetColor(255);
-        }
-    }
-
-    void drawStillUI(int i, float x, float y, float w, float h, float _alpha){
-
-        if (isMovieLoaded()) {
-
-            float tempFontSize = ofMap(w, 0.0, 1000.0, 0.0, 45.0); // groessen mapping der still UI
-            string dummyString;
-
-            if (vfFramesToTimeSwitch) {
-                dummyString = framesToTime(grabbedStill[i].gsFrameNumber);
-            } else {
-                dummyString = "#" + ofToString(grabbedStill[i].gsFrameNumber);
-            }
-
-            ofPushStyle();
-            ofEnableAlphaBlending();
-
-//            ofRectangle rect = gmFontStashUbuntu.getBBox(dummyString, tempFontSize, 0, 0);
-            ofRectangle rect (0, 0, 100, 100); // substitute for not functional code
-            if (grabbedStill[i].gsManipulated) {
-                ofSetColor(FAK_ORANGECOLOR, 200*_alpha);
-            } else {
-                ofSetColor(0,0,0,200*_alpha);
-            }
-            ofDrawRectRounded(x, y, rect.width + rect.width*0.03, rect.height + rect.height*0.3, rect.width*0.03);
-            if (grabbedStill[i].gsToBeUpdated) {
-                ofSetColor(100, 255 * _alpha);
-            } else {
-                ofSetColor(255, 255 * _alpha);
-            }
-//            gmFontStashUbuntu.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
-
-            ofPopStyle();
-
-        }
-    }
 
     // Thread funcions
 
@@ -957,7 +505,7 @@ public:
                 for (int i = 0; i<gmOrderNumberVector.size(); i++) { // frames are being updated in the order of their framenumber
                     if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
                         gmThreadCounter++;
-                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
+//                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
                         grabToImage(gmOrderNumberVector.at(i).x, grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber);
                     }
                 }
@@ -1067,4 +615,5 @@ public:
 
 };
 
-#endif // FAKGRABBEDMOVIE_H
+#endif // FAKGRABFRAMES_H
+*/

@@ -661,7 +661,7 @@ void ofApp::draw(){
         }
     }
 
-//    ofxNotify::draw(drawNotify);
+    ofxNotify::draw(drawNotify);
 }
 
 //--------------------------------------------------------------
@@ -1787,7 +1787,7 @@ void ofApp::updateGridTimeArrayWithAutomaticInterval(){
         inPoint = 0;
     }
     if (outPoint > (totalFrames-1)) {
-        outPoint = (totalFrames-1);
+        outPoint = max(0,(totalFrames-1));
     }
 
     for (int i=0; i<numberOfStills; i++) {
@@ -1798,7 +1798,7 @@ void ofApp::updateGridTimeArrayWithAutomaticInterval(){
 //            moviePrintDataSet.gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, inPoint, outPoint, TRUE);
             moviePrintDataSet.gridTimeArray[i] = ofMap(i, 0, (numberOfStills - 1), inPoint, outPoint, TRUE);
         }
-//        ofLog(OF_LOG_VERBOSE, "inPoint: " + ofToString(inPoint) + " outPoint: " + ofToString(outPoint) + " totalFrames: " + ofToString(totalFrames));
+        ofLog(OF_LOG_VERBOSE, "inPoint: " + ofToString(inPoint) + " outPoint: " + ofToString(outPoint) + " totalFrames: " + ofToString(totalFrames));
     }
     ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray: " +  ofToString(moviePrintDataSet.gridTimeArray));
 }
