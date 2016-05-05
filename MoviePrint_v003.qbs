@@ -12,15 +12,25 @@ Project{
         name: { return FileInfo.baseName(path) }
 
         files: [
+            "src/fakgrabbedlist.h",
+            "src/fakgrabbedlistitem.h",
             "src/fakgrabbedmovie.h",
             "src/fakgrabbedmoviestill.h",
+            "src/fakmenu.h",
+            "src/fakscrollbar.h",
             "src/main.cpp",
             "src/ofApp.cpp",
             "src/ofApp.h",
         ]
 
         of.addons: [
-            "ofxNotify"
+            "ofxNotify",
+            "ofxEasing",
+            "ofxMSATimer",
+            "ofxImgui",
+            "ofxFontStash",
+//            "ofxUnicode-ofxFontStash",
+            "ofxAvCodec",
         ]
 
         // additional flags for the project. the of module sets some

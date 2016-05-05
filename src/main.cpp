@@ -3,7 +3,12 @@
 
 //========================================================================
 int main( ){
-    ofSetupOpenGL(1024,768,OF_WINDOW);			// <-------- setup the GL context
+
+//    ofAppGLFWWindow window;
+
+    ofSetupOpenGL(1320,660,OF_WINDOW);			// <-------- setup the GL context
+
+//    window.setWindowTitle("MoviePrint");
 
     // this kicks off the running of my app
     // can be OF_WINDOW or OF_FULLSCREEN

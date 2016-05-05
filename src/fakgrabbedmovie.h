@@ -6,6 +6,9 @@
 #include "ofMain.h"
 #include "fakGrabbedMovieStill.h"
 
+//#include "ofxAvAudioPlayer.h"
+//#include "ofxAvVideoPlayer.h"
+
 #define REsizeFactor 10.0
 #define TimeToWaitForMovie 500
 
@@ -97,7 +100,6 @@ public:
 //        gmSetTitleInfo = TRUE; //create new title size und umbruch
 
         loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills, _showPlaceHolder, false);
-//        loadNewMovieToBeGrabbed(vfMovieName);
 
         gmSetupFinished = TRUE;
         gmShowFramesUI = TRUE;
@@ -113,6 +115,10 @@ public:
 
         if (!_showPlaceHolder) {
             ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function");
+
+            // used for AvCodec addon
+//            gmMovie.setupAudioOut(2, 44100); // resample to stereo, 44khz
+
             gmMovie.load(vfMovieName);
             ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function");
             ofLog(OF_LOG_VERBOSE, "_____________________________________ " + ofToString(vfMovieName));
@@ -129,7 +135,9 @@ public:
                     gmFrameRate = ceil(gmTotalFrames/gmMovie.getDuration());
                 }
                 gmImageRatio = gmMovie.getWidth()/gmMovie.getHeight();
-                gmPixelRatio = gmMovie.getPixelFormat();
+//                gmPixelRatio = gmMovie.getPixelFormat();
+                // quickfix for ofxAvCodec
+                gmPixelRatio = 1.0;
                 ofLog(OF_LOG_VERBOSE, "ImageRatio:" + ofToString(gmImageRatio) + " PixelRatio:" + ofToString(gmPixelRatio)  + " Framerate:" + ofToString(gmFrameRate) + " totalFrames:" + ofToString(gmTotalFrames) + " getDuration:" + ofToString(gmMovie.getDuration()));
 
             } else {
@@ -148,6 +156,127 @@ public:
         return isMovieLoaded();
     }
 
+//    void audioOut( float * buffer, int nFrames, int nChannels ){
+//        gmMovie.audioOut( buffer, nFrames, nChannels );
+//    }
+
+    void loadNewMovieToBeScrubbed(string vfMovieName){
+
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function SCRUB");
+            gmMovieScrub.load(vfMovieName);
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function SCRUB");
+
+    }
+
+    string ReplaceString(string subject, const string& search, const string& replace) {
+        size_t pos = 0;
+        while ((pos = subject.find(search, pos)) != std::string::npos) {
+            subject.replace(pos, search.length(), replace);
+            pos += replace.length();
+        }
+        return subject;
+    }
+
+    void getMovieInformation(string _vfMovieName){
+
+        gmMIFilePathOhne = getMoviePathName();
+        gmMIFilePath = "FilePath: " + gmMIFilePath;
+
+
+//        //Information about MediaInfo
+//        MediaInfo MI;
+//        MI.Open(__T(_vfMovieName));
+
+//        MI.Option(__T("Inform"), __T("General;Name : %FileName%.%FileExtension%\\r\\n:::Format : %Format%\\r\\n:::Format/String : %Format/String%\\r\\n:::FileSize : %FileSize/String%\\r\\n:::Duration : %Duration/String1%\\r\\n:::\nVideo;FrameCount : %FrameCount%\\r\\n:::Size : %Width%x%Height%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio/String%\\r\\n:::FrameRate : %FrameRate/String%"));
+
+//        gmInfCol1 = MI.Inform();
+//        gmInfCol1 = ReplaceString(gmInfCol1, ":::", "\n");
+
+//        gmMIFileName = MI.Get(Stream_General, 0, __T("FileName"), Info_Text).c_str();
+//        gmMIFileExtension = MI.Get(Stream_General, 0, __T("FileExtension"), Info_Text).c_str();
+//        gmMIFormat = MI.Get(Stream_General, 0, __T("Format"), Info_Text).c_str();
+//        gmMIFormatString = MI.Get(Stream_General, 0, __T("Format/String"), Info_Text).c_str();
+//        gmMIFileSizeString = MI.Get(Stream_General, 0, __T("FileSize/String"), Info_Text).c_str();
+//        gmMIDurationString1 = MI.Get(Stream_General, 0, __T("Duration/String1"), Info_Text).c_str();
+
+//        gmMIFrameCount = MI.Get(Stream_Video, 0, __T("FrameCount"), Info_Text).c_str();
+//        gmMIWidth = MI.Get(Stream_Video, 0, __T("Width"), Info_Text).c_str();
+//        gmMIHeight = MI.Get(Stream_Video, 0, __T("Height"), Info_Text).c_str();
+//        gmMIWidth = gmMIWidth + "x" + gmMIHeight;
+//        gmMIDisplayAspectRatioString = MI.Get(Stream_Video, 0, __T("DisplayAspectRatio/String"), Info_Text).c_str();
+//        gmMIFrameRateString = MI.Get(Stream_Video, 0, __T("FrameRate/String"), Info_Text).c_str();
+//        gmMIVFormat = MI.Get(Stream_Video, 0, __T("Format"), Info_Text).c_str();
+//        gmMIFormatInfo = MI.Get(Stream_Video, 0, __T("Format/Info"), Info_Text).c_str();
+//        gmMIBitRate = MI.Get(Stream_Video, 0, __T("BitRate"), Info_Text).c_str();
+//        gmMIPixelAspectRatio = MI.Get(Stream_Video, 0, __T("PixelAspectRatio"), Info_Text).c_str();
+//        gmMIDisplayAspectRatio = MI.Get(Stream_Video, 0, __T("DisplayAspectRatio"), Info_Text).c_str();
+//        gmMIFrameRate_ModeString = MI.Get(Stream_Video, 0, __T("FrameRate_Mode/String"), Info_Text).c_str();
+//        gmMIColorSpace = MI.Get(Stream_Video, 0, __T("ColorSpace"), Info_Text).c_str();
+//        gmMIChromaSubsampling = MI.Get(Stream_Video, 0, __T("ChromaSubsampling"), Info_Text).c_str();
+//        gmMIBitDepthString = MI.Get(Stream_Video, 0, __T("BitDepth/String"), Info_Text).c_str();
+//        gmMIInterlacementString = MI.Get(Stream_Video, 0, __T("Interlacement/String"), Info_Text).c_str();
+
+//        gmMIAFormat = MI.Get(Stream_Audio, 0, __T("Format"), Info_Text).c_str();
+//        gmMIAChannelsString = MI.Get(Stream_Audio, 0, __T("Channel(s)/String"), Info_Text).c_str();
+//        gmMIASamplingRate = MI.Get(Stream_Audio, 0, __T("SamplingRate/String"), Info_Text).c_str();
+
+//        gmMIFileNameClean = gmMIFileName + "." + gmMIFileExtension;
+
+//        MI.Option(__T("Inform"), __T("Video;Video\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::PixelAspectRatio : %PixelAspectRatio%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio%\\r\\n:::FrameRate_Mode/String : %FrameRate_Mode/String%\\r\\n:::ColorSpace : %ColorSpace%\\r\\n:::ChromaSubsampling : %ChromaSubsampling%\\r\\n:::BitDepth/String : %BitDepth/String%\\r\\n:::Interlacement/String : %Interlacement/String%"));
+
+//        gmInfCol2 = MI.Inform().c_str();
+//        gmInfCol2 = ReplaceString(gmInfCol2, ":::", "\n");
+
+//        MI.Option(__T("Inform"), __T("Audio;Audio\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::Channel(s)/String : %Channel(s)/String%\\r\\n:::ChannelPositons : %ChannelPositons%\\r\\n:::SamplingRate/String : %SamplingRate/String%"));
+
+//        gmInfCol3 = MI.Inform().c_str();
+//        gmInfCol3 = ReplaceString(gmInfCol3, ":::", "\n");
+
+//        MI.Close();
+
+    }
+
+    string StringToUpper(string strToConvert){
+        std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::toupper);
+        return strToConvert;
+    }
+
+    string getMoviePathName(){
+        gmMIFilePath = ofToString(gmMovie.getMoviePath());
+        vector<string> tempVectorString = ofSplitString(gmMIFilePath, "/");
+        tempVectorString.pop_back();
+        return ofJoinString(tempVectorString, "/") + "/";
+    }
+
+    int CountNewlines(string s){
+        int len = s.length();
+        int c = 0;
+        for (int i=0; i < len;  i++)
+        {
+            if (s[i] == '\n') c++;
+        }
+        return c;
+    }
+
+     void scrubMovie(int & i){
+        if (isMovieLoaded()) {
+            gmScrubID = i;
+//            ofLog(OF_LOG_VERBOSE, "rollOverMovieID" + ofToString(gmRollOverMovieID) + "gmRollOverMovieButtonID" + ofToString(gmRollOverMovieButtonID));
+            if (gmRollOverMovieButtonID == 0) {
+                gmScrubMovie = TRUE;
+            }
+        }
+    }
+
+    void rollOverMovie(ofVec2f & i){
+        if (isMovieLoaded()) {
+            gmRollOverMovieID = i.x;
+            gmRollOverMovieButtonID = i.y;
+            gmRollOver = TRUE;
+//            ofLog(OF_LOG_VERBOSE, "rollOverMovieID" + ofToString(gmRollOverMovieID) + "gmRollOverMovieButtonID" + ofToString(gmRollOverMovieButtonID));
+        }
+    }
+
     void update(){
         if (isMovieLoaded()) {
             gmMovie.update();
@@ -163,6 +292,26 @@ public:
     bool isMovieLoaded(){
 //        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(gmMovie.isLoaded()));
         return gmMovie.isLoaded();
+    }
+
+    void disableMouseEvents(){
+        gmMouseEventsEnabled = false;
+        for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
+            grabbedStill[i].unregisterMouseEvents();
+        }
+    }
+
+    bool getMouseEventsEnabled(){
+        return gmMouseEventsEnabled;
+    }
+
+    void enableMouseEvents(){
+        if (isMovieLoaded()) {
+            gmMouseEventsEnabled = true;
+            for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
+                grabbedStill[i].registerMouseEvents();
+            }
+        }
     }
 
     void setNumberOfStills(int _numberOfStills){
@@ -215,22 +364,22 @@ public:
                 ofLog(OF_LOG_VERBOSE, "allocateNewNumberOfStills is waiting for thread to stop");
             }
 
-////          unregister All Mouse Events of the Stills (old gmNumberOfStills)
-//            disableMouseEvents();
+            // unregister All Mouse Events of the Stills (old gmNumberOfStills)
+            disableMouseEvents();
 
             setNumberOfStills(_numberOfStills);
             grabbedStill.clear();
             grabbedStill.resize(_numberOfStills);
 
-//            if (_addListener) {
-//                enableMouseEvents();
-//            }
+            if (_addListener) {
+                enableMouseEvents();
+            }
             for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
             {
-//                if (_addListener) {
-//                    ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
-//                    ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabbedMovie::rollOverMovie);
-//                }
+                if (_addListener) {
+                    ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
+                    ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabbedMovie::rollOverMovie);
+                }
                 grabbedStill[i].gsID = i;
                 grabbedStill[i].gsX = 0;
                 grabbedStill[i].gsY = 0;
@@ -454,50 +603,108 @@ public:
             ofSetColor(255);        }
     }
 
+    void setAllToBeGrabbedAndToBeUpdated(){
+        if (isMovieLoaded()) {
+            for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
+                grabbedStill[i].gsToBeUpdated = TRUE;
+                grabbedStill[i].gsToBeGrabbed = TRUE;
+                grabbedStill[i].gsManipulated = FALSE;
+            }
+        }
+    }
 
-    void grabToImage(int i, int f){
+    void grabToImage(int i, int _frame){
+
+        ofLog(OF_LOG_VERBOSE, "before grabToImage: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
         if (isMovieLoaded()) {
 
-            if (f < 0) {
-                f = 0;
+            if (_frame < 0) {
+                _frame = 0;
             }
-            if (f > gmTotalFrames-1) {
-                f = gmTotalFrames-1;
+            if (_frame > gmTotalFrames-1) {
+                _frame = gmTotalFrames-1;
             }
 
             if (gmHasNoFrames) { // movies die "keine frames haben" benoetigen setPosition, deshalb sind auch meist die ersten paar frames "kaputt"
-                if (f < 5) {
-                    f = 5;
+                if (_frame < 5) {
+                    _frame = 5;
                 }
-                gmMovie.setPosition((float)(f-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
+                gmMovie.setPosition((float)(_frame-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
                 gmMovie.nextFrame();
                 gmMovie.nextFrame();
                 if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
                     ofSleepMillis(TimeToWaitForMovie);
                 }
-                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
             } else {
-                if (f==0) {
-                    gmMovie.setFrame(0);
-                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-                        ofSleepMillis(TimeToWaitForMovie);
-                    }
-                } else {
-                    gmMovie.setFrame(f);
-                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-                        ofSleepMillis(TimeToWaitForMovie);
-                    }
-                }
+//                if (_frame==0) {
+//                    gmMovie.setFrame(0);
+//                    gmMovie.update();
+//                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+//                        ofSleepMillis(TimeToWaitForMovie);
+//                    }
+////                    while (!gmMovie.isFrameNew()) {
+////                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready - isFrameNew()" + ofToString(gmMovie.isFrameNew()));
+////                    }
+//                } else {
+//                    gmMovie.setFrame(_frame);
+//                    gmMovie.update();
+//                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+//                        ofSleepMillis(TimeToWaitForMovie);
+//                    }
+////                    while (!gmMovie.isFrameNew()) {
+////                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready");
+////                    }
+//                }
+                gmMovie.play();
+                gmMovie.setFrame(_frame);
+                gmMovie.update();
+                gmMovie.stop();
+//                ofSleepMillis(TimeToWaitForMovie);
+                ofLog(OF_LOG_VERBOSE, "setPosition: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+
             }
             if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
-                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
+                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixels());
                 grabbedStill[i].gsToBeGrabbed = FALSE;
             } else {
                 ofLog(OF_LOG_VERBOSE, "CRASH AVOIDED grabbedStill[i].gsImage.isAllocated() FALSE _______________________________");
             }
         }
+        ofLog(OF_LOG_VERBOSE, "after grabToImage: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+    }
+
+    int numberLoaded(){
+        gmNumberLoadedCounter = 0;
+        if (isMovieLoaded()) {
+            for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
+            {
+                if(!grabbedStill[i].gsToBeUpdated){
+                    gmNumberLoadedCounter++;
+                }
+            }
+        }
+        return gmNumberLoadedCounter;
+    }
+
+    int numberGrabbed(){
+        gmNumberGrabbedCounter = 0;
+        if (isMovieLoaded()) {
+            for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
+            {
+                if(!grabbedStill[i].gsToBeGrabbed){
+                    gmNumberGrabbedCounter++;
+                }
+            }
+        }
+        return gmNumberGrabbedCounter;
+    }
+
+    float percLoaded(){
+        int gmNumberLoaded = numberLoaded();
+        return (float)gmNumberLoaded/(gmNumberOfStills-1);
     }
 
     bool allGrabbed(){
@@ -518,6 +725,216 @@ public:
             return FALSE;
         }
 
+    }
+
+    void setAllLimitsUpper(int _upperLimit){
+//        ofLog(OF_LOG_VERBOSE, "gmNumberOfStills" + ofToString(gmNumberOfStills));
+//        ofLog(OF_LOG_VERBOSE, "grabbedStill" + ofToString(grabbedStill.size()));
+        gmUpperLimitY = _upperLimit;
+        for (int i=0; i<grabbedStill.size(); i++) {
+            grabbedStill[i].gsUpperLimitY = gmUpperLimitY;
+        }
+    }
+
+    void setAllLimitsLower(int _LowerLimit){
+        gmLowerLimitY = _LowerLimit;
+        for (int i=0; i<grabbedStill.size(); i++) {
+            grabbedStill[i].gsLowerLimitY = gmLowerLimitY;
+        }
+    }
+
+    void setAllLimitsLeft(int _leftLimit){
+        gmLeftLimitX = _leftLimit;
+        for (int i=0; i<grabbedStill.size(); i++) {
+            grabbedStill[i].gsLeftLimitX = gmLeftLimitX;
+        }
+    }
+
+    void setAllLimitsRight(int _rightLimit){
+        gmRightLimitX = _rightLimit;
+        for (int i=0; i<grabbedStill.size(); i++) {
+            grabbedStill[i].gsRightLimitX = gmRightLimitX;
+        }
+    }
+
+    void drawMoviePrint(float _x, float _y, int _gridColumns, int _gridRows, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo, bool _drawPreview){
+
+        ofPushStyle();
+        ofPushMatrix();
+
+        if (_printDisplayVideoAudioInfo) { // draw info header
+            ofPushStyle();
+            ofPushMatrix();
+            ofEnableAlphaBlending();
+            ofSetColor(FAK_GRAY);
+            ofDrawRectangle(_x * _scaleFactor, _y * _scaleFactor, (_gridMargin + (gmThumbWidth+_gridMargin) * _gridColumns) * _scaleFactor, _printHeaderHeight * _scaleFactor);
+            for(int i=0; i<_gridColumns; i++)
+            {
+                switch (i%5) {
+                    case 0:
+                        ofSetColor(FAK_ORANGE1);
+                        break;
+                    case 1:
+                        ofSetColor(FAK_ORANGE2);
+                        break;
+                    case 2:
+                        ofSetColor(FAK_ORANGE3);
+                        break;
+                    case 3:
+                        ofSetColor(FAK_ORANGE4);
+                        break;
+                    case 4:
+                        ofSetColor(FAK_ORANGE5);
+                        break;
+                    default:
+                        ofSetColor(255, 255, 255, 255);
+                        break;
+                }
+                // draw orange stripes
+                ofDrawRectangle((_x + _gridMargin + (gmThumbWidth+_gridMargin) * i) * _scaleFactor, (_y + _printHeaderHeight*0.7) * _scaleFactor, gmThumbWidth * _scaleFactor, _printHeaderHeight* 0.15 * _scaleFactor);
+            }
+
+            if (_drawPreview) { // draw Info fake for preview
+                ofSetColor(255, 255, 255, 255);
+                ofDrawRectangle(((_x + _gridMargin) * _scaleFactor), ((_y +_printHeaderHeight*0.3) * _scaleFactor), (gmThumbWidth/4.0 - gmThumbWidth/40.0) * _scaleFactor, _printHeaderHeight*0.3 * _scaleFactor);
+                ofDrawRectangle(((_x + _gridMargin + gmThumbWidth/4.0) * _scaleFactor), ((_y + _printHeaderHeight*0.45) * _scaleFactor), ((gmThumbWidth/4)*3) * _scaleFactor, _printHeaderHeight*0.15 * _scaleFactor);
+            } else {
+                // draw Info text
+                float tempFontHeightBig = 20;
+                float tempFontHeightSmall = 10;
+                float tempFontScale = _scaleFactor;
+
+                // get Width of Type
+//                float tempWidthOfName = gmFontStashFranchise.getBBox("movieprint", tempFontHeightBig * _scaleFactor, 0, 0).getWidth();
+//                float tempWidthOfPathName = gmFontStashHelveticaMedium.getBBox(ofToString(gmMovie.getMoviePath()), tempFontHeightSmall * _scaleFactor, 0, 0).getWidth();
+
+                // when PathName width bigger then display width then downscale the PathName
+//                if ((((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName) <= tempWidthOfPathName) {
+//                    tempFontScale = tempFontScale * (((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName)/tempWidthOfPathName*0.75;
+//                }
+//                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, 0, 0).getWidth();
+
+                ofSetColor(255, 255, 255, 255);
+//                gmFontStashFranchise.draw("movieprint",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+//                gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+//                gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+            }
+
+            ofPopMatrix();
+            ofPopStyle();
+
+            ofTranslate(0, (_printHeaderHeight) * _scaleFactor);
+        }
+
+        // draw all frames
+        ofEnableAlphaBlending();
+        ofSetColor(255, 255, 255, 255);
+        int tempNumberOfThumbsToDisplay;
+        tempNumberOfThumbsToDisplay = _gridColumns * _gridRows;
+
+        for(int i=0; i<tempNumberOfThumbsToDisplay; i++)
+        {
+            float tempX = (_x + _gridMargin + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
+            float tempY = (_y + _gridMargin + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
+            if (((_gridColumns * _gridRows) > gmNumberOfStills) || !isMovieLoaded()) {
+                printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, true);
+            } else {
+                printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, _drawPlaceHolder);
+            }
+        }
+        ofPopMatrix();
+        ofPopStyle();
+    }
+
+    string framesToTime(int _frames){
+
+        int frames  =    _frames % gmFrameRate;
+        int seconds =   (_frames / gmFrameRate) % 60;
+        int minutes =  ((_frames / gmFrameRate) / 60) % 60;
+        int hours   = (((_frames / gmFrameRate) / 60) / 60) % 24;
+        return (ofToString(hours,2,'0') + ":" + ofToString(minutes,2,'0') + ":" + ofToString(seconds,2,'0') + ":" + ofToString(frames,2,'0'));
+
+    }
+
+    void printStill(int i, float _x, float _y, float _w, float _h, bool _drawPlaceHolder){
+
+        if (_drawPlaceHolder){
+
+            ofPushStyle();
+            ofSetColor(FAK_MIDDLEGRAY);
+
+            ofDrawRectangle(_x, _y, _w, _h);
+
+            ofPopStyle();
+
+        } else if (isMovieLoaded()) {
+
+            ofPushStyle();
+            ofEnableAlphaBlending();
+            ofSetColor(255);
+
+            grabbedStill[i].gsDrawWidth = _w;
+            grabbedStill[i].gsDrawHeight = _h;
+            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
+
+            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
+                if (!grabbedStill[i].gsToBeGrabbed) {
+                    if (gmCalcResizeSwitch) {
+                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
+                    }
+                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
+                    grabbedStill[i].gsToBeUpdated = FALSE;
+                }
+            }
+
+            shader.begin(); // draw still with rounded corners
+            shader.setUniformTexture("maskTex", maskFbo.getTexture(), 1 );
+            grabbedStill[i].gsTexture.draw(_x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+            shader.end();
+
+//            if (gmShowFramesUI) { // drawing UI
+//                drawStillUI(i, _x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, 1.0);
+//            }
+
+            ofPopStyle();
+            ofSetColor(255);
+        }
+    }
+
+    void drawStillUI(int i, float x, float y, float w, float h, float _alpha){
+
+        if (isMovieLoaded()) {
+
+            float tempFontSize = ofMap(w, 0.0, 1000.0, 0.0, 45.0); // groessen mapping der still UI
+            string dummyString;
+
+            if (vfFramesToTimeSwitch) {
+                dummyString = framesToTime(grabbedStill[i].gsFrameNumber);
+            } else {
+                dummyString = "#" + ofToString(grabbedStill[i].gsFrameNumber);
+            }
+
+            ofPushStyle();
+            ofEnableAlphaBlending();
+
+//            ofRectangle rect = gmFontStashUbuntu.getBBox(dummyString, tempFontSize, 0, 0);
+            ofRectangle rect (0, 0, 100, 100); // substitute for not functional code
+            if (grabbedStill[i].gsManipulated) {
+                ofSetColor(FAK_ORANGECOLOR, 200*_alpha);
+            } else {
+                ofSetColor(0,0,0,200*_alpha);
+            }
+            ofDrawRectRounded(x, y, rect.width + rect.width*0.03, rect.height + rect.height*0.3, rect.width*0.03);
+            if (grabbedStill[i].gsToBeUpdated) {
+                ofSetColor(100, 255 * _alpha);
+            } else {
+                ofSetColor(255, 255 * _alpha);
+            }
+//            gmFontStashUbuntu.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
+
+            ofPopStyle();
+
+        }
     }
 
     // Thread funcions
@@ -552,7 +969,6 @@ public:
 
     void start(){
 
-//        startThread(true, false);   // blocking, verbose
         startThread(true);   // blocking, verbose
         gmThreadCounter = 0;
 
@@ -642,6 +1058,10 @@ public:
     // used for rounded corner mask
     ofShader shader;
     ofFbo maskFbo;
+
+    // used for ofxAvCodec addon
+//    ofxAvVideoPlayer gmMovie;
+
 };
 
 #endif // FAKGRABBEDMOVIE_H
