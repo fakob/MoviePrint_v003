@@ -335,8 +335,8 @@ public:
     fakMenu menuTimeline;
     fakMenu menuMoveToList;
 
-//    ofxFontStash fontStashHelveticaLight;
-//    ofxFontStash fontStashHelveticaMedium;
+    ofxFontStash fontStashHelveticaLight;
+    ofxFontStash fontStashHelveticaMedium;
 
 
     // Printing

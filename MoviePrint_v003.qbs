@@ -12,6 +12,7 @@ Project{
         name: { return FileInfo.baseName(path) }
 
         files: [
+            "resources.qrc",
             "src/fakgrabbedlist.h",
             "src/fakgrabbedlistitem.h",
             "src/fakgrabbedmovie.h",

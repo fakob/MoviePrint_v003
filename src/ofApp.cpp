@@ -13,7 +13,7 @@ void ofApp::setup(){
     io->Fonts->AddFontFromFileTTF(&ofToDataPath("fonts/HelveticaNeueLTCom-Lt.ttf")[0], 14.f);
     gui.setup();
 
-    //    setResourcePath();
+//    setResourcePath();
 
     setupFinished = FALSE;
     updateNewPrintGrid = FALSE;
@@ -154,8 +154,8 @@ void ofApp::setup(){
     helpMenuImage.load("images/HelpMenu_v001.png");
     backgroundImagePreview.load("images/MoviePrint_PreviewBackground_v001_00000.png");
 
-//    fontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
-//    fontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
+    fontStashHelveticaLight.setup("fonts/HelveticaNeueLTCom-Lt.ttf");
+    fontStashHelveticaMedium.setup("fonts/HelveticaNeueLTCom-Md.ttf");
 
 
     // load standard movie
@@ -733,8 +733,8 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         menuMovieInfo.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
         menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
         menuMovieInfo.drawMenu();
-//        drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
-//        fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
+        drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
+        fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
     }
 
     tempXPos = gridColumns-2;
@@ -2283,24 +2283,6 @@ void ofApp::exit(){
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //--------------------------------------------------------------
 void ofApp::drawMovieInfo(float _x, float _y, float _fade){
     float tempFontHeightSmall = 14;
@@ -2309,18 +2291,14 @@ void ofApp::drawMovieInfo(float _x, float _y, float _fade){
     ofEnableAlphaBlending();
     ofSetColor(255, 255, 255, _fade * 255);
 
-//    for (int i=0; i<stringMovieInfo.size(); i++) {
-//        float tempWidthOfPath = fontStashHelveticaLight.getBBox(stringMovieInfo[i], tempFontHeightSmall, 0, 0).getWidth();
-//        fontStashHelveticaLight.draw(stringMovieInfo[i],tempFontHeightSmall, _x, (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
-//        fontStashHelveticaMedium.draw(stringMovieData[i], tempFontHeightSmall, (int)(_x + tempWidthOfPath), (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
-//    }
+    for (int i=0; i<stringMovieInfo.size(); i++) {
+        float tempWidthOfPath = fontStashHelveticaLight.getBBox(stringMovieInfo[i], tempFontHeightSmall, 0, 0).getWidth();
+        fontStashHelveticaLight.draw(stringMovieInfo[i],tempFontHeightSmall, _x, (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
+        fontStashHelveticaMedium.draw(stringMovieData[i], tempFontHeightSmall, (int)(_x + tempWidthOfPath), (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
+    }
 
     ofPopStyle();
-
-
-
 }
-
 
 //--------------------------------------------------------------
 void ofApp::drawPrintScreen(){

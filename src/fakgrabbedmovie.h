@@ -5,6 +5,7 @@
 #include <iostream>
 #include "ofMain.h"
 #include "fakGrabbedMovieStill.h"
+#include "ofxFontStash.h"
 
 #include "ofxAvAudioPlayer.h"
 #include "ofxAvVideoPlayer.h"
@@ -88,16 +89,15 @@ public:
 
         setNumberOfStills(_numberOfStills);
 
-//        gmFontStashUbuntu.setup("Ubuntu-Light.ttf", 1.03);
-//        gmFontStashFranchise.setup("Franchise-Bold.ttf", 0.9);
-//        gmFontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
-//        gmFontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
+        gmFontStashUbuntu.setup("fonts/Ubuntu-Light.ttf", 1.03);
+        gmFontStashFranchise.setup("fonts/Franchise-Bold.ttf", 0.9);
+        gmFontStashHelveticaLight.setup("fonts/HelveticaNeueLTCom-Lt.ttf");
+        gmFontStashHelveticaMedium.setup("fonts/HelveticaNeueLTCom-Md.ttf");
 
+        franchiseFontRightSize = 0;
+        stringMargin = 2;
 
-//        franchiseFontRightSize = 0;
-//        stringMargin = 2;
-
-//        gmSetTitleInfo = TRUE; //create new title size und umbruch
+        gmSetTitleInfo = TRUE; //create new title size und umbruch
 
         loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills, _showPlaceHolder, false);
 
@@ -666,7 +666,7 @@ public:
                 gmMovie.setPosition(_frame/(float)gmTotalFrames);
 //                gmMovie.setPosition(0.5);
                 gmMovie.update();
-//                gmMovie.stop();
+                gmMovie.stop();
 //                ofSleepMillis(TimeToWaitForMovie);
                 ofLog(OF_LOG_VERBOSE, "setPosition2: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
@@ -897,9 +897,9 @@ public:
             grabbedStill[i].gsTexture.draw(_x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
             shader.end();
 
-//            if (gmShowFramesUI) { // drawing UI
-//                drawStillUI(i, _x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, 1.0);
-//            }
+            if (gmShowFramesUI) { // drawing UI
+                drawStillUI(i, _x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, 1.0);
+            }
 
             ofPopStyle();
             ofSetColor(255);
@@ -922,8 +922,8 @@ public:
             ofPushStyle();
             ofEnableAlphaBlending();
 
-//            ofRectangle rect = gmFontStashUbuntu.getBBox(dummyString, tempFontSize, 0, 0);
-            ofRectangle rect (0, 0, 100, 100); // substitute for not functional code
+            ofRectangle rect = gmFontStashUbuntu.getBBox(dummyString, tempFontSize, 0, 0);
+//            ofRectangle rect (0, 0, 100, 100); // substitute for not functional code
             if (grabbedStill[i].gsManipulated) {
                 ofSetColor(FAK_ORANGECOLOR, 200*_alpha);
             } else {
@@ -935,7 +935,7 @@ public:
             } else {
                 ofSetColor(255, 255 * _alpha);
             }
-//            gmFontStashUbuntu.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
+            gmFontStashUbuntu.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
 
             ofPopStyle();
 
@@ -1073,10 +1073,10 @@ public:
     ofImage emptyImage;
     ofImage scrubImage;
 
-    //ofxFontStash gmFontStashHelveticaLight;
-    //ofxFontStash gmFontStashHelveticaMedium;
-    //ofxFontStash gmFontStashUbuntu;
-    //ofxFontStash gmFontStashFranchise;
+    ofxFontStash gmFontStashHelveticaLight;
+    ofxFontStash gmFontStashHelveticaMedium;
+    ofxFontStash gmFontStashUbuntu;
+    ofxFontStash gmFontStashFranchise;
     int tempFontSize[24] = {6, 10, 14, 18, 22, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 80, 92, 108, 128, 256, 300};
 
     int franchiseFontRightSize;
