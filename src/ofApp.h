@@ -152,6 +152,8 @@ public:
 
     bool threadIsRunning;
 
+    bool useThread;
+
     bool addToUndo;
 
     bool showPrintScreen;

@@ -31,7 +31,6 @@ Project{
             "ofxMSATimer",
             "ofxImgui",
             "ofxFontStash",
-//            "ofxUnicode-ofxFontStash",
             "ofxAvCodec",
         ]
 

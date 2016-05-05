@@ -15,6 +15,8 @@ void ofApp::setup(){
 
 //    setResourcePath();
 
+    useThread = FALSE;
+
     setupFinished = FALSE;
     updateNewPrintGrid = FALSE;
     showListView = FALSE;
@@ -1207,9 +1209,9 @@ void ofApp::keyPressed(int key){
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-//    if (!lockedDueToInteraction && !lockedDueToPrinting) {
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
 
-//        currentKey = -1;
+        currentKey = -1;
 
 //        if (uiRangeSliderTimeline->getState()) {
 
@@ -1218,7 +1220,7 @@ void ofApp::keyReleased(int key){
 //                uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
 //                updateGridTimeArrayWithAutomaticInterval();
 //                updateAllStills();
-    //                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+//                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
 //                tweenFading.minValue = 255.0;
 //                tweenFading.maxValue = 0.0;
 //                tweenFading.duration = 0.0;
@@ -1232,42 +1234,42 @@ void ofApp::keyReleased(int key){
 
 //            }
 //        }
-//        if (!showListView && loadedMovie.isMovieLoaded) {
-//            if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == 105 || key == 111) {
-//                if (key == OF_KEY_LEFT){
-//                    rollOverButtonsClicked(rollOverMovieID, 1);
-//                } else if (key == OF_KEY_RIGHT){
-//                    rollOverButtonsClicked(rollOverMovieID, 2);
-//                } else if (key == 105){
-//                    rollOverButtonsClicked(rollOverMovieID, 3);
-//                } else if (key == 111){
-//                    rollOverButtonsClicked(rollOverMovieID, 4);
-//                }
-//                addToUndo = true;
-    //                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
-//                tweenFading.minValue = 255.0;
-//                tweenFading.maxValue = 0.0;
-//                tweenFading.duration = 0.0;
-//                tweenFading.initialTime = ofGetElapsedTimef();
-//                addToUndo = true;
-//                if (addToUndo) {
-//                    addMoviePrintDataSet(undoPosition);
-//                    addToUndo = false;
-//                }
-//                ofLog(OF_LOG_VERBOSE, "Key Manipulation over Thumb" );
-//            }
-//        }
+        if (!showListView && loadedMovie.isMovieLoaded()) {
+            if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == 105 || key == 111) {
+                if (key == OF_KEY_LEFT){
+                    rollOverButtonsClicked(rollOverMovieID, 1);
+                } else if (key == OF_KEY_RIGHT){
+                    rollOverButtonsClicked(rollOverMovieID, 2);
+                } else if (key == 105){
+                    rollOverButtonsClicked(rollOverMovieID, 3);
+                } else if (key == 111){
+                    rollOverButtonsClicked(rollOverMovieID, 4);
+                }
+                addToUndo = true;
+                //    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+                tweenFading.minValue = 255.0;
+                tweenFading.maxValue = 0.0;
+                tweenFading.duration = 0.0;
+                tweenFading.initialTime = ofGetElapsedTimef();
+                addToUndo = true;
+                if (addToUndo) {
+                    addMoviePrintDataSet(undoPosition);
+                    addToUndo = false;
+                }
+                ofLog(OF_LOG_VERBOSE, "Key Manipulation over Thumb" );
+            }
+        }
 
 
-//        manipulateSlider = FALSE;
-//    //        loadedMovie.gmScrubMovie = FALSE; // deactivated so shiftKeyPressed and released works in scrubView
-//        loadedMovie.gmRollOver = FALSE;
+        manipulateSlider = FALSE;
+    //        loadedMovie.gmScrubMovie = FALSE; // deactivated so shiftKeyPressed and released works in scrubView
+        loadedMovie.gmRollOver = FALSE;
 
-//        superKeyPressed = FALSE;
-//        shiftKeyPressed = FALSE;
-//    } else {
-//        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
-//    }
+        superKeyPressed = FALSE;
+        shiftKeyPressed = FALSE;
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
+    }
 }
 
 //--------------------------------------------------------------
@@ -1376,7 +1378,7 @@ void ofApp::mouseReleased(int x, int y, int button){
                 }
                 if (updateInOut) {
                     ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
-    //                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+                    //      tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     tweenFading.minValue = 255.0;
                     tweenFading.maxValue = 0.0;
                     tweenFading.duration = 0.5;
@@ -1386,7 +1388,7 @@ void ofApp::mouseReleased(int x, int y, int button){
                     addToUndo = true;
                 }
                 if (updateScrub) {
-    //                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+                    //     tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     tweenFading.minValue = 255.0;
                     tweenFading.maxValue = 0.0;
                     tweenFading.duration = 0.5;
@@ -1394,19 +1396,19 @@ void ofApp::mouseReleased(int x, int y, int button){
 
                     int i = loadedMovie.gmScrubID;
                     if (scrubInitialFrame != loadedMovie.grabbedStill[i].gsFrameNumber) {
-//                        updateOneThumb(i, loadedMovie.grabbedStill[i].gsFrameNumber);
+                        updateOneThumb(i, loadedMovie.grabbedStill[i].gsFrameNumber);
                         addToUndo = true;
                     }
 
                 }
                 if (rollOverClicked) {
-//                    rollOverButtonsClicked(rollOverMovieID, rollOverMovieButtonID);
+                    rollOverButtonsClicked(rollOverMovieID, rollOverMovieButtonID);
                     addToUndo = true;
                 }
             }
         }
         if (addToUndo) {
-//            addMoviePrintDataSet(undoPosition);
+            addMoviePrintDataSet(undoPosition);
             addToUndo = false;
         }
         manipulateSlider = FALSE;
@@ -1816,8 +1818,11 @@ void ofApp::updateAllStills(){
     }
 
     movieIsBeingGrabbed = TRUE;
-//    loadedMovie.start();
-    loadedMovie.grabToImageFunction();
+    if (useThread) {
+        loadedMovie.start();
+    } else {
+        loadedMovie.grabToImageFunction();
+    }
 
     ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
 }
@@ -2250,7 +2255,11 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
         }
         loadedMovie.updateOrderNumber();
         if (!loadedMovie.isThreadRunning()) {
-            loadedMovie.start();
+            if (useThread) {
+                loadedMovie.start();
+            } else {
+                loadedMovie.grabToImageFunction();
+            }
         }
 
 //        uiRangeSliderTimeline->setValueLow(getLowestFrameNumber());
@@ -2716,7 +2725,11 @@ void ofApp::updateOneThumb(int _thumbID, int _newFrameNumber){
     loadedMovie.updateOrderNumber();
 
     if (!loadedMovie.isThreadRunning()) {
-        loadedMovie.start();
+        if (useThread) {
+            loadedMovie.start();
+        } else {
+            loadedMovie.grabToImageFunction();
+        }
     }
 
 //    uiRangeSliderTimeline->setValueLow(getLowestFrameNumber());
