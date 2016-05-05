@@ -6,6 +6,8 @@ void ofApp::setup(){
     drawNotify = true; // ofxNotify
     showPlaceHolder = false; // added for developing
 
+    // used for ofxAvCodec addon
+    soundStream.setup(this, 2, 0, 44100, 512, 4);
 
     ImGuiIO * io = &ImGui::GetIO();
     io->Fonts->AddFontFromFileTTF(&ofToDataPath("fonts/HelveticaNeueLTCom-Lt.ttf")[0], 14.f);

@@ -6,6 +6,9 @@
 #include "ofMain.h"
 #include "fakGrabbedMovieStill.h"
 
+//#include "ofxAvAudioPlayer.h"
+//#include "ofxAvVideoPlayer.h"
+
 #define REsizeFactor 10.0
 #define TimeToWaitForMovie 500
 
@@ -112,6 +115,10 @@ public:
 
         if (!_showPlaceHolder) {
             ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function");
+
+            // used for AvCodec addon
+//            gmMovie.setupAudioOut(2, 44100); // resample to stereo, 44khz
+
             gmMovie.load(vfMovieName);
             ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function");
             ofLog(OF_LOG_VERBOSE, "_____________________________________ " + ofToString(vfMovieName));
@@ -128,7 +135,9 @@ public:
                     gmFrameRate = ceil(gmTotalFrames/gmMovie.getDuration());
                 }
                 gmImageRatio = gmMovie.getWidth()/gmMovie.getHeight();
-                gmPixelRatio = gmMovie.getPixelFormat();
+//                gmPixelRatio = gmMovie.getPixelFormat();
+                // quickfix for ofxAvCodec
+                gmPixelRatio = 1.0;
                 ofLog(OF_LOG_VERBOSE, "ImageRatio:" + ofToString(gmImageRatio) + " PixelRatio:" + ofToString(gmPixelRatio)  + " Framerate:" + ofToString(gmFrameRate) + " totalFrames:" + ofToString(gmTotalFrames) + " getDuration:" + ofToString(gmMovie.getDuration()));
 
             } else {
@@ -146,6 +155,10 @@ public:
 
         return isMovieLoaded();
     }
+
+//    void audioOut( float * buffer, int nFrames, int nChannels ){
+//        gmMovie.audioOut( buffer, nFrames, nChannels );
+//    }
 
     void loadNewMovieToBeScrubbed(string vfMovieName){
 
@@ -1045,6 +1058,10 @@ public:
     // used for rounded corner mask
     ofShader shader;
     ofFbo maskFbo;
+
+    // used for ofxAvCodec addon
+//    ofxAvVideoPlayer gmMovie;
+
 };
 
 #endif // FAKGRABBEDMOVIE_H
