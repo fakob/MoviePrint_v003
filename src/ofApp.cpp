@@ -2562,53 +2562,53 @@ void ofApp::printImageToFile(int _printSizeWidth){
 //--------------------------------------------------------------
 void ofApp::printListToFile(){
 
-//    if (!droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint && itemToPrint == 0 && !movieIsBeingGrabbed && !currPrintingList) {
-//        currPrintingList = TRUE;
+    if (!droppedItem[itemToPrint].itemProperties.ipTriedToPrint && itemToPrint == 0 && !movieIsBeingGrabbed && !currPrintingList) {
+        currPrintingList = TRUE;
 //        droppedList.disableMouseEvents(droppedFiles.size());
 //        droppedList.setActiveItem(itemToPrint);
-//        loadNewMovie(droppedList.glDroppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
-//    }
-//    if (!droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint && !movieIsBeingGrabbed && currPrintingList) {
-//        ofLog(OF_LOG_VERBOSE, "printImageToFile: " + ofToString(itemToPrint) );
-//        if (loadedMovie.isMovieLoaded){
-//            calculateNewPrintGrid();
-//            printImageToFile(moviePrintDataSet.printSizeWidth);
-//            droppedList.glDroppedItem[itemToPrint].itemProperties.ipPrinted = TRUE;
-//        }
-//        droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint = TRUE;
-//        ofLog(OF_LOG_VERBOSE, "ipTriedToPrint: " + ofToString(droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint) );
-//        ofLog(OF_LOG_VERBOSE, "ipPrinted: " + ofToString(droppedList.glDroppedItem[itemToPrint].itemProperties.ipPrinted) );
-//        for (int i=0; i < droppedList.glDroppedItem.size(); i++) {
-//            if (!droppedList.glDroppedItem[i].itemProperties.ipTriedToPrint){
-//                itemToPrint = i;
-//                i = droppedList.glDroppedItem.size();
-//            }
-//        }
+        loadNewMovie(droppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
+    }
+    if (!droppedItem[itemToPrint].itemProperties.ipTriedToPrint && !movieIsBeingGrabbed && currPrintingList) {
+        ofLog(OF_LOG_VERBOSE, "printImageToFile: " + ofToString(itemToPrint) );
+        if (loadedMovie.isMovieLoaded()){
+            calculateNewPrintGrid();
+            printImageToFile(moviePrintDataSet.printSizeWidth);
+            droppedItem[itemToPrint].itemProperties.ipPrinted = TRUE;
+        }
+        droppedItem[itemToPrint].itemProperties.ipTriedToPrint = TRUE;
+        ofLog(OF_LOG_VERBOSE, "ipTriedToPrint: " + ofToString(droppedItem[itemToPrint].itemProperties.ipTriedToPrint) );
+        ofLog(OF_LOG_VERBOSE, "ipPrinted: " + ofToString(droppedItem[itemToPrint].itemProperties.ipPrinted) );
+        for (int i=0; i < droppedItem.size(); i++) {
+            if (!droppedItem[i].itemProperties.ipTriedToPrint){
+                itemToPrint = i;
+                i = droppedItem.size();
+            }
+        }
 //        droppedList.setActiveItem(itemToPrint);
-//        loadNewMovie(droppedList.glDroppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
-//    }
+        loadNewMovie(droppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
+    }
 
-//    int tempIterator = 0;
-//    for (int i=0; i < droppedList.glDroppedItem.size(); i++) {
-//        if (droppedList.glDroppedItem[i].itemProperties.ipTriedToPrint){
-//            tempIterator++;
-//        }
-//    }
-//    if (tempIterator >= droppedList.glDroppedItem.size()) {
-//        stopListPrinting();
-//    }
+    int tempIterator = 0;
+    for (int i=0; i < droppedItem.size(); i++) {
+        if (droppedItem[i].itemProperties.ipTriedToPrint){
+            tempIterator++;
+        }
+    }
+    if (tempIterator >= droppedItem.size()) {
+        stopListPrinting();
+    }
 
-//    timer.setStartTime();
-//    finishedPrinting = TRUE;
+    timer.setStartTime();
+    finishedPrinting = TRUE;
 
 }
 
 //--------------------------------------------------------------
 void ofApp::resetItemsToPrint(){
-//    for (int i=0; i < droppedList.glDroppedItem.size(); i++) {
-//        droppedList.glDroppedItem[i].itemProperties.ipTriedToPrint = FALSE;
-//        droppedList.glDroppedItem[i].itemProperties.ipPrinted = FALSE;
-//    }
+    for (int i=0; i < droppedItem.size(); i++) {
+        droppedItem[i].itemProperties.ipTriedToPrint = FALSE;
+        droppedItem[i].itemProperties.ipPrinted = FALSE;
+    }
 }
 
 
@@ -2800,23 +2800,23 @@ void ofApp::stopPrinting(){
 
 //--------------------------------------------------------------
 void ofApp::startListPrinting(){
-//    lockedDueToPrinting = true;
-//    inactivateAllMenus();
-//    ofLog(OF_LOG_VERBOSE, "Start Printing List-------------------------------------------");
-//    itemToPrint = 0;
+    lockedDueToPrinting = true;
+    inactivateAllMenus();
+    ofLog(OF_LOG_VERBOSE, "Start Printing List-------------------------------------------");
+    itemToPrint = 0;
 //    droppedList.disableMouseEvents(droppedFiles.size());
-//    resetItemsToPrint();
-//    printListToFile();
+    resetItemsToPrint();
+    printListToFile();
 }
 
 //--------------------------------------------------------------
 void ofApp::stopListPrinting(){
-//    currPrintingList = FALSE;
-//    moveToList();
-//    activateAllMenus();
+    currPrintingList = FALSE;
+    moveToList();
+    activateAllMenus();
 //    droppedList.enableMouseEvents();
-//    lockedDueToPrinting = false;
-//    ofLog(OF_LOG_VERBOSE, "Finished Printing List-------------------------------------------");
+    lockedDueToPrinting = false;
+    ofLog(OF_LOG_VERBOSE, "Finished Printing List-------------------------------------------");
 }
 
 //--------------------------------------------------------------
