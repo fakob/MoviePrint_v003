@@ -399,7 +399,7 @@ public:
                 }
                 grabbedStill[i].gsWidth = gmMovie.getWidth()/grabbedStill[i].gsResizeFactor;
                 grabbedStill[i].gsHeight = gmMovie.getHeight()/grabbedStill[i].gsResizeFactor;
-                grabbedStill[i].gsImage.setUseTexture(FALSE);
+                grabbedStill[i].gsImage.setUseTexture(FALSE);  // no texture used yet - later: grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
                 grabbedStill[i].gsImage.allocate(gmMovie.getWidth(), gmMovie.getHeight(), OF_IMAGE_COLOR);
                 grabbedStill[i].gsTexture.allocate(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight,GL_RGB);
                 grabbedStill[i].gsToBeUpdated = TRUE;

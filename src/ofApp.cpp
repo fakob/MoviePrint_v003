@@ -232,6 +232,11 @@ void ofApp::setup(){
 //    uiSliderValueHigh = 1000;    // added this temporarily until new timeline slider is in place
 
     setupFinished = TRUE;
+
+   loadedMovie2.setup("Original - Short from Vucko.mp4", 5);
+   loadedMovie2.gmMovie.play();
+   loadedMovie2.gmMovie.stop();
+
 }
 
 //--------------------------------------------------------------
@@ -263,6 +268,7 @@ void ofApp::setGUITimeline(){
 //--------------------------------------------------------------
 void ofApp::update(){
     loadedMovie.update();
+    loadedMovie2.update();
 
     tweenTimelineInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimelineInOut.initialTime, (tweenTimelineInOut.initialTime + tweenTimelineInOut.duration), tweenTimelineInOut.minValue, tweenTimelineInOut.maxValue, &ofxeasing::exp::easeInOut);
     tweenListInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenListInOut.initialTime, (tweenListInOut.initialTime + tweenListInOut.duration), tweenListInOut.minValue, tweenListInOut.maxValue, &ofxeasing::exp::easeInOut);
@@ -662,6 +668,20 @@ void ofApp::draw(){
             drawUpdateScreen();
         }
     }
+
+    ofPushStyle();
+    ofPushMatrix();
+    loadedMovie2.gmMovie.draw(0,0,640,360);
+    for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(); i++)
+    {
+//        ofDrawRectangle(640 + (i*105),320,100,100);
+        loadedMovie2.grabbedFrame[i].gsImage.draw(640 + (i*105),320,100,100);
+        loadedMovie2.getImage(i).draw(640 + (i*105),320,100,100);
+//        loadedMovie2.grabbedFrame[i].g
+//        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "]: " + ofToString(loadedMovie2.grabbedFrame[i].gsFrameNumber) + "#");
+    }
+    ofPopMatrix();
+    ofPopStyle();
 
     ofxNotify::draw(drawNotify);
 }
@@ -1120,11 +1140,15 @@ void ofApp::keyPressed(int key){
             }
                 break;
 
-    //            case 'v':
-    //            {
-    //                logPreviousMoviePrintDataSet();
-    //            }
-    //                break;
+                case 'v':
+                {
+                    if (useThread) {
+                        loadedMovie2.start();
+                    } else {
+                        loadedMovie2.grabToImageFunction();
+                    }
+                }
+                    break;
     //
     //            case 'c':
     //            {

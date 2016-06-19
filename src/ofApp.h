@@ -5,6 +5,7 @@
 #include "fakmenu.h"
 #include "fakgrabbedlistitem.h"
 #include "fakscrollbar.h"
+#include "fakgrabframes.h"
 
 #include "ofxNotify.h"
 #include "ofxEasing.h"
@@ -129,6 +130,7 @@ public:
 
     // Movie
     fakGrabbedMovie loadedMovie;
+    fakGrabFrames loadedMovie2;
     vector<string> stringMovieInfo;
     vector<string> stringMovieData;
 
