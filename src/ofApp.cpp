@@ -233,7 +233,7 @@ void ofApp::setup(){
 
     setupFinished = TRUE;
 
-   loadedMovie2.setup("Original - Short from Vucko.mp4", 5, true);
+   loadedMovie2.setup("Original - Short from Vucko.mp4", 5);
    loadedMovie2.gmMovie.play();
    loadedMovie2.gmMovie.stop();
 

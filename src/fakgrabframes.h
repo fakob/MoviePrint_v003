@@ -58,9 +58,7 @@ public:
         int gsHeight; //original height of grabbedFrame
     };
 
-    void setup(string vfMovieName, int _numberOfStills, bool _isOpenCVMovie){
-        isOpenCVMovie = _isOpenCVMovie;
-
+    void setup(string vfMovieName, int _numberOfStills){
         gmSetupFinished = false;
         loadNewMovieToBeGrabbed(vfMovieName);
         allocateNewNumberOfStills(_numberOfStills);
@@ -71,47 +69,26 @@ public:
         stop(FALSE);
 
         ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function");
-        if (isOpenCVMovie) {
-//            gmMovie.load(vfMovieName);
-            ofFile fileToRead(vfMovieName);
-            movieFile.open(fileToRead.getAbsolutePath());
-//            ofLog(OF_LOG_VERBOSE, "fileToRead.getAbsolutePath(): " + ofToString(fileToRead.getAbsolutePath()));
-//            movieFile.read(matOrig);
+        ofFile fileToRead(vfMovieName);
+        movieFile.open(fileToRead.getAbsolutePath());
+        // ofLog(OF_LOG_VERBOSE, "fileToRead.getAbsolutePath(): " + ofToString(fileToRead.getAbsolutePath()));
+        // movieFile.read(matOrig);
 
-            if(movieFile.isOpened()){
-                // get some meta data about frame.
-                gmFrameRate = int(movieFile.get(CV_CAP_PROP_FPS));
-                gmTotalFrames = int(movieFile.get(CV_CAP_PROP_FRAME_COUNT));
-                gmFrameHeight = int(movieFile.get(CV_CAP_PROP_FRAME_HEIGHT));
-                gmFrameWidth = int(movieFile.get(CV_CAP_PROP_FRAME_WIDTH));
-//                double posFrames = movieFile.get(CV_CAP_PROP_POS_FRAMES);
-//                double posMsec = movieFile.get(CV_CAP_PROP_POS_MSEC);
-                gmImageRatio = gmFrameWidth/(float)gmFrameHeight;
-                gmPixelRatio = 1.0;
-            }
-            while (!isMovieLoaded()) {
-                ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load");
-            }
-        } else {
-            gmMovie.load(vfMovieName);
-            while (!isMovieLoaded()) {
-                ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load");
-            }
-            if (gmMovie.getTotalNumFrames() < 2) { //check if movie has only one frame, if so than calculate totalframes and later use setPosition instead of setFrame
-                gmHasNoFrames = TRUE;
-                gmFrameRate = 25;
-                gmTotalFrames = gmMovie.getDuration() * gmFrameRate;
-            } else {
-                gmHasNoFrames = FALSE;
-                gmTotalFrames = gmMovie.getTotalNumFrames();
-                gmFrameRate = ceil(gmTotalFrames/gmMovie.getDuration());
-            }
-            gmFrameWidth = gmMovie.getWidth();
-            gmFrameHeight = gmMovie.getHeight();
+        if(movieFile.isOpened()){
+            // get some meta data about frame.
+            gmFrameRate = int(movieFile.get(CV_CAP_PROP_FPS));
+            gmTotalFrames = int(movieFile.get(CV_CAP_PROP_FRAME_COUNT));
+            gmFrameHeight = int(movieFile.get(CV_CAP_PROP_FRAME_HEIGHT));
+            gmFrameWidth = int(movieFile.get(CV_CAP_PROP_FRAME_WIDTH));
+            //                double posFrames = movieFile.get(CV_CAP_PROP_POS_FRAMES);
+            //                double posMsec = movieFile.get(CV_CAP_PROP_POS_MSEC);
             gmImageRatio = gmFrameWidth/(float)gmFrameHeight;
             gmPixelRatio = 1.0;
-    //            gmPixelRatio = gmMovie.getPixelFormat();
         }
+        while (!isMovieLoaded()) {
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load");
+        }
+
         ofLog(OF_LOG_VERBOSE, "_____________________________________ " + ofToString(vfMovieName));
         ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function");
 
@@ -157,11 +134,6 @@ public:
     void update(){
         if (isMovieLoaded()) {
 //            ofLog(OF_LOG_VERBOSE, "____________gmMovie.update() ");
-            if (isOpenCVMovie) {
-
-            } else {
-                gmMovie.update();
-            }
 //            for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(); i++) {
 //                grabbedFrame[i].gsTexture.loadScreenData(0,0,200,200);
 //                grabbedFrame[i].gsImage.update();
@@ -213,11 +185,7 @@ public:
 
     bool isMovieLoaded(){
 //        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(isMovieLoaded()));
-        if (isOpenCVMovie) {
-            return movieFile.isOpened();
-        } else {
-            return gmMovie.isLoaded();
-        }
+        return movieFile.isOpened();
     }
 
     void grabNextFrame(int i, bool _useThreads){
@@ -280,39 +248,12 @@ public:
             _frame = min((gmTotalFrames-1), max(_frame, 0));
             grabbedFrame[i].gsFrameNumber = _frame;
 
-
-            if (isOpenCVMovie) {
-                movieFile.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
-                movieFile.read(matOrig);
-//                float frameLength = 1000/gmMovie.getFps();
-//                gmMovie.setPositionMS(_frame*frameLength);
-//                while (!isMovieLoaded()) {
-//                    ofLog(OF_LOG_VERBOSE, str + "_____________________________________ waiting for movie to load");
-//                }
-//                ofLog(OF_LOG_VERBOSE, str + "_frame*frameLength " + ofToString(_frame*frameLength));
-            } else {
-                gmMovie.play();
-                ofSleepMillis(TimeToWaitForMovie);
-//                gmMovie.setPosition(_frame/(float)gmTotalFrames);
-//                gmMovie.update();
-                gmMovie.setFrame(_frame);
-                gmMovie.update();
-                ofSleepMillis(TimeToWaitForMovie);
-                gmMovie.update();
-                ofLog(OF_LOG_VERBOSE, str + "_____________________________________ was sleeping a bit");
-                gmMovie.stop();
-            }
-//            while (!isMovieLoaded()) {
-//                ofLog(OF_LOG_VERBOSE, str + "_____________________________________ waiting for movie to load");
-//            }
+            movieFile.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
+            movieFile.read(matOrig);
 
             if (grabbedFrame[i].gsImage.isAllocated() && !gmCurrAllocating) {
-                if (isOpenCVMovie) {
-                    ofxCv::copy(matOrig, grabbedFrame[i].gsImage);
-                    grabbedFrame[i].gsImage.update();
-                } else {
-                    grabbedFrame[i].gsImage.setFromPixels(gmMovie.getPixels());
-                }
+                ofxCv::copy(matOrig, grabbedFrame[i].gsImage);
+                grabbedFrame[i].gsImage.update();
                 grabbedFrame[i].gsToBeGrabbed = FALSE;
                 ofLog(OF_LOG_VERBOSE, str + "Frame " + ofToString(i) + " saved");
             } else {
@@ -409,9 +350,6 @@ public:
     int gmNumberOfStills;
     bool gmSetupFinished;
     int gmThreadCounter;
-
-//    bool useThread;
-    bool isOpenCVMovie;
 
     cv::VideoCapture movieFile;
     cv::Mat matOrig;
