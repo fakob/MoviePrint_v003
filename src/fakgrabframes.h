@@ -58,12 +58,12 @@ public:
         int gsHeight; //original height of grabbedFrame
     };
 
-    void setup(string vfMovieName, int _numberOfStills, bool _isOpenCVMovie, bool _isUsingThreads){
+    void setup(string vfMovieName, int _numberOfStills, bool _isOpenCVMovie){
         isOpenCVMovie = _isOpenCVMovie;
 
         gmSetupFinished = false;
         loadNewMovieToBeGrabbed(vfMovieName);
-        allocateNewNumberOfStills(_numberOfStills, _isUsingThreads);
+        allocateNewNumberOfStills(_numberOfStills);
         gmSetupFinished = true;
     }
 
@@ -124,7 +124,7 @@ public:
         return isMovieLoaded();
     }
 
-    void allocateNewNumberOfStills(int _numberOfStills, bool _isUsingThreads){
+    void allocateNewNumberOfStills(int _numberOfStills){
 
         gmNumberOfStills = _numberOfStills;
 
@@ -139,11 +139,7 @@ public:
                 grabbedFrame[i].gsID = i;
                 grabbedFrame[i].gsWidth = gmFrameWidth;
                 grabbedFrame[i].gsHeight = gmFrameHeight;
-                if (_isUsingThreads) {
-                    grabbedFrame[i].gsImage.setUseTexture(false); // can also not use texture yet - later: grabbedFrame[i].gsTexture.loadData(grabbedFrame[i].gsImage);
-                } else {
-                    grabbedFrame[i].gsImage.setUseTexture(true); // can also not use texture yet - later: grabbedFrame[i].gsTexture.loadData(grabbedFrame[i].gsImage);
-                }
+                grabbedFrame[i].gsImage.setUseTexture(false); // can also not use texture yet - later: grabbedFrame[i].gsTexture.loadData(grabbedFrame[i].gsImage);
                 grabbedFrame[i].gsImage.allocate(grabbedFrame[i].gsWidth, grabbedFrame[i].gsHeight, OF_IMAGE_COLOR);
                 grabbedFrame[i].gsTexture.allocate(grabbedFrame[i].gsWidth, grabbedFrame[i].gsHeight,GL_RGB);
 //                grabbedFrame[i].gsToBeUpdated = TRUE;
