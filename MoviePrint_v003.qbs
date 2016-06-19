@@ -31,7 +31,8 @@ Project{
             "ofxMSATimer",
             "ofxImgui",
             "ofxFontStash",
-            "ofxAvCodec",
+            "ofxCv",
+            "ofxOpenCv"
         ]
 
         // additional flags for the project. the of module sets some
@@ -44,7 +45,7 @@ Project{
         of.linkerFlags: []      // flags passed to the linker
         of.defines: []          // defines are passed as -D to the compiler
         // and can be checked with #ifdef or #if in the code
-        of.frameworks: []       // osx only, additional frameworks to link with the project
+        of.frameworks: ["Qtkit"]       // osx only, additional frameworks to link with the project
 
         // other flags can be set through the cpp module: http://doc.qt.io/qbs/cpp-module.html
         // eg: this will enable ccache when compiling

@@ -15,7 +15,7 @@ void ofApp::setup(){
 
 //    setResourcePath();
 
-    useThread = FALSE;
+    useThread = true;
 
     setupFinished = FALSE;
     updateNewPrintGrid = FALSE;
@@ -233,7 +233,7 @@ void ofApp::setup(){
 
     setupFinished = TRUE;
 
-   loadedMovie2.setup("Original - Short from Vucko.mp4", 5);
+   loadedMovie2.setup("Original - Short from Vucko.mp4", 5, true, true);
    loadedMovie2.gmMovie.play();
    loadedMovie2.gmMovie.stop();
 
@@ -675,10 +675,25 @@ void ofApp::draw(){
     for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(); i++)
     {
 //        ofDrawRectangle(640 + (i*105),320,100,100);
-        loadedMovie2.grabbedFrame[i].gsImage.draw(640 + (i*105),320,100,100);
-        loadedMovie2.getImage(i).draw(640 + (i*105),320,100,100);
+//        loadedMovie2.grabbedFrame[i].gsImage.draw(640 + (i*105),320,100,100);
+//        loadedMovie2.getImage(i).draw(640 + (i*105),320,100,100);
 //        loadedMovie2.grabbedFrame[i].g
 //        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "]: " + ofToString(loadedMovie2.grabbedFrame[i].gsFrameNumber) + "#");
+        if (loadedMovie2.grabbedFrame[i].gsToBeUpdated && !loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()) { // load textures in proper size
+            if (!loadedMovie2.grabbedFrame[i].gsToBeGrabbed ) {
+                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsImage.isUsingTexture():" + ofToString(loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()));
+                loadedMovie2.grabbedFrame[i].gsTexture.loadData(loadedMovie2.grabbedFrame[i].gsImage);
+            //  loadedMovie2.grabbedFrame[i].gsTexture.loadScreenData(0,0,400,400);
+                loadedMovie2.grabbedFrame[i].gsImage.update();
+                loadedMovie2.grabbedFrame[i].gsToBeUpdated = FALSE;
+                ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
+            }
+        }
+
+        int tempX, tempY;
+        tempX = 0 + ((i%4)*160);
+        tempY = 365 + ((i/4)*90);
+        loadedMovie2.grabbedFrame[i].gsTexture.draw(tempX,tempY,155,87);
     }
     ofPopMatrix();
     ofPopStyle();
@@ -1145,7 +1160,7 @@ void ofApp::keyPressed(int key){
                     if (useThread) {
                         loadedMovie2.start();
                     } else {
-                        loadedMovie2.grabToImageFunction();
+                        loadedMovie2.grabToImageAll();
                     }
                 }
                     break;

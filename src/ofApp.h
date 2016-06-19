@@ -13,8 +13,8 @@
 #include "ofxImgui.h"
 #include "ofxFontStash.h"
 
-#include "ofxAvAudioPlayer.h"
-#include "ofxAvVideoPlayer.h"
+//#include "ofxAvAudioPlayer.h"
+//#include "ofxAvVideoPlayer.h"
 
 class ofApp : public ofBaseApp{
 

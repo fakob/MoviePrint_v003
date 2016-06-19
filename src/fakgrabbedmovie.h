@@ -7,8 +7,8 @@
 #include "fakGrabbedMovieStill.h"
 #include "ofxFontStash.h"
 
-#include "ofxAvAudioPlayer.h"
-#include "ofxAvVideoPlayer.h"
+//#include "ofxAvAudioPlayer.h"
+//#include "ofxAvVideoPlayer.h"
 
 #define REsizeFactor 10.0
 #define TimeToWaitForMovie 500
