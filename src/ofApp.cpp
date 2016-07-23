@@ -672,7 +672,7 @@ void ofApp::draw(){
 
     ofPushStyle();
     ofPushMatrix();
-    loadedMovie2.gmMovie.draw(0,0,640,360);
+//    loadedMovie2.gmMovie.draw(0,0,640,360);
     for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(); i++)
     {
 //        ofDrawRectangle(640 + (i*105),320,100,100);
@@ -680,6 +680,9 @@ void ofApp::draw(){
 //        loadedMovie2.getImage(i).draw(640 + (i*105),320,100,100);
 //        loadedMovie2.grabbedFrame[i].g
 //        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "]: " + ofToString(loadedMovie2.grabbedFrame[i].gsFrameNumber) + "#");
+//        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsToBeUpdated: " + ofToString(loadedMovie2.grabbedFrame[i].gsToBeUpdated));
+//        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsToBeGrabbed: " + ofToString(loadedMovie2.grabbedFrame[i].gsToBeGrabbed));
+//        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsImage.isUsingTexture(): " + ofToString(loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()));
         if (loadedMovie2.grabbedFrame[i].gsToBeUpdated && !loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()) { // load textures in proper size
             if (!loadedMovie2.grabbedFrame[i].gsToBeGrabbed ) {
                 ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsImage.isUsingTexture():" + ofToString(loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()));
@@ -1159,6 +1162,7 @@ void ofApp::keyPressed(int key){
                 case 'v':
                 {
                     if (useThread) {
+                        loadedMovie.start();
                         loadedMovie2.start();
                     } else {
                         loadedMovie2.grabToImageAll();
