@@ -125,7 +125,9 @@ public:
             ofLog(OF_LOG_VERBOSE, "_____________________________________ fakgrabbedmovie: end loadMovie function" + ofToString(vfMovieName));
 
         }
-//        allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
+        gmTotalFrames = gmMovie.gfTotalFrames;
+
+        allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
 
 //        getMovieInformation(vfMovieName);
 
@@ -335,10 +337,10 @@ public:
             gmThumbWidth = _gmThumbWidth;
             gmThumbHeight = _gmThumbHeight;
 
-            stop(TRUE);
-            while (isThreadRunning()) {
-                ofLog(OF_LOG_VERBOSE, "allocateNewNumberOfStills is waiting for thread to stop");
-            }
+//            stop(TRUE);
+//            while (isThreadRunning()) {
+//                ofLog(OF_LOG_VERBOSE, "allocateNewNumberOfStills is waiting for thread to stop");
+//            }
 
             // unregister All Mouse Events of the Stills (old gmNumberOfStills)
             disableMouseEvents();
@@ -426,7 +428,7 @@ public:
 
     }
 
-    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
+    void drawStill_Temp(int i, float _x, float _y, float _w, float _h, float _alpha, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
 
         if (isMovieLoaded()) {
 
@@ -472,7 +474,7 @@ public:
 
     }
 
-    void drawStill_Old(int i, float _x, float _y, float _w, float _h, float _alpha, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
+    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
 
         if (isMovieLoaded()) {
 
@@ -501,7 +503,21 @@ public:
             shader.setUniformTexture("maskTex", maskFbo.getTexture(), 1 );
 
             ofSetColor(255, 255, 255, 255);
-            grabbedStill[i].gsTexture.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+
+//            grabbedStill[i].gsTexture.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+
+            if (gmMovie.grabbedFrame[i].gsToBeUpdated && !gmMovie.grabbedFrame[i].gsImage.isUsingTexture()) { // load textures in proper size
+                if (!gmMovie.grabbedFrame[i].gsToBeGrabbed ) {
+                    ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsImage.isUsingTexture():" + ofToString(gmMovie.grabbedFrame[i].gsImage.isUsingTexture()));
+                    gmMovie.grabbedFrame[i].gsTexture.loadData(gmMovie.grabbedFrame[i].gsImage);
+                //  gmMovie.grabbedFrame[i].gsTexture.loadScreenData(0,0,400,400);
+                    gmMovie.grabbedFrame[i].gsImage.update();
+                    gmMovie.grabbedFrame[i].gsToBeUpdated = FALSE;
+                    ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
+                }
+            }
+
+            gmMovie.grabbedFrame[i].gsTexture.draw(_x,_y,_w,_h);
 
             shader.end();
 

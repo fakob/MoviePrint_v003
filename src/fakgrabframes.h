@@ -60,10 +60,10 @@ public:
 //    };
 
     void setup(string vfMovieName, int _numberOfFrames){
-        gmSetupFinished = false;
+        gfSetupFinished = false;
         loadNewMovieToBeGrabbed(vfMovieName);
         allocateNewNumberOfFrames(_numberOfFrames);
-        gmSetupFinished = true;
+        gfSetupFinished = true;
     }
 
     bool loadNewMovieToBeGrabbed(string vfMovieName){
@@ -71,30 +71,30 @@ public:
 
         ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function" + ofToString(vfMovieName));
         ofFile fileToRead(vfMovieName);
-        gmMoviePath = fileToRead.getAbsolutePath();
-        movieFile.open(gmMoviePath);
+        gfMoviePath = fileToRead.getAbsolutePath();
+        movieFile.open(gfMoviePath);
         // ofLog(OF_LOG_VERBOSE, "fileToRead.getAbsolutePath(): " + ofToString(fileToRead.getAbsolutePath()));
         // movieFile.read(matOrig);
 
         if(movieFile.isOpened()){
             // get some meta data about frame.
-            gmFrameRate = int(movieFile.get(CV_CAP_PROP_FPS));
-            gmTotalFrames = int(movieFile.get(CV_CAP_PROP_FRAME_COUNT));
-            gmFrameHeight = int(movieFile.get(CV_CAP_PROP_FRAME_HEIGHT));
-            gmFrameWidth = int(movieFile.get(CV_CAP_PROP_FRAME_WIDTH));
+            gfFrameRate = int(movieFile.get(CV_CAP_PROP_FPS));
+            gfTotalFrames = int(movieFile.get(CV_CAP_PROP_FRAME_COUNT));
+            gfFrameHeight = int(movieFile.get(CV_CAP_PROP_FRAME_HEIGHT));
+            gfFrameWidth = int(movieFile.get(CV_CAP_PROP_FRAME_WIDTH));
             //                double posFrames = movieFile.get(CV_CAP_PROP_POS_FRAMES);
             //                double posMsec = movieFile.get(CV_CAP_PROP_POS_MSEC);
-            gmImageRatio = gmFrameWidth/(float)gmFrameHeight;
-            gmPixelRatio = 1.0;
+            gfImageRatio = gfFrameWidth/(float)gfFrameHeight;
+            gfPixelRatio = 1.0;
         }
         while (!isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load - " + ofToString(gmMoviePath));
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load - " + ofToString(gfMoviePath));
         }
 
         ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function" + ofToString(vfMovieName));
 
         if (isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "Width: " + ofToString(gmFrameWidth) + " Height: " + ofToString(gmFrameHeight) + " ImageRatio:" + ofToString(gmImageRatio) + " PixelRatio:" + ofToString(gmPixelRatio)  + " Framerate:" + ofToString(gmFrameRate) + " totalFrames:" + ofToString(gmTotalFrames) + " getDuration:" + ofToString(gmMovie.getDuration()));
+            ofLog(OF_LOG_VERBOSE, "Width: " + ofToString(gfFrameWidth) + " Height: " + ofToString(gfFrameHeight) + " ImageRatio:" + ofToString(gfImageRatio) + " PixelRatio:" + ofToString(gfPixelRatio)  + " Framerate:" + ofToString(gfFrameRate) + " totalFrames:" + ofToString(gfTotalFrames) + " getDuration:" + ofToString(gfMovie.getDuration()));
             ofLog(OF_LOG_VERBOSE, "Movie loaded");
         } else {
             ofLog(OF_LOG_VERBOSE, "Movie not loaded");
@@ -104,50 +104,50 @@ public:
 
     void allocateNewNumberOfFrames(int _numberOfFrames){
 
-        gmNumberOfFrames = _numberOfFrames;
+        gfNumberOfFrames = _numberOfFrames;
 
         if (isMovieLoaded()) {
-            gmCurrAllocating = true;
+            gfCurrAllocating = true;
 
             grabbedFrame.clear();
-            grabbedFrame.resize(gmNumberOfFrames);
+            grabbedFrame.resize(gfNumberOfFrames);
 
-            for(int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++)
+            for(int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfNumberOfFrames(); i++)
             {
                 grabbedFrame[i].gsID = i;
-                grabbedFrame[i].gsWidth = gmFrameWidth;
-                grabbedFrame[i].gsHeight = gmFrameHeight;
+                grabbedFrame[i].gsWidth = gfFrameWidth;
+                grabbedFrame[i].gsHeight = gfFrameHeight;
                 grabbedFrame[i].gsImage.setUseTexture(false); // can also not use texture yet - later: grabbedFrame[i].gsTexture.loadData(grabbedFrame[i].gsImage);
                 grabbedFrame[i].gsImage.allocate(grabbedFrame[i].gsWidth, grabbedFrame[i].gsHeight, OF_IMAGE_COLOR);
                 grabbedFrame[i].gsTexture.allocate(grabbedFrame[i].gsWidth, grabbedFrame[i].gsHeight,GL_RGB);
 //                grabbedFrame[i].gsToBeUpdated = TRUE;
                 grabbedFrame[i].gsToBeGrabbed = TRUE;
-                grabbedFrame[i].gsFrameNumber = ofMap(i, 0, (returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames() - 1), 0, (gmTotalFrames - 1), TRUE);
-                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsFrameNumber:" + ofToString(grabbedFrame[i].gsFrameNumber) + "gmTotalFrames:" + ofToString(gmTotalFrames));
+                grabbedFrame[i].gsFrameNumber = ofMap(i, 0, (returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfNumberOfFrames() - 1), 0, (gfTotalFrames - 1), TRUE);
+                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsFrameNumber: " + ofToString(grabbedFrame[i].gsFrameNumber) + " gfTotalFrames: " + ofToString(gfTotalFrames));
             }
             ofLog(OF_LOG_VERBOSE, "Allocations worked");
         } else{
             ofLog(OF_LOG_VERBOSE, "Movie not loaded");
         }
-        gmCurrAllocating = false;
+        gfCurrAllocating = false;
     }
 
     string getMoviePath(){
-        return gmMoviePath;
+        return gfMoviePath;
     }
 
     void update(){
         if (isMovieLoaded()) {
-//            ofLog(OF_LOG_VERBOSE, "____________gmMovie.update() ");
-//            for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++) {
+//            ofLog(OF_LOG_VERBOSE, "____________gfMovie.update() ");
+//            for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfNumberOfFrames(); i++) {
 //                grabbedFrame[i].gsTexture.loadScreenData(0,0,200,200);
 //                grabbedFrame[i].gsImage.update();
 //            }
-//            for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++) {
+//            for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfNumberOfFrames(); i++) {
 //                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsImage.isUsingTexture():" + ofToString(grabbedFrame[i].gsImage.isUsingTexture()));
 //                if (grabbedFrame[i].gsToBeUpdated && !grabbedFrame[i].gsImage.isUsingTexture()) { // load textures in proper size
 //                    if (!grabbedFrame[i].gsToBeGrabbed ) {
-//                        //                    if (gmCalcResizeSwitch) {
+//                        //                    if (gfCalcResizeSwitch) {
 //                        //                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
 //                        //                    }
 //                        grabbedFrame[i].gsTexture.loadData(grabbedFrame[i].gsImage);
@@ -162,11 +162,11 @@ public:
     }
 
 
-    int returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(){
-        int tempNumberOfFrames = gmNumberOfFrames;
-//        ofLog(OF_LOG_VERBOSE, "returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames() gmNumberOfFrames:" + ofToString(gmNumberOfFrames));
-        if (gmNumberOfFrames != grabbedFrame.size()) {
-            ofLog(OF_LOG_VERBOSE, "XXX___ Size of gmNumberOfFrames and grabbedFrame.size() differs -> grabbedFrame.size() is used");
+    int returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfNumberOfFrames(){
+        int tempNumberOfFrames = gfNumberOfFrames;
+//        ofLog(OF_LOG_VERBOSE, "returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfNumberOfFrames() gfNumberOfFrames:" + ofToString(gfNumberOfFrames));
+        if (gfNumberOfFrames != grabbedFrame.size()) {
+            ofLog(OF_LOG_VERBOSE, "XXX___ Size of gfNumberOfFrames and grabbedFrame.size() differs -> grabbedFrame.size() is used");
             tempNumberOfFrames = grabbedFrame.size();
         }
         return tempNumberOfFrames;
@@ -174,7 +174,7 @@ public:
 
     void setAllToBeGrabbedAndToBeUpdated(){
         ofLog(OF_LOG_VERBOSE, "____________setAllToBeGrabbedAndToBeUpdated()");
-        for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++) {
+        for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfNumberOfFrames(); i++) {
             setOneToBeGrabbedAndToBeUpdated(i, FALSE);
         }
     }
@@ -195,17 +195,17 @@ public:
 
     void play(){
         if (isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "____________gmMovie.play() ");
-            gmMovie.play();
+            ofLog(OF_LOG_VERBOSE, "____________gfMovie.play() ");
+            gfMovie.play();
         }
     }
 
     int getWidth(){
-        return gmFrameWidth;
+        return gfFrameWidth;
     }
 
     int getHeight(){
-        return gmFrameHeight;
+        return gfFrameHeight;
     }
 
     void grabNextFrame(int i, bool _useThreads){
@@ -261,17 +261,17 @@ public:
         if (_inThread) {
             str = "In Thread function - ";
         }
-        ofLog(OF_LOG_VERBOSE, str + "1 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gmMovie.getPosition()) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+        ofLog(OF_LOG_VERBOSE, str + "1 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfMovie.getCurrentFrame()));
 
         if (isMovieLoaded()) {
 
-            _frame = min((gmTotalFrames-1), max(_frame, 0));
+            _frame = min((gfTotalFrames-1), max(_frame, 0));
             grabbedFrame[i].gsFrameNumber = _frame;
 
             movieFile.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
             movieFile.read(matOrig);
 
-            if (grabbedFrame[i].gsImage.isAllocated() && !gmCurrAllocating) {
+            if (grabbedFrame[i].gsImage.isAllocated() && !gfCurrAllocating) {
                 ofxCv::copy(matOrig, grabbedFrame[i].gsImage);
                 grabbedFrame[i].gsImage.update();
                 grabbedFrame[i].gsToBeGrabbed = FALSE;
@@ -280,21 +280,21 @@ public:
                 ofLog(OF_LOG_VERBOSE, str + "CRASH AVOIDED grabbedFrame[i].gsImage.isAllocated() FALSE _______________________________");
             }
         }
-        ofLog(OF_LOG_VERBOSE, str + "2 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gmMovie.getPosition()) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+        ofLog(OF_LOG_VERBOSE, str + "2 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfMovie.getCurrentFrame()));
     }
 
     bool allGrabbed(){
         int allGrabbed = 0;
         if (isMovieLoaded()) {
 
-            for(int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++)
+            for(int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfNumberOfFrames(); i++)
             {
                 if(!grabbedFrame[i].gsToBeGrabbed){
                     allGrabbed++;
                 }
             }
         }
-        if (allGrabbed == gmNumberOfFrames){
+        if (allGrabbed == gfNumberOfFrames){
             return TRUE;
         } else {
             return FALSE;
@@ -303,7 +303,7 @@ public:
     }
 
     void grabToImageAll(){
-        if (gmSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
+        if (gfSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
             do {
                 for (int i = 0; i<grabbedFrame.size(); i++) { // frames are being updated in the order of their framenumber
                     if (grabbedFrame[i].gsToBeGrabbed) {
@@ -319,12 +319,12 @@ public:
 
     void threadedFunction(){
 
-        if (gmSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
+        if (gfSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
             lock();
             do {
                 for (int i = 0; i<grabbedFrame.size(); i++) {
                     if (grabbedFrame[i].gsToBeGrabbed) {
-                        gmThreadCounter++;
+                        gfThreadCounter++;
                         ofLog(OF_LOG_VERBOSE, "In Thread Function - i:" + ofToString(i) + " Frame:" + ofToString(grabbedFrame[i].gsFrameNumber));
                         grabToImage(i, grabbedFrame[i].gsFrameNumber, true);                    }
                 }
@@ -339,7 +339,7 @@ public:
     void start(){
 
         startThread(true);   // blocking, verbose
-        gmThreadCounter = 0;
+        gfThreadCounter = 0;
 
     }
 
@@ -354,24 +354,24 @@ public:
 
     //properties
 
-    ofVideoPlayer gmMovie;
+    ofVideoPlayer gfMovie;
 
 //    vector<grabbedFrameStruct> grabbedFrame;
     vector<fakGrabbedMovieStill> grabbedFrame;
-    vector<ofVec2f> gmOrderNumberVector;
+    vector<ofVec2f> gfOrderNumberVector;
 
-    int gmFrameWidth;
-    int gmFrameHeight;
-    bool gmCurrAllocating;
-    bool gmHasNoFrames;
-    float gmFrameRate;
-    int gmTotalFrames;
-    float gmImageRatio;
-    float gmPixelRatio;
-    int gmNumberOfFrames;
-    bool gmSetupFinished;
-    int gmThreadCounter;
-    string gmMoviePath;
+    int gfFrameWidth;
+    int gfFrameHeight;
+    bool gfCurrAllocating;
+    bool gfHasNoFrames;
+    float gfFrameRate;
+    int gfTotalFrames;
+    float gfImageRatio;
+    float gfPixelRatio;
+    int gfNumberOfFrames;
+    bool gfSetupFinished;
+    int gfThreadCounter;
+    string gfMoviePath;
 
     cv::VideoCapture movieFile;
     cv::Mat matOrig;

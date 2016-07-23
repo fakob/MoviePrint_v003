@@ -235,8 +235,8 @@ void ofApp::setup(){
     setupFinished = TRUE;
 
    loadedMovie2.setup("Original - Short from Vucko.mp4", 5);
-   loadedMovie2.gmMovie.play();
-   loadedMovie2.gmMovie.stop();
+   loadedMovie2.gfMovie.play();
+   loadedMovie2.gfMovie.stop();
 
 }
 
@@ -672,8 +672,8 @@ void ofApp::draw(){
 
     ofPushStyle();
     ofPushMatrix();
-//    loadedMovie2.gmMovie.draw(0,0,640,360);
-    for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++)
+//    loadedMovie2.gfMovie.draw(0,0,640,360);
+    for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfNumberOfFrames(); i++)
     {
 //        ofDrawRectangle(640 + (i*105),320,100,100);
 //        loadedMovie2.grabbedFrame[i].gsImage.draw(640 + (i*105),320,100,100);
@@ -1589,7 +1589,7 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
     ofLog(OF_LOG_VERBOSE, "_newMoviePath" + ofToString(_newMoviePath) );
     ofLog(OF_LOG_VERBOSE, "totalFrames" + ofToString(totalFrames) );
 
-//    updateTimeSlider(_wholeRange);
+    updateTimeSlider(_wholeRange);
     updateGridTimeArrayWithAutomaticInterval();
     updateAllStills();
 
@@ -2807,20 +2807,25 @@ void ofApp::setOutPoint(int _outPoint){
 
 //--------------------------------------------------------------
 void ofApp::updateTimeSlider(bool _wholeRange) {
-
 //    uiRangeSliderTimeline->setMax(totalFrames-1);
 //    uiRangeSliderTimeline->setValueLow(0);
 
-//    if (_wholeRange) {
-//        if (totalFrames > 250) {
+    if (_wholeRange) {
+        if (totalFrames > 250) {
+            setInPoint(25);
+            setOutPoint(totalFrames-26);
 //            uiRangeSliderTimeline->setValueLow(25);
 //            uiRangeSliderTimeline->setValueHigh(totalFrames-26);
-//        } else {
+        } else {
+            setInPoint(0);
+            setOutPoint(totalFrames-1);
 //            uiRangeSliderTimeline->setValueHigh(totalFrames-1);
-//        }
-//    } else {
+        }
+    } else {
+        setInPoint(0);
+        setOutPoint(numberOfStills);
 //        uiRangeSliderTimeline->setValueHigh(numberOfStills);
-//    }
+    }
 //    uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
 //    uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
 }
