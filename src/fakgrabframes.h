@@ -46,18 +46,18 @@ public:
 //    } compareYOperator;
 
     //--------------------------------------------------------------
-    struct grabbedFrameStruct {
-        ofImage gsImage; //image into which the videoframe is grabbed
-        ofTexture gsTexture; //texture into which the grabbedFrame is copied - this is drawn to screen - this is also resized if necessary
-        int gsID; // ID in Array
-        int gsFrameNumber; // current Framenumber
-        int gsUpdateOrderNumber; // order which is used to update frames, reordering dependend on framenumber, so the playhead doesnt jump back and forth
-        bool gsManipulated = FALSE; // indicating if the framenumber is automatically assigned or if it was manually manipulated
-        bool gsToBeUpdated = TRUE; // This frame/image has changed, the texture needs to be updated
-        bool gsToBeGrabbed = TRUE; // The framenumber has changed so the frame has to be grabbed again (threadable)
-        int gsWidth; //original width of grabbedFrame
-        int gsHeight; //original height of grabbedFrame
-    };
+//    struct grabbedFrameStruct {
+//        ofImage gsImage; //image into which the videoframe is grabbed
+//        ofTexture gsTexture; //texture into which the grabbedFrame is copied - this is drawn to screen - this is also resized if necessary
+//        int gsID; // ID in Array
+//        int gsFrameNumber; // current Framenumber
+//        int gsUpdateOrderNumber; // order which is used to update frames, reordering dependend on framenumber, so the playhead doesnt jump back and forth
+//        bool gsManipulated = FALSE; // indicating if the framenumber is automatically assigned or if it was manually manipulated
+//        bool gsToBeUpdated = TRUE; // This frame/image has changed, the texture needs to be updated
+//        bool gsToBeGrabbed = TRUE; // The framenumber has changed so the frame has to be grabbed again (threadable)
+//        int gsWidth; //original width of grabbedFrame
+//        int gsHeight; //original height of grabbedFrame
+//    };
 
     void setup(string vfMovieName, int _numberOfStills){
         gmSetupFinished = false;
@@ -356,8 +356,8 @@ public:
 
     ofVideoPlayer gmMovie;
 
-    vector<grabbedFrameStruct> grabbedFrame;
-//    vector<fakGrabbedMovieStill> grabbedFrame;
+//    vector<grabbedFrameStruct> grabbedFrame;
+    vector<fakGrabbedMovieStill> grabbedFrame;
     vector<ofVec2f> gmOrderNumberVector;
 
     int gmFrameWidth;
