@@ -433,6 +433,52 @@ public:
             ofPushStyle();
             ofEnableAlphaBlending();
             ofSetColor(255);
+            ofPushMatrix();
+
+            grabbedStill[i].gsX = _x;
+            grabbedStill[i].gsY = _y;
+            grabbedStill[i].gsDrawWidth = _w;
+            grabbedStill[i].gsDrawHeight = _h;
+            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
+
+//            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
+//                if (!grabbedStill[i].gsToBeGrabbed) {
+//                    if (gmCalcResizeSwitch) {
+//                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
+//                    }
+//                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
+//                    grabbedStill[i].gsToBeUpdated = FALSE;
+//                }
+//            }
+
+
+            if (gmMovie.grabbedFrame[i].gsToBeUpdated && !gmMovie.grabbedFrame[i].gsImage.isUsingTexture()) { // load textures in proper size
+                if (!gmMovie.grabbedFrame[i].gsToBeGrabbed ) {
+                    ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsImage.isUsingTexture():" + ofToString(gmMovie.grabbedFrame[i].gsImage.isUsingTexture()));
+                    gmMovie.grabbedFrame[i].gsTexture.loadData(gmMovie.grabbedFrame[i].gsImage);
+                //  gmMovie.grabbedFrame[i].gsTexture.loadScreenData(0,0,400,400);
+                    gmMovie.grabbedFrame[i].gsImage.update();
+                    gmMovie.grabbedFrame[i].gsToBeUpdated = FALSE;
+                    ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
+                }
+            }
+
+            gmMovie.grabbedFrame[i].gsTexture.draw(_x,_y,_w,_h);
+
+            ofPopMatrix();
+            ofPopStyle();
+
+        }
+
+    }
+
+    void drawStill_Old(int i, float _x, float _y, float _w, float _h, float _alpha, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
+
+        if (isMovieLoaded()) {
+
+            ofPushStyle();
+            ofEnableAlphaBlending();
+            ofSetColor(255);
 
             grabbedStill[i].gsX = _x;
             grabbedStill[i].gsY = _y;
