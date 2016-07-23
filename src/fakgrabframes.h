@@ -59,10 +59,10 @@ public:
 //        int gsHeight; //original height of grabbedFrame
 //    };
 
-    void setup(string vfMovieName, int _numberOfStills){
+    void setup(string vfMovieName, int _numberOfFrames){
         gmSetupFinished = false;
         loadNewMovieToBeGrabbed(vfMovieName);
-        allocateNewNumberOfStills(_numberOfStills);
+        allocateNewNumberOfFrames(_numberOfFrames);
         gmSetupFinished = true;
     }
 
@@ -102,17 +102,17 @@ public:
         return isMovieLoaded();
     }
 
-    void allocateNewNumberOfStills(int _numberOfStills){
+    void allocateNewNumberOfFrames(int _numberOfFrames){
 
-        gmNumberOfStills = _numberOfStills;
+        gmNumberOfFrames = _numberOfFrames;
 
         if (isMovieLoaded()) {
             gmCurrAllocating = true;
 
             grabbedFrame.clear();
-            grabbedFrame.resize(gmNumberOfStills);
+            grabbedFrame.resize(gmNumberOfFrames);
 
-            for(int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(); i++)
+            for(int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++)
             {
                 grabbedFrame[i].gsID = i;
                 grabbedFrame[i].gsWidth = gmFrameWidth;
@@ -122,7 +122,7 @@ public:
                 grabbedFrame[i].gsTexture.allocate(grabbedFrame[i].gsWidth, grabbedFrame[i].gsHeight,GL_RGB);
 //                grabbedFrame[i].gsToBeUpdated = TRUE;
                 grabbedFrame[i].gsToBeGrabbed = TRUE;
-                grabbedFrame[i].gsFrameNumber = ofMap(i, 0, (returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills() - 1), 0, (gmTotalFrames - 1), TRUE);
+                grabbedFrame[i].gsFrameNumber = ofMap(i, 0, (returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames() - 1), 0, (gmTotalFrames - 1), TRUE);
                 ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsFrameNumber:" + ofToString(grabbedFrame[i].gsFrameNumber) + "gmTotalFrames:" + ofToString(gmTotalFrames));
             }
             ofLog(OF_LOG_VERBOSE, "Allocations worked");
@@ -139,11 +139,11 @@ public:
     void update(){
         if (isMovieLoaded()) {
 //            ofLog(OF_LOG_VERBOSE, "____________gmMovie.update() ");
-//            for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(); i++) {
+//            for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++) {
 //                grabbedFrame[i].gsTexture.loadScreenData(0,0,200,200);
 //                grabbedFrame[i].gsImage.update();
 //            }
-//            for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(); i++) {
+//            for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++) {
 //                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsImage.isUsingTexture():" + ofToString(grabbedFrame[i].gsImage.isUsingTexture()));
 //                if (grabbedFrame[i].gsToBeUpdated && !grabbedFrame[i].gsImage.isUsingTexture()) { // load textures in proper size
 //                    if (!grabbedFrame[i].gsToBeGrabbed ) {
@@ -162,19 +162,19 @@ public:
     }
 
 
-    int returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(){
-        int tempNumberOfStills = gmNumberOfStills;
-//        ofLog(OF_LOG_VERBOSE, "returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills() gmNumberOfStills:" + ofToString(gmNumberOfStills));
-        if (gmNumberOfStills != grabbedFrame.size()) {
-            ofLog(OF_LOG_VERBOSE, "XXX___ Size of gmNumberOfStills and grabbedFrame.size() differs -> grabbedFrame.size() is used");
-            tempNumberOfStills = grabbedFrame.size();
+    int returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(){
+        int tempNumberOfFrames = gmNumberOfFrames;
+//        ofLog(OF_LOG_VERBOSE, "returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames() gmNumberOfFrames:" + ofToString(gmNumberOfFrames));
+        if (gmNumberOfFrames != grabbedFrame.size()) {
+            ofLog(OF_LOG_VERBOSE, "XXX___ Size of gmNumberOfFrames and grabbedFrame.size() differs -> grabbedFrame.size() is used");
+            tempNumberOfFrames = grabbedFrame.size();
         }
-        return tempNumberOfStills;
+        return tempNumberOfFrames;
     }
 
     void setAllToBeGrabbedAndToBeUpdated(){
         ofLog(OF_LOG_VERBOSE, "____________setAllToBeGrabbedAndToBeUpdated()");
-        for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(); i++) {
+        for (int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++) {
             setOneToBeGrabbedAndToBeUpdated(i, FALSE);
         }
     }
@@ -287,14 +287,14 @@ public:
         int allGrabbed = 0;
         if (isMovieLoaded()) {
 
-            for(int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(); i++)
+            for(int i=0; i<returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++)
             {
                 if(!grabbedFrame[i].gsToBeGrabbed){
                     allGrabbed++;
                 }
             }
         }
-        if (allGrabbed == gmNumberOfStills){
+        if (allGrabbed == gmNumberOfFrames){
             return TRUE;
         } else {
             return FALSE;
@@ -368,7 +368,7 @@ public:
     int gmTotalFrames;
     float gmImageRatio;
     float gmPixelRatio;
-    int gmNumberOfStills;
+    int gmNumberOfFrames;
     bool gmSetupFinished;
     int gmThreadCounter;
     string gmMoviePath;

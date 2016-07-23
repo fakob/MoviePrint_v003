@@ -673,7 +673,7 @@ void ofApp::draw(){
     ofPushStyle();
     ofPushMatrix();
 //    loadedMovie2.gmMovie.draw(0,0,640,360);
-    for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfStills(); i++)
+    for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGmNumberOfFrames(); i++)
     {
 //        ofDrawRectangle(640 + (i*105),320,100,100);
 //        loadedMovie2.grabbedFrame[i].gsImage.draw(640 + (i*105),320,100,100);
