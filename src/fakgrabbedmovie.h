@@ -6,6 +6,7 @@
 #include "ofMain.h"
 #include "fakGrabbedMovieStill.h"
 #include "ofxFontStash.h"
+#include "fakgrabframes.h"
 
 //#include "ofxAvAudioPlayer.h"
 //#include "ofxAvVideoPlayer.h"
@@ -36,6 +37,7 @@
 #define FAK_GRAY ofColor(59, 59, 59, 255)
 
 class fakGrabbedMovie : public ofThread
+//class fakGrabbedMovie
 {
 public:
     fakGrabbedMovie(){};
@@ -99,55 +101,31 @@ public:
 
         gmSetTitleInfo = TRUE; //create new title size und umbruch
 
-        loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills, _showPlaceHolder, false);
+//        loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills, _showPlaceHolder, false);
+        loadAndAllocateNewMovie(vfMovieName, gmNumberOfStills, _showPlaceHolder, false);
 
         gmSetupFinished = TRUE;
         gmShowFramesUI = TRUE;
 
     }
 
-    bool loadNewMovieToBeGrabbed(string vfMovieName, int _numberOfStills, bool _showPlaceHolder, bool _addListener){
+//    bool loadNewMovieToBeGrabbed(string vfMovieName, int _numberOfStills, bool _showPlaceHolder, bool _addListener){
+        bool loadAndAllocateNewMovie(string vfMovieName, int _numberOfStills, bool _showPlaceHolder, bool _addListener){
 
         setNumberOfStills(_numberOfStills);
-        stop(FALSE);
+//        stop(FALSE);
 
-        isMovieLoaded2 = FALSE;
+//        isMovieLoaded2 = FALSE;
 
         if (!_showPlaceHolder) {
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function");
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ fakgrabbedmovie: start loadMovie function" + ofToString(vfMovieName));
 
-            // used for AvCodec addon
-//            gmMovie.setupAudioOut(2, 44100); // resample to stereo, 44khz
+            gmMovie.setup(vfMovieName, gmNumberOfStills);
 
-            gmMovie.load(vfMovieName);
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function");
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ " + ofToString(vfMovieName));
-
-            if (gmMovie.isLoaded()) {
-                isMovieLoaded2 = TRUE;
-                if (gmMovie.getTotalNumFrames() < 2) { //check if movie has only one frame, if so than calculate totalframes and later use setPosition instead of setFrame
-                    gmHasNoFrames = TRUE;
-                    gmFrameRate = 25;
-                    gmTotalFrames = gmMovie.getDuration() * gmFrameRate;
-                } else {
-                    gmHasNoFrames = FALSE;
-                    gmTotalFrames = gmMovie.getTotalNumFrames();
-                    gmFrameRate = ceil(gmTotalFrames/gmMovie.getDuration());
-                }
-                gmImageRatio = gmMovie.getWidth()/gmMovie.getHeight();
-//                gmPixelRatio = gmMovie.getPixelFormat();
-                // quickfix for ofxAvCodec
-                gmPixelRatio = 1.0;
-                ofLog(OF_LOG_VERBOSE, "ImageRatio:" + ofToString(gmImageRatio) + " PixelRatio:" + ofToString(gmPixelRatio)  + " Framerate:" + ofToString(gmFrameRate) + " totalFrames:" + ofToString(gmTotalFrames) + " getDuration:" + ofToString(gmMovie.getDuration()));
-
-            } else {
-                gmTotalFrames = gmNumberOfStills;
-                ofLog(OF_LOG_VERBOSE, "gmTotalFrames set manually");
-
-            }
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ fakgrabbedmovie: end loadMovie function" + ofToString(vfMovieName));
 
         }
-        allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
+//        allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
 
 //        getMovieInformation(vfMovieName);
 
@@ -155,11 +133,6 @@ public:
 
         return isMovieLoaded();
     }
-
-    // used for ofxAvCodec addon
-//void audioOut( float * buffer, int nFrames, int nChannels ){
-//    gmMovie.audioOut( buffer, nFrames, nChannels );
-//}
 
     void loadNewMovieToBeScrubbed(string vfMovieName){
 
@@ -294,7 +267,7 @@ public:
 
     bool isMovieLoaded(){
 //        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(gmMovie.isLoaded()));
-        return gmMovie.isLoaded();
+        return gmMovie.isMovieLoaded();
     }
 
     void disableMouseEvents(){
@@ -616,70 +589,70 @@ public:
         }
     }
 
-    void grabToImage(int i, int _frame){
+//    void grabToImage(int i, int _frame){
 
-        ofLog(OF_LOG_VERBOSE, "before grabToImage: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+//        ofLog(OF_LOG_VERBOSE, "before grabToImage: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
-        if (isMovieLoaded()) {
+//        if (isMovieLoaded()) {
 
-            if (_frame < 0) {
-                _frame = 0;
-            }
-            if (_frame > gmTotalFrames-1) {
-                _frame = gmTotalFrames-1;
-            }
+//            if (_frame < 0) {
+//                _frame = 0;
+//            }
+//            if (_frame > gmTotalFrames-1) {
+//                _frame = gmTotalFrames-1;
+//            }
 
-            if (gmHasNoFrames) { // movies die "keine frames haben" benoetigen setPosition, deshalb sind auch meist die ersten paar frames "kaputt"
-                if (_frame < 5) {
-                    _frame = 5;
-                }
-                gmMovie.setPosition((float)(_frame-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
-                gmMovie.nextFrame();
-                gmMovie.nextFrame();
-                if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-                    ofSleepMillis(TimeToWaitForMovie);
-                }
-                ofLog(OF_LOG_VERBOSE, "setPosition1: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+//            if (gmHasNoFrames) { // movies die "keine frames haben" benoetigen setPosition, deshalb sind auch meist die ersten paar frames "kaputt"
+//                if (_frame < 5) {
+//                    _frame = 5;
+//                }
+//                gmMovie.setPosition((float)(_frame-2)/(float)(gmTotalFrames-1)); //setPosition Movies brauchen das setzen des frames davor und dann nextFrame
+//                gmMovie.nextFrame();
+//                gmMovie.nextFrame();
+//                if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+//                    ofSleepMillis(TimeToWaitForMovie);
+//                }
+//                ofLog(OF_LOG_VERBOSE, "setPosition1: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
-            } else {
-                if (_frame==0) {
-                    gmMovie.setFrame(0);
-                    gmMovie.update();
-                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-                        ofSleepMillis(TimeToWaitForMovie);
-                    }
-//                    while (!gmMovie.isFrameNew()) {
-//                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready - isFrameNew()" + ofToString(gmMovie.isFrameNew()));
+//            } else {
+//                if (_frame==0) {
+//                    gmMovie.setFrame(0);
+//                    gmMovie.update();
+//                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+//                        ofSleepMillis(TimeToWaitForMovie);
 //                    }
-                } else {
-                    gmMovie.setFrame(_frame);
-                    gmMovie.update();
-                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
-                        ofSleepMillis(TimeToWaitForMovie);
-                    }
-//                    while (!gmMovie.isFrameNew()) {
-//                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready");
+////                    while (!gmMovie.isFrameNew()) {
+////                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready - isFrameNew()" + ofToString(gmMovie.isFrameNew()));
+////                    }
+//                } else {
+//                    gmMovie.setFrame(_frame);
+//                    gmMovie.update();
+//                    if (gmThreadCounter < 2) { // der erste frame muss ein wenig warten, bis das movie bereit ist
+//                        ofSleepMillis(TimeToWaitForMovie);
 //                    }
-                }
-                gmMovie.play();
-//                gmMovie.setFrame(_frame);
-                gmMovie.setPosition(_frame/(float)gmTotalFrames);
-//                gmMovie.setPosition(0.5);
-                gmMovie.update();
-                gmMovie.stop();
-//                ofSleepMillis(TimeToWaitForMovie);
-                ofLog(OF_LOG_VERBOSE, "setPosition2: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+////                    while (!gmMovie.isFrameNew()) {
+////                        ofLog(OF_LOG_VERBOSE, "grabToImage: waiting for frame to be ready");
+////                    }
+//                }
+//                gmMovie.play();
+////                gmMovie.setFrame(_frame);
+//                gmMovie.setPosition(_frame/(float)gmTotalFrames);
+////                gmMovie.setPosition(0.5);
+//                gmMovie.update();
+//                gmMovie.stop();
+////                ofSleepMillis(TimeToWaitForMovie);
+//                ofLog(OF_LOG_VERBOSE, "setPosition2: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
 
-            }
-            if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
-                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixels());
-                grabbedStill[i].gsToBeGrabbed = FALSE;
-            } else {
-                ofLog(OF_LOG_VERBOSE, "CRASH AVOIDED grabbedStill[i].gsImage.isAllocated() FALSE _______________________________");
-            }
-        }
-        ofLog(OF_LOG_VERBOSE, "after grabToImage: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
-    }
+//            }
+//            if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
+//                grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixels());
+//                grabbedStill[i].gsToBeGrabbed = FALSE;
+//            } else {
+//                ofLog(OF_LOG_VERBOSE, "CRASH AVOIDED grabbedStill[i].gsImage.isAllocated() FALSE _______________________________");
+//            }
+//        }
+//        ofLog(OF_LOG_VERBOSE, "after grabToImage: " + ofToString(gmMovie.getPosition()) + " _frame: " + ofToString(_frame) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+//    }
 
     int numberLoaded(){
         gmNumberLoadedCounter = 0;
@@ -941,33 +914,33 @@ public:
         }
     }
 
-    void grabToImageFunction(){
+//    void grabToImageFunction(){
 
-        if (gmSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
-//            lock();
-            do {
-                //                for (int i = 0; i<gmNumberOfStills; i++) {
-                //                    if (grabbedStill[i].gsToBeGrabbed) {
-                //                        gmThreadCounter++;
-                //                        grabToImage(i, grabbedStill[i].gsFrameNumber);
-                //                    }
-                //                }
+//        if (gmSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
+////            lock();
+//            do {
+//                //                for (int i = 0; i<gmNumberOfStills; i++) {
+//                //                    if (grabbedStill[i].gsToBeGrabbed) {
+//                //                        gmThreadCounter++;
+//                //                        grabToImage(i, grabbedStill[i].gsFrameNumber);
+//                //                    }
+//                //                }
 
-                for (int i = 0; i<gmOrderNumberVector.size(); i++) { // frames are being updated in the order of their framenumber
-                    if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
-                        gmThreadCounter++;
-                        ofLog(OF_LOG_VERBOSE, "In NoneThread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
-                        grabToImage(gmOrderNumberVector.at(i).x, grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber);
-                    }
-                }
+//                for (int i = 0; i<gmOrderNumberVector.size(); i++) { // frames are being updated in the order of their framenumber
+//                    if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
+//                        gmThreadCounter++;
+//                        ofLog(OF_LOG_VERBOSE, "In NoneThread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
+//                        grabToImage(gmOrderNumberVector.at(i).x, grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber);
+//                    }
+//                }
 
-            } while (!allGrabbed());
-//            unlock();
-        }
-//        stop(TRUE);
-//        ofLog(OF_LOG_VERBOSE, "Closing Thread Function-----------------------------------------------" );
+//            } while (!allGrabbed());
+////            unlock();
+//        }
+////        stop(TRUE);
+////        ofLog(OF_LOG_VERBOSE, "Closing Thread Function-----------------------------------------------" );
 
-    }
+//    }
 
     // Thread funcions
 
@@ -1020,14 +993,16 @@ public:
     // used for ofxAvCodec addon
 //    ofxAvVideoPlayer gmMovie;
 
-    ofVideoPlayer gmMovie;
+//    ofVideoPlayer gmMovie;
     ofVideoPlayer gmMovieScrub;
+
+    fakGrabFrames gmMovie;
 
     vector<fakGrabbedMovieStill> grabbedStill;
     vector<ofVec2f> gmOrderNumberVector;
 
     bool devTurnOffMovieSwitch = FALSE;
-    bool isMovieLoaded2 = FALSE;
+//    bool isMovieLoaded2 = FALSE;
 
     float gmDuration;
     string gmMovieName;

@@ -6,8 +6,8 @@ void ofApp::setup(){
     drawNotify = true; // ofxNotify
     showPlaceHolder = false; // added for developing
 
-    // used for ofxAvCodec addon
-    soundStream.setup(this, 2, 0, 44100, 512, 4);
+//    // used for ofxAvCodec addon
+//    soundStream.setup(this, 2, 0, 44100, 512, 4);
 
     ImGuiIO * io = &ImGui::GetIO();
     io->Fonts->AddFontFromFileTTF(&ofToDataPath("fonts/HelveticaNeueLTCom-Lt.ttf")[0], 14.f);
@@ -162,7 +162,8 @@ void ofApp::setup(){
 
     // load standard movie
 //    loadedFile = "movies/FrameTestMovie_4zu3_v001.mov";
-    loadedFile = "";
+    loadedFile = "Original - Short from Vucko.mp4";
+//    loadedFile = "";
     saveMoviePrintPath = appPathUpStr + "/MoviePrints/";
 
     loadedMovie.gmUpperLimitY = headerHeight;
@@ -579,7 +580,7 @@ void ofApp::update(){
     // sollte kurze wait schleife fuer das scrubvideoloading sein - leider funktioniert das nicht so ganz - man kann zwar das scrubvideo etwas spaeter loaden, waerenddessen haelt aber trotzdem alles an
     if (loadNewMovieToBeScrubbedBool) {
         if (timer.getElapsedSeconds() > 0.1) {
-            loadedMovie.loadNewMovieToBeScrubbed(loadedMovie.gmMovie.getMoviePath());
+//            loadedMovie.loadNewMovieToBeScrubbed(loadedMovie.gmMovie.getMoviePath());
             loadNewMovieToBeScrubbedBool = FALSE;
         }
     }
@@ -1462,7 +1463,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
             if( dragInfo.files.size() > 0 ){
 
-                loadNewMovie("", FALSE, TRUE, FALSE);
+//                loadNewMovie("", FALSE, TRUE, FALSE);
 
 //                droppedList.disableMouseEvents(droppedFiles.size());
                 droppedFiles.clear();
@@ -1571,7 +1572,7 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
     loadedMovie.stop(TRUE);
 
     ofxNotify() << "Movie has started to load";
-    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, numberOfStills, showPlaceHolder, !_loadInBackground);
+    loadedMovie.loadAndAllocateNewMovie(_newMoviePath, numberOfStills, showPlaceHolder, !_loadInBackground);
     calculateNewPrintGrid();
     if (loadedMovie.gmTotalFrames <=1) {
         movieProperlyLoaded = FALSE;
@@ -1733,13 +1734,13 @@ void ofApp::calculateNewPrintGrid(){
 
 
     float gridRatio;
-    if (loadedMovie.gmMovie.isLoaded()) { // if no movie is loaded yet, then take a 16 by 9 and square pixel ratio
+    if (loadedMovie.gmMovie.isMovieLoaded()) { // if no movie is loaded yet, then take a 16 by 9 and square pixel ratio
         scrubWindowH = scrubWindowW * (1/loadedMovie.gmImageRatio) * loadedMovie.gmPixelRatio;
     } else {
         scrubWindowH = scrubWindowW * 0.5625 * 1;
     }
     loadedMovie.stop(TRUE);
-    if (isnan(loadedMovie.gmImageRatio) || !loadedMovie.gmMovie.isLoaded()) {
+    if (isnan(loadedMovie.gmImageRatio) || !loadedMovie.gmMovie.isMovieLoaded()) {
         gridRatio = 0.5625;
     } else {
         gridRatio = 1.0/loadedMovie.gmImageRatio;
@@ -1827,9 +1828,9 @@ void ofApp::updateAllStills(){
 
     movieIsBeingGrabbed = TRUE;
     if (useThread) {
-        loadedMovie.start();
+        loadedMovie.gmMovie.start();
     } else {
-        loadedMovie.grabToImageFunction();
+        loadedMovie.gmMovie.grabToImageAll();
     }
 
     ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
@@ -2264,9 +2265,9 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
         loadedMovie.updateOrderNumber();
         if (!loadedMovie.isThreadRunning()) {
             if (useThread) {
-                loadedMovie.start();
+                loadedMovie.gmMovie.start();
             } else {
-                loadedMovie.grabToImageFunction();
+                loadedMovie.gmMovie.grabToImageAll();
             }
         }
 
@@ -2734,9 +2735,9 @@ void ofApp::updateOneThumb(int _thumbID, int _newFrameNumber){
 
     if (!loadedMovie.isThreadRunning()) {
         if (useThread) {
-            loadedMovie.start();
+            loadedMovie.gmMovie.start();
         } else {
-            loadedMovie.grabToImageFunction();
+            loadedMovie.gmMovie.grabToImageAll();
         }
     }
 

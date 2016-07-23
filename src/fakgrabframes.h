@@ -69,9 +69,10 @@ public:
     bool loadNewMovieToBeGrabbed(string vfMovieName){
         stop(FALSE);
 
-        ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function");
+        ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function" + ofToString(vfMovieName));
         ofFile fileToRead(vfMovieName);
-        movieFile.open(fileToRead.getAbsolutePath());
+        gmMoviePath = fileToRead.getAbsolutePath();
+        movieFile.open(gmMoviePath);
         // ofLog(OF_LOG_VERBOSE, "fileToRead.getAbsolutePath(): " + ofToString(fileToRead.getAbsolutePath()));
         // movieFile.read(matOrig);
 
@@ -87,11 +88,10 @@ public:
             gmPixelRatio = 1.0;
         }
         while (!isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load");
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load - " + ofToString(gmMoviePath));
         }
 
-        ofLog(OF_LOG_VERBOSE, "_____________________________________ " + ofToString(vfMovieName));
-        ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function");
+        ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function" + ofToString(vfMovieName));
 
         if (isMovieLoaded()) {
             ofLog(OF_LOG_VERBOSE, "Width: " + ofToString(gmFrameWidth) + " Height: " + ofToString(gmFrameHeight) + " ImageRatio:" + ofToString(gmImageRatio) + " PixelRatio:" + ofToString(gmPixelRatio)  + " Framerate:" + ofToString(gmFrameRate) + " totalFrames:" + ofToString(gmTotalFrames) + " getDuration:" + ofToString(gmMovie.getDuration()));
@@ -130,6 +130,10 @@ public:
             ofLog(OF_LOG_VERBOSE, "Movie not loaded");
         }
         gmCurrAllocating = false;
+    }
+
+    string getMoviePath(){
+        return gmMoviePath;
     }
 
     void update(){
@@ -187,6 +191,21 @@ public:
     bool isMovieLoaded(){
 //        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(isMovieLoaded()));
         return movieFile.isOpened();
+    }
+
+    void play(){
+        if (isMovieLoaded()) {
+            ofLog(OF_LOG_VERBOSE, "____________gmMovie.play() ");
+            gmMovie.play();
+        }
+    }
+
+    int getWidth(){
+        return gmFrameWidth;
+    }
+
+    int getHeight(){
+        return gmFrameHeight;
     }
 
     void grabNextFrame(int i, bool _useThreads){
@@ -352,6 +371,7 @@ public:
     int gmNumberOfStills;
     bool gmSetupFinished;
     int gmThreadCounter;
+    string gmMoviePath;
 
     cv::VideoCapture movieFile;
     cv::Mat matOrig;
