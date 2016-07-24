@@ -208,6 +208,18 @@ public:
         return gfFrameHeight;
     }
 
+    float getImageRatio(){
+        return gfImageRatio;
+    }
+
+    float getPixelRatio(){
+        return gfPixelRatio;
+    }
+
+    int getTotalFrames(){
+        return gfTotalFrames;
+    }
+
     void grabNextFrame(int i, bool _useThreads){
         setOneToBeGrabbedAndToBeUpdated(i, TRUE);
         grabbedFrame[i].gsFrameNumber = grabbedFrame[i].gsFrameNumber + 1;

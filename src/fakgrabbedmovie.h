@@ -125,7 +125,9 @@ public:
             ofLog(OF_LOG_VERBOSE, "_____________________________________ fakgrabbedmovie: end loadMovie function" + ofToString(vfMovieName));
 
         }
-        gmTotalFrames = gmMovie.gfTotalFrames;
+        gmTotalFrames = gmMovie.getTotalFrames();
+        gmImageRatio = gmMovie.getImageRatio();
+        gmPixelRatio = gmMovie.getPixelRatio();
 
         allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
 
@@ -405,6 +407,9 @@ public:
 
     void drawGridOfStills(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
 
+//        ofLog(OF_LOG_VERBOSE, "_gridColumns:"+ ofToString(_gridColumns) +  " _gridMargin:"+ ofToString(_gridMargin) +  "_scrollAmount:"+ ofToString(_scrollAmount));
+//        ofLog(OF_LOG_VERBOSE, "gmThumbWidth:"+ ofToString(gmThumbWidth) +  " gmThumbHeight:"+ ofToString(gmThumbHeight) +  "returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills():"+ ofToString(returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills()));
+
         // draw all frames
         ofPushStyle();
         ofPushMatrix();
@@ -417,6 +422,7 @@ public:
             float tempX = (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
             float tempY = (_y + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
             drawStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
+//            ofLog(OF_LOG_VERBOSE, "tempX:"+ ofToString(tempX) +  " tempY:"+ ofToString(tempY) +  "_scaleFactor:"+ ofToString(_scaleFactor));
         }
 
 //        if (_isBeingPrinted) {
@@ -425,52 +431,6 @@ public:
 
         ofPopMatrix();
         ofPopStyle();
-
-    }
-
-    void drawStill_Temp(int i, float _x, float _y, float _w, float _h, float _alpha, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
-
-        if (isMovieLoaded()) {
-
-            ofPushStyle();
-            ofEnableAlphaBlending();
-            ofSetColor(255);
-            ofPushMatrix();
-
-            grabbedStill[i].gsX = _x;
-            grabbedStill[i].gsY = _y;
-            grabbedStill[i].gsDrawWidth = _w;
-            grabbedStill[i].gsDrawHeight = _h;
-            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
-
-//            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
-//                if (!grabbedStill[i].gsToBeGrabbed) {
-//                    if (gmCalcResizeSwitch) {
-//                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
-//                    }
-//                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
-//                    grabbedStill[i].gsToBeUpdated = FALSE;
-//                }
-//            }
-
-
-            if (gmMovie.grabbedFrame[i].gsToBeUpdated && !gmMovie.grabbedFrame[i].gsImage.isUsingTexture()) { // load textures in proper size
-                if (!gmMovie.grabbedFrame[i].gsToBeGrabbed ) {
-                    ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsImage.isUsingTexture():" + ofToString(gmMovie.grabbedFrame[i].gsImage.isUsingTexture()));
-                    gmMovie.grabbedFrame[i].gsTexture.loadData(gmMovie.grabbedFrame[i].gsImage);
-                //  gmMovie.grabbedFrame[i].gsTexture.loadScreenData(0,0,400,400);
-                    gmMovie.grabbedFrame[i].gsImage.update();
-                    gmMovie.grabbedFrame[i].gsToBeUpdated = FALSE;
-                    ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
-                }
-            }
-
-            gmMovie.grabbedFrame[i].gsTexture.draw(_x,_y,_w,_h);
-
-            ofPopMatrix();
-            ofPopStyle();
-
-        }
 
     }
 
