@@ -1,19 +1,19 @@
 //
-//  fakGrabbedMovieStill.h
+//  fakGrabbedFrameOverlay.h
 //  fakBreakupVideo
 //
 //  Created by fakob on 23.02.2016
 //
 //
 
-#ifndef FAKGRABBEDMOVIESTILL_H
-#define FAKGRABBEDMOVIESTILL_H
+#ifndef FAKGRABBEDFRAMEOVERLAY_H
+#define FAKGRABBEDFRAMEOVERLAY_H
 
-class fakGrabbedMovieStill {
+class fakGrabbedFrameOverlay {
 
 public:
 
-    fakGrabbedMovieStill(){}
+    fakGrabbedFrameOverlay(){}
 
 
     // Functions
@@ -111,15 +111,9 @@ public:
     ofEvent<int> gsClickedInside;
     ofEvent<ofVec2f> gsMovedInside;
 
-    ofImage gsImage; //image into which the videoframe is grabbed
-    ofTexture gsTexture; //texture into which the grabbedStill is copied - this is drawn to screen - this is also resized if necessary
     int gsID; // ID in Array
     int gsFrameNumber; // current Framenumber
     int gsUpdateOrderNumber; // order which is used to update frames, reordering dependend on framenumber, so the playhead doesnt jump back and forth
-    bool gsManipulated = FALSE; // indicating if the framenumber is automatically assigned or if it was manually manipulated
-    bool gsToBeUpdated = TRUE; // This frame has changed somehow, it needs to be redrawn
-    bool gsToBeGrabbed = TRUE; // The framenumber has changed so the frame has to be grabbed again (threadable)
-    //    bool gsFrameCorrupt = FALSE; //set if frame is corrupt
     int gsX; //x position of grabbedStill
     int gsY; //y position of grabbedStill
     int gsWidth; //original width of grabbedStill
@@ -140,5 +134,5 @@ public:
 
 };
 
-#endif // FAKGRABBEDMOVIESTILL_H
+#endif // FAKGRABBEDFRAMEOVERLAY_H
 

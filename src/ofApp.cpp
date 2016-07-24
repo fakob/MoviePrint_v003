@@ -2260,9 +2260,9 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
         for (int i = 0; i<numberOfStills; i++) {
             if ((tempHasTheNumberOfThumbsChanged == true) || (moviePrintDataSet.gridTimeArray[i] != _newMoviePrintDataSet.gridTimeArray[i])) { // when the number of Thumbs has changed, all get updated - otherwise only the changed ones get updated
                 moviePrintDataSet.gridTimeArray[i] = _newMoviePrintDataSet.gridTimeArray[i];
-                loadedMovie.grabbedStill[i].gsFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
-                loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
-                loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
+                loadedMovie.gmMovie.grabbedFrame[i].gsFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
+                loadedMovie.gmMovie.grabbedFrame[i].gsToBeGrabbed = TRUE;
+                loadedMovie.gmMovie.grabbedFrame[i].gsToBeUpdated = TRUE;
                 ofLog(OF_LOG_VERBOSE, "Still:" + ofToString(i) + " will be updated:" +  ofToString(_newMoviePrintDataSet.gridTimeArray[i]));
             }
         }
@@ -2586,7 +2586,7 @@ void ofApp::printImageToFile(int _printSizeWidth){
             for (int i=0; i<loadedMovie.gmNumberOfStills; i++) {
                 string singleImageName = fileName + "_" + ofToString(i, 3, '0') + "." + formatExtension;
                 singleImageName = singleImagePath + singleImageName;
-                ofSaveImage(loadedMovie.grabbedStill[i].gsImage, singleImageName, OF_IMAGE_QUALITY_HIGH);
+                ofSaveImage(loadedMovie.gmMovie.grabbedFrame[i].gsImage, singleImageName, OF_IMAGE_QUALITY_HIGH);
             }
         }
 
@@ -2731,10 +2731,10 @@ int ofApp::getHighestFrameNumber(){
 //--------------------------------------------------------------
 void ofApp::updateOneThumb(int _thumbID, int _newFrameNumber){
     moviePrintDataSet.gridTimeArray[_thumbID] = _newFrameNumber;
-    loadedMovie.grabbedStill[_thumbID].gsFrameNumber = _newFrameNumber;
-    loadedMovie.grabbedStill[_thumbID].gsManipulated = TRUE;
-    loadedMovie.grabbedStill[_thumbID].gsToBeGrabbed = TRUE;
-    loadedMovie.grabbedStill[_thumbID].gsToBeUpdated = TRUE;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gsFrameNumber = _newFrameNumber;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gsManipulated = TRUE;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gsToBeGrabbed = TRUE;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gsToBeUpdated = TRUE;
     loadedMovie.updateOrderNumber();
 
     if (!loadedMovie.isThreadRunning()) {

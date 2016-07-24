@@ -14,10 +14,10 @@ Project{
         files: [
             "resources.qrc",
             "src/fakgrabbedframe.h",
+            "src/fakgrabbedframeoverlay.h",
             "src/fakgrabbedlist.h",
             "src/fakgrabbedlistitem.h",
             "src/fakgrabbedmovie.h",
-            "src/fakgrabbedmoviestill.h",
             "src/fakgrabframes.h",
             "src/fakmenu.h",
             "src/fakscrollbar.h",

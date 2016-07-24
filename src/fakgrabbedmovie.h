@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include "ofMain.h"
-#include "fakGrabbedMovieStill.h"
+#include "fakgrabbedframeoverlay.h"
 #include "ofxFontStash.h"
 #include "fakgrabframes.h"
 
@@ -312,22 +312,25 @@ public:
         gmOrderNumberVector.clear();
 
         for (int i = 0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
-            gmOrderNumberVector.push_back(ofVec2f(i,grabbedStill[i].gsFrameNumber));
+            gmOrderNumberVector.push_back(ofVec2f(i,gmMovie.grabbedFrame[i].gsFrameNumber));
         }
         sort(gmOrderNumberVector.begin(), gmOrderNumberVector.end(), compareYOperator);
         for (int i = 0; i<gmNumberOfStills; i++) {
             grabbedStill[i].gsUpdateOrderNumber = gmOrderNumberVector.at(i).x;
+            gmMovie.grabbedFrame[i].gsUpdateOrderNumber = gmOrderNumberVector.at(i).x;
         }
     }
 
     void updateAllFrameNumbers(vector<int>* _gridTimeArray){
         if (isMovieLoaded()) {
             for (int i = 0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
+                gmMovie.grabbedFrame[i].gsFrameNumber = _gridTimeArray->at(i);
                 grabbedStill[i].gsFrameNumber = _gridTimeArray->at(i);
+                gmMovie.grabbedFrame[i].gsUpdateOrderNumber = i;
                 grabbedStill[i].gsUpdateOrderNumber = i;
-                grabbedStill[i].gsToBeUpdated = TRUE;
-                grabbedStill[i].gsToBeGrabbed = TRUE;
-                grabbedStill[i].gsManipulated = FALSE;
+                gmMovie.grabbedFrame[i].gsToBeUpdated = TRUE;
+                gmMovie.grabbedFrame[i].gsToBeGrabbed = TRUE;
+                gmMovie.grabbedFrame[i].gsManipulated = FALSE;
             }
             updateOrderNumber();
         }
@@ -376,10 +379,10 @@ public:
                 }
                 grabbedStill[i].gsWidth = gmMovie.getWidth()/grabbedStill[i].gsResizeFactor;
                 grabbedStill[i].gsHeight = gmMovie.getHeight()/grabbedStill[i].gsResizeFactor;
-                grabbedStill[i].gsImage.setUseTexture(FALSE);  // no texture used yet - later: grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
-                grabbedStill[i].gsImage.allocate(gmMovie.getWidth(), gmMovie.getHeight(), OF_IMAGE_COLOR);
-                grabbedStill[i].gsTexture.allocate(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight,GL_RGB);
-                grabbedStill[i].gsToBeUpdated = TRUE;
+//                grabbedStill[i].gsImage.setUseTexture(FALSE);  // no texture used yet - later: grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
+//                grabbedStill[i].gsImage.allocate(gmMovie.getWidth(), gmMovie.getHeight(), OF_IMAGE_COLOR);
+//                grabbedStill[i].gsTexture.allocate(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight,GL_RGB);
+//                grabbedStill[i].gsToBeUpdated = TRUE;
             }
 
             // creating maskFbo - for rounding stills
@@ -604,9 +607,9 @@ public:
     void setAllToBeGrabbedAndToBeUpdated(){
         if (isMovieLoaded()) {
             for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
-                grabbedStill[i].gsToBeUpdated = TRUE;
-                grabbedStill[i].gsToBeGrabbed = TRUE;
-                grabbedStill[i].gsManipulated = FALSE;
+                gmMovie.grabbedFrame[i].gsToBeUpdated = TRUE;
+                gmMovie.grabbedFrame[i].gsToBeGrabbed = TRUE;
+                gmMovie.grabbedFrame[i].gsManipulated = FALSE;
             }
         }
     }
@@ -681,7 +684,7 @@ public:
         if (isMovieLoaded()) {
             for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
             {
-                if(!grabbedStill[i].gsToBeUpdated){
+                if(!gmMovie.grabbedFrame[i].gsToBeUpdated){
                     gmNumberLoadedCounter++;
                 }
             }
@@ -694,7 +697,7 @@ public:
         if (isMovieLoaded()) {
             for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
             {
-                if(!grabbedStill[i].gsToBeGrabbed){
+                if(!gmMovie.grabbedFrame[i].gsToBeGrabbed){
                     gmNumberGrabbedCounter++;
                 }
             }
@@ -713,7 +716,7 @@ public:
 
             for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
             {
-                if(!grabbedStill[i].gsToBeGrabbed){
+                if(!gmMovie.grabbedFrame[i].gsToBeGrabbed){
                     allGrabbed++;
                 }
 
@@ -877,19 +880,20 @@ public:
             grabbedStill[i].gsDrawHeight = _h;
             grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
 
-            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
-                if (!grabbedStill[i].gsToBeGrabbed) {
+            if (gmMovie.grabbedFrame[i].gsToBeUpdated) { // load textures in proper size
+                if (!gmMovie.grabbedFrame[i].gsToBeGrabbed) {
                     if (gmCalcResizeSwitch) {
-                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
+                        gmMovie.grabbedFrame[i].gsImage.resize(gmMovie.grabbedFrame[i].gsWidth, gmMovie.grabbedFrame[i].gsHeight);
                     }
-                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
-                    grabbedStill[i].gsToBeUpdated = FALSE;
+                    gmMovie.grabbedFrame[i].gsTexture.loadData(gmMovie.grabbedFrame[i].gsImage);
+                    gmMovie.grabbedFrame[i].gsImage.update();
+                    gmMovie.grabbedFrame[i].gsToBeUpdated = FALSE;
                 }
             }
 
             shader.begin(); // draw still with rounded corners
             shader.setUniformTexture("maskTex", maskFbo.getTexture(), 1 );
-            grabbedStill[i].gsTexture.draw(_x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+            gmMovie.grabbedFrame[i].gsTexture.draw(_x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
             shader.end();
 
             if (gmShowFramesUI) { // drawing UI
@@ -909,22 +913,22 @@ public:
             string dummyString;
 
             if (vfFramesToTimeSwitch) {
-                dummyString = framesToTime(grabbedStill[i].gsFrameNumber);
+                dummyString = framesToTime(gmMovie.grabbedFrame[i].gsFrameNumber);
             } else {
-                dummyString = "#" + ofToString(grabbedStill[i].gsFrameNumber);
+                dummyString = "#" + ofToString(gmMovie.grabbedFrame[i].gsFrameNumber);
             }
 
             ofPushStyle();
             ofEnableAlphaBlending();
 
             ofRectangle rect = gmFontStashUbuntu.getBBox(dummyString, tempFontSize, 0, 0);
-            if (grabbedStill[i].gsManipulated) {
+            if (gmMovie.grabbedFrame[i].gsManipulated) {
                 ofSetColor(FAK_ORANGECOLOR, 200*_alpha);
             } else {
                 ofSetColor(0,0,0,200*_alpha);
             }
             ofDrawRectRounded(x, y, rect.width + rect.width*0.03, rect.height + rect.height*0.3, rect.width*0.03);
-            if (grabbedStill[i].gsToBeUpdated) {
+            if (gmMovie.grabbedFrame[i].gsToBeUpdated) {
                 ofSetColor(100, 255 * _alpha);
             } else {
                 ofSetColor(255, 255 * _alpha);
@@ -1020,7 +1024,7 @@ public:
 
     fakGrabFrames gmMovie;
 
-    vector<fakGrabbedMovieStill> grabbedStill;
+    vector<fakGrabbedFrameOverlay> grabbedStill;
     vector<ofVec2f> gmOrderNumberVector;
 
     bool devTurnOffMovieSwitch = FALSE;
