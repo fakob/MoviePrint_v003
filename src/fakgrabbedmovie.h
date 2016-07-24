@@ -448,15 +448,15 @@ public:
             grabbedStill[i].gsDrawHeight = _h;
             grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
 
-            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
-                if (!grabbedStill[i].gsToBeGrabbed) {
-                    if (gmCalcResizeSwitch) {
-                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
-                    }
-                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
-                    grabbedStill[i].gsToBeUpdated = FALSE;
-                }
-            }
+//            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
+//                if (!grabbedStill[i].gsToBeGrabbed) {
+//                    if (gmCalcResizeSwitch) {
+//                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
+//                    }
+//                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
+//                    grabbedStill[i].gsToBeUpdated = FALSE;
+//                }
+//            }
 
             shader.begin(); // draw still with rounded corners
 //            shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
@@ -491,7 +491,7 @@ public:
             ofPopStyle();
 
             // draw update image
-            if (grabbedStill[i].gsToBeGrabbed) {
+            if (gmMovie.grabbedFrame[i].gsToBeGrabbed) {
                 ofPushMatrix();
                 ofPushStyle();
                 ofSetColor(0, 0, 0, 130);
