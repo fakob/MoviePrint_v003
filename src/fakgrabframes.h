@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include "ofMain.h"
-#include "fakgrabbedmoviestill.h"
+#include "fakgrabbedframe.h"
 
 #include "ofxCv.h"
 
@@ -369,7 +369,7 @@ public:
     ofVideoPlayer gfMovie;
 
 //    vector<grabbedFrameStruct> grabbedFrame;
-    vector<fakGrabbedMovieStill> grabbedFrame;
+    vector<fakGrabbedFrame> grabbedFrame;
     vector<ofVec2f> gfOrderNumberVector;
 
     int gfFrameWidth;

@@ -13,6 +13,7 @@ Project{
 
         files: [
             "resources.qrc",
+            "src/fakgrabbedframe.h",
             "src/fakgrabbedlist.h",
             "src/fakgrabbedlistitem.h",
             "src/fakgrabbedmovie.h",
