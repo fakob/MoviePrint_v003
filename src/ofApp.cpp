@@ -278,7 +278,7 @@ void ofApp::update(){
     tweenTimeDelay.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimeDelay.initialTime, (tweenTimeDelay.initialTime + tweenTimeDelay.duration), tweenTimeDelay.minValue, tweenTimeDelay.maxValue, &ofxeasing::exp::easeInOut);
     tweenMoviePrintPreview.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenMoviePrintPreview.initialTime, (tweenMoviePrintPreview.initialTime + tweenMoviePrintPreview.duration), tweenMoviePrintPreview.minValue, tweenMoviePrintPreview.maxValue, &ofxeasing::exp::easeInOut);
 
-    threadIsRunning = loadedMovie.isThreadRunning();
+    threadIsRunning = loadedMovie.gmMovie.isThreadRunning();
 
     // set window to minium width !!NOT WORKING
     //    if (windowWasResized && !ofGetMousePressed()) {
@@ -1162,7 +1162,7 @@ void ofApp::keyPressed(int key){
                 case 'v':
                 {
                     if (useThread) {
-                        loadedMovie.start();
+                        loadedMovie.gmMovie.start();
 //                        loadedMovie2.start();
                     } else {
 //                        loadedMovie2.grabToImageAll();
@@ -1386,8 +1386,8 @@ void ofApp::mouseReleased(int x, int y, int button){
             ofLog(OF_LOG_VERBOSE, "mouseReleased" );
 
             if (!showListView) {
-                if (loadedMovie.isThreadRunning()) {
-                    loadedMovie.stop(false);
+                if (loadedMovie.gmMovie.isThreadRunning()) {
+                    loadedMovie.gmMovie.stop(false);
                 }
                 if (updateInOut) {
                     ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
@@ -1573,7 +1573,7 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
         moveToMovie();
     }
 
-    loadedMovie.stop(TRUE);
+    loadedMovie.gmMovie.stop(TRUE);
 
     ofxNotify() << "Movie has started to load";
     loadedMovie.loadAndAllocateNewMovie(_newMoviePath, numberOfStills, showPlaceHolder, !_loadInBackground);
@@ -1743,13 +1743,13 @@ void ofApp::calculateNewPrintGrid(){
     } else {
         scrubWindowH = scrubWindowW * 0.5625 * 1;
     }
-    loadedMovie.stop(TRUE);
+    loadedMovie.gmMovie.stop(TRUE);
     if (isnan(loadedMovie.gmImageRatio) || !loadedMovie.gmMovie.isMovieLoaded()) {
         gridRatio = 0.5625;
     } else {
         gridRatio = 1.0/loadedMovie.gmImageRatio;
     }
-    while (loadedMovie.isThreadRunning()) {
+    while (loadedMovie.gmMovie.isThreadRunning()) {
     }
 
     thumbHeight = thumbWidth*gridRatio;
@@ -1930,7 +1930,7 @@ void ofApp::moveToList(){
 
     showListView = TRUE;
 
-    loadedMovie.stop(TRUE);
+    loadedMovie.gmMovie.stop(TRUE);
     loadedMovie.disableMouseEvents();
 
 //    guiTimeline->setVisible(FALSE);
@@ -2267,7 +2267,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
             }
         }
         loadedMovie.updateOrderNumber();
-        if (!loadedMovie.isThreadRunning()) {
+        if (!loadedMovie.gmMovie.isThreadRunning()) {
             if (useThread) {
                 loadedMovie.gmMovie.start();
             } else {
@@ -2297,7 +2297,7 @@ void ofApp::logPreviousMoviePrintDataSet(){
 //--------------------------------------------------------------
 void ofApp::exit(){
 
-    loadedMovie.stop(false);
+    loadedMovie.gmMovie.stop(false);
 
 //    delete guiTimeline;
 
@@ -2737,7 +2737,7 @@ void ofApp::updateOneThumb(int _thumbID, int _newFrameNumber){
     loadedMovie.gmMovie.grabbedFrame[_thumbID].gfToBeUpdated = TRUE;
     loadedMovie.updateOrderNumber();
 
-    if (!loadedMovie.isThreadRunning()) {
+    if (!loadedMovie.gmMovie.isThreadRunning()) {
         if (useThread) {
             loadedMovie.gmMovie.start();
         } else {

@@ -36,8 +36,8 @@
 #define FAK_SHADOW ofColor(0, 0, 0, 130)
 #define FAK_GRAY ofColor(59, 59, 59, 255)
 
-class fakGrabbedMovie : public ofThread
-//class fakGrabbedMovie
+//class fakGrabbedMovie : public ofThread
+class fakGrabbedMovie
 {
 public:
     fakGrabbedMovie(){};
@@ -110,7 +110,7 @@ public:
     }
 
 //    bool loadNewMovieToBeGrabbed(string vfMovieName, int _numberOfStills, bool _showPlaceHolder, bool _addListener){
-        bool loadAndAllocateNewMovie(string vfMovieName, int _numberOfStills, bool _showPlaceHolder, bool _addListener){
+    bool loadAndAllocateNewMovie(string vfMovieName, int _numberOfStills, bool _showPlaceHolder, bool _addListener){
 
         setNumberOfStills(_numberOfStills);
 //        stop(FALSE);
@@ -970,7 +970,7 @@ public:
 
     // Thread funcions
 
-    void threadedFunction(){
+//    void threadedFunction(){
 
 //        if (gmSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
 //            lock();
@@ -996,23 +996,23 @@ public:
 //        stop(TRUE);
 //                ofLog(OF_LOG_VERBOSE, "Closing Thread Function-----------------------------------------------" );
 
-    }
+//    }
 
-    void start(){
+//    void start(){
 
-        startThread(true);   // blocking, verbose
-        gmThreadCounter = 0;
+//        startThread(true);   // blocking, verbose
+//        gmThreadCounter = 0;
 
-    }
+//    }
 
-    void stop(bool rightNow){
+//    void stop(bool rightNow){
 
-        if (!rightNow) {
-            waitForThread();
-        }
-        stopThread();
+//        if (!rightNow) {
+//            waitForThread();
+//        }
+//        stopThread();
 
-    }
+//    }
 
     //properties
 
