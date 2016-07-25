@@ -112,12 +112,12 @@ public:
     ofEvent<ofVec2f> gsMovedInside;
 
     int gsID; // ID in Array
-    int gsFrameNumber; // current Framenumber
-    int gsUpdateOrderNumber; // order which is used to update frames, reordering dependend on framenumber, so the playhead doesnt jump back and forth
+//    int gsFrameNumber; // current Framenumber
+//    int gsUpdateOrderNumber; // order which is used to update frames, reordering dependend on framenumber, so the playhead doesnt jump back and forth
     int gsX; //x position of grabbedStill
     int gsY; //y position of grabbedStill
-    int gsWidth; //original width of grabbedStill
-    int gsHeight; //original height of grabbedStill
+//    int gsWidth; //original width of grabbedStill
+//    int gsHeight; //original height of grabbedStill
     float gsDrawWidth; //drawn width of grabbedStill
     float gsDrawHeight; //drawn height of grabbedStill
     int gsUpperLimitY; // Lower Limit for turning off mouseevent testing if over the header

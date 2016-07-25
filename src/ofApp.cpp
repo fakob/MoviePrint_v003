@@ -235,8 +235,8 @@ void ofApp::setup(){
     setupFinished = TRUE;
 
    loadedMovie2.setup("Original - Short from Vucko.mp4", 5);
-   loadedMovie2.gfMovie.play();
-   loadedMovie2.gfMovie.stop();
+   loadedMovie2.gfsMovie.play();
+   loadedMovie2.gfsMovie.stop();
 
 }
 
@@ -379,7 +379,7 @@ void ofApp::update(){
                 scrubbingJustStarted = false;
                 scrubDelta = 0.0;
                 scrubMouseDelta = 0.0;
-                scrubInitialFrame = loadedMovie.grabbedStill[i].gsFrameNumber;
+                scrubInitialFrame = loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber;
             }
 
             scrubMouseDelta = (ofGetMouseX() - loadedMovie.grabbedStill[i].gsX - thumbWidth/2);
@@ -439,7 +439,7 @@ void ofApp::update(){
             } else {
                 loadedMovie.gmMovieScrub.setFrame(newFrameNumber);
             }
-            loadedMovie.grabbedStill[i].gsFrameNumber = newFrameNumber;
+            loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber = newFrameNumber;
         }
 
 //        // update while Slider sends event
@@ -673,7 +673,7 @@ void ofApp::draw(){
     ofPushStyle();
     ofPushMatrix();
 //    loadedMovie2.gfMovie.draw(0,0,640,360);
-    for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfNumberOfFrames(); i++)
+    for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfsNumberOfFrames(); i++)
     {
 //        ofDrawRectangle(640 + (i*105),320,100,100);
 //        loadedMovie2.grabbedFrame[i].gsImage.draw(640 + (i*105),320,100,100);
@@ -683,13 +683,13 @@ void ofApp::draw(){
 //        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsToBeUpdated: " + ofToString(loadedMovie2.grabbedFrame[i].gsToBeUpdated));
 //        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsToBeGrabbed: " + ofToString(loadedMovie2.grabbedFrame[i].gsToBeGrabbed));
 //        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsImage.isUsingTexture(): " + ofToString(loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()));
-        if (loadedMovie2.grabbedFrame[i].gsToBeUpdated && !loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()) { // load textures in proper size
-            if (!loadedMovie2.grabbedFrame[i].gsToBeGrabbed ) {
-                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gsImage.isUsingTexture():" + ofToString(loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()));
-                loadedMovie2.grabbedFrame[i].gsTexture.loadData(loadedMovie2.grabbedFrame[i].gsImage);
-            //  loadedMovie2.grabbedFrame[i].gsTexture.loadScreenData(0,0,400,400);
-                loadedMovie2.grabbedFrame[i].gsImage.update();
-                loadedMovie2.grabbedFrame[i].gsToBeUpdated = FALSE;
+        if (loadedMovie2.grabbedFrame[i].gfToBeUpdated && !loadedMovie2.grabbedFrame[i].gfImage.isUsingTexture()) { // load textures in proper size
+            if (!loadedMovie2.grabbedFrame[i].gfToBeGrabbed ) {
+                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gfImage.isUsingTexture():" + ofToString(loadedMovie2.grabbedFrame[i].gfImage.isUsingTexture()));
+                loadedMovie2.grabbedFrame[i].gfTexture.loadData(loadedMovie2.grabbedFrame[i].gfImage);
+            //  loadedMovie2.grabbedFrame[i].gfTexture.loadScreenData(0,0,400,400);
+                loadedMovie2.grabbedFrame[i].gfImage.update();
+                loadedMovie2.grabbedFrame[i].gfToBeUpdated = FALSE;
                 ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
             }
         }
@@ -697,7 +697,7 @@ void ofApp::draw(){
         int tempX, tempY;
         tempX = 0 + ((i%4)*160);
         tempY = 365 + ((i/4)*90);
-        loadedMovie2.grabbedFrame[i].gsTexture.draw(tempX,tempY,155,87);
+        loadedMovie2.grabbedFrame[i].gfTexture.draw(tempX,tempY,155,87);
     }
     ofPopMatrix();
     ofPopStyle();
@@ -1408,8 +1408,8 @@ void ofApp::mouseReleased(int x, int y, int button){
                     tweenFading.initialTime = ofGetElapsedTimef();
 
                     int i = loadedMovie.gmScrubID;
-                    if (scrubInitialFrame != loadedMovie.grabbedStill[i].gsFrameNumber) {
-                        updateOneThumb(i, loadedMovie.grabbedStill[i].gsFrameNumber);
+                    if (scrubInitialFrame != loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber) {
+                        updateOneThumb(i, loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber);
                         addToUndo = true;
                     }
 
@@ -2104,9 +2104,9 @@ void ofApp::addGridTimeArrayToMoviePrintDataSet(){ // adds the GridTimeArray to 
         if ((!moviePrintDataSet.gridTimeArray.empty()) && loadedMovie.isMovieLoaded()){
             for (int i=0; i<numberOfStills; i++) {
     //                ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray[i]:" + ofToString(moviePrintDataSet.gridTimeArray[i]));
-    //                moviePrintDataSet.gridTimeArray[i] = loadedMovie.grabbedStill[i].gsFrameNumber;
+    //                moviePrintDataSet.gridTimeArray[i] = loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber;
                 previousMoviePrintDataSet.back().gridTimeArray[i] = moviePrintDataSet.gridTimeArray[i];
-    //                previousMoviePrintDataSet.back().gridTimeArray[i] = loadedMovie.grabbedStill[i].gsFrameNumber;
+    //                previousMoviePrintDataSet.back().gridTimeArray[i] = loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber;
             }
         } else {
             for (int i=0; i<numberOfStills; i++) {
@@ -2260,9 +2260,9 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
         for (int i = 0; i<numberOfStills; i++) {
             if ((tempHasTheNumberOfThumbsChanged == true) || (moviePrintDataSet.gridTimeArray[i] != _newMoviePrintDataSet.gridTimeArray[i])) { // when the number of Thumbs has changed, all get updated - otherwise only the changed ones get updated
                 moviePrintDataSet.gridTimeArray[i] = _newMoviePrintDataSet.gridTimeArray[i];
-                loadedMovie.gmMovie.grabbedFrame[i].gsFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
-                loadedMovie.gmMovie.grabbedFrame[i].gsToBeGrabbed = TRUE;
-                loadedMovie.gmMovie.grabbedFrame[i].gsToBeUpdated = TRUE;
+                loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
+                loadedMovie.gmMovie.grabbedFrame[i].gfToBeGrabbed = TRUE;
+                loadedMovie.gmMovie.grabbedFrame[i].gfToBeUpdated = TRUE;
                 ofLog(OF_LOG_VERBOSE, "Still:" + ofToString(i) + " will be updated:" +  ofToString(_newMoviePrintDataSet.gridTimeArray[i]));
             }
         }
@@ -2586,7 +2586,7 @@ void ofApp::printImageToFile(int _printSizeWidth){
             for (int i=0; i<loadedMovie.gmNumberOfStills; i++) {
                 string singleImageName = fileName + "_" + ofToString(i, 3, '0') + "." + formatExtension;
                 singleImageName = singleImagePath + singleImageName;
-                ofSaveImage(loadedMovie.gmMovie.grabbedFrame[i].gsImage, singleImageName, OF_IMAGE_QUALITY_HIGH);
+                ofSaveImage(loadedMovie.gmMovie.grabbedFrame[i].gfImage, singleImageName, OF_IMAGE_QUALITY_HIGH);
             }
         }
 
@@ -2659,18 +2659,18 @@ void ofApp::resetItemsToPrint(){
 //--------------------------------------------------------------
 void ofApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieButtonID){
     if (_rollOverMovieButtonID == 3) {
-        setInPoint(loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber);
+        setInPoint(loadedMovie.gmMovie.grabbedFrame[_rollOverMovieID].gfFrameNumber);
         loadedMovie.gmRollOver = FALSE;
         ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
 
     } else if (_rollOverMovieButtonID == 4) {
-        setOutPoint(loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber);
+        setOutPoint(loadedMovie.gmMovie.grabbedFrame[_rollOverMovieID].gfFrameNumber);
         loadedMovie.gmRollOver = FALSE;
         ofLog(OF_LOG_VERBOSE, "manipulated OutPoint" );
 
     } else if (_rollOverMovieButtonID == 1) {
         ofLog(OF_LOG_VERBOSE, "frame backwards" );
-        int j = loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber;
+        int j = loadedMovie.gmMovie.grabbedFrame[_rollOverMovieID].gfFrameNumber;
         if(shiftKeyPressed) {
             j = j - 10;
         } else if(superKeyPressed){
@@ -2693,7 +2693,7 @@ void ofApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieButto
         updateOneThumb(_rollOverMovieID, j);
     } else if (_rollOverMovieButtonID == 2) {
         ofLog(OF_LOG_VERBOSE, "frame forward" );
-        int j = loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber;
+        int j = loadedMovie.gmMovie.grabbedFrame[_rollOverMovieID].gfFrameNumber;
         if(shiftKeyPressed) {
             j = j + 10;
         } else if(superKeyPressed){
@@ -2731,10 +2731,10 @@ int ofApp::getHighestFrameNumber(){
 //--------------------------------------------------------------
 void ofApp::updateOneThumb(int _thumbID, int _newFrameNumber){
     moviePrintDataSet.gridTimeArray[_thumbID] = _newFrameNumber;
-    loadedMovie.gmMovie.grabbedFrame[_thumbID].gsFrameNumber = _newFrameNumber;
-    loadedMovie.gmMovie.grabbedFrame[_thumbID].gsManipulated = TRUE;
-    loadedMovie.gmMovie.grabbedFrame[_thumbID].gsToBeGrabbed = TRUE;
-    loadedMovie.gmMovie.grabbedFrame[_thumbID].gsToBeUpdated = TRUE;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gfFrameNumber = _newFrameNumber;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gfManipulated = TRUE;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gfToBeGrabbed = TRUE;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gfToBeUpdated = TRUE;
     loadedMovie.updateOrderNumber();
 
     if (!loadedMovie.isThreadRunning()) {
