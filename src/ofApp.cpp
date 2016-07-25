@@ -234,9 +234,9 @@ void ofApp::setup(){
 
     setupFinished = TRUE;
 
-   loadedMovie2.setup("Original - Short from Vucko.mp4", 5);
-   loadedMovie2.gfsMovie.play();
-   loadedMovie2.gfsMovie.stop();
+//   loadedMovie2.setup("Original - Short from Vucko.mp4", 5);
+//   loadedMovie2.gfsMovie.play();
+//   loadedMovie2.gfsMovie.stop();
 
 }
 
@@ -269,7 +269,7 @@ void ofApp::setGUITimeline(){
 //--------------------------------------------------------------
 void ofApp::update(){
     loadedMovie.update();
-    loadedMovie2.update();
+//    loadedMovie2.update();
 
     tweenTimelineInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimelineInOut.initialTime, (tweenTimelineInOut.initialTime + tweenTimelineInOut.duration), tweenTimelineInOut.minValue, tweenTimelineInOut.maxValue, &ofxeasing::exp::easeInOut);
     tweenListInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenListInOut.initialTime, (tweenListInOut.initialTime + tweenListInOut.duration), tweenListInOut.minValue, tweenListInOut.maxValue, &ofxeasing::exp::easeInOut);
@@ -673,32 +673,32 @@ void ofApp::draw(){
     ofPushStyle();
     ofPushMatrix();
 //    loadedMovie2.gfMovie.draw(0,0,640,360);
-    for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfsNumberOfFrames(); i++)
-    {
-//        ofDrawRectangle(640 + (i*105),320,100,100);
-//        loadedMovie2.grabbedFrame[i].gsImage.draw(640 + (i*105),320,100,100);
-//        loadedMovie2.getImage(i).draw(640 + (i*105),320,100,100);
-//        loadedMovie2.grabbedFrame[i].g
-//        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "]: " + ofToString(loadedMovie2.grabbedFrame[i].gsFrameNumber) + "#");
-//        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsToBeUpdated: " + ofToString(loadedMovie2.grabbedFrame[i].gsToBeUpdated));
-//        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsToBeGrabbed: " + ofToString(loadedMovie2.grabbedFrame[i].gsToBeGrabbed));
-//        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsImage.isUsingTexture(): " + ofToString(loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()));
-        if (loadedMovie2.grabbedFrame[i].gfToBeUpdated && !loadedMovie2.grabbedFrame[i].gfImage.isUsingTexture()) { // load textures in proper size
-            if (!loadedMovie2.grabbedFrame[i].gfToBeGrabbed ) {
-                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gfImage.isUsingTexture():" + ofToString(loadedMovie2.grabbedFrame[i].gfImage.isUsingTexture()));
-                loadedMovie2.grabbedFrame[i].gfTexture.loadData(loadedMovie2.grabbedFrame[i].gfImage);
-            //  loadedMovie2.grabbedFrame[i].gfTexture.loadScreenData(0,0,400,400);
-                loadedMovie2.grabbedFrame[i].gfImage.update();
-                loadedMovie2.grabbedFrame[i].gfToBeUpdated = FALSE;
-                ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
-            }
-        }
+//    for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfsNumberOfFrames(); i++)
+//    {
+////        ofDrawRectangle(640 + (i*105),320,100,100);
+////        loadedMovie2.grabbedFrame[i].gsImage.draw(640 + (i*105),320,100,100);
+////        loadedMovie2.getImage(i).draw(640 + (i*105),320,100,100);
+////        loadedMovie2.grabbedFrame[i].g
+////        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "]: " + ofToString(loadedMovie2.grabbedFrame[i].gsFrameNumber) + "#");
+////        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsToBeUpdated: " + ofToString(loadedMovie2.grabbedFrame[i].gsToBeUpdated));
+////        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsToBeGrabbed: " + ofToString(loadedMovie2.grabbedFrame[i].gsToBeGrabbed));
+////        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsImage.isUsingTexture(): " + ofToString(loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()));
+//        if (loadedMovie2.grabbedFrame[i].gfToBeUpdated && !loadedMovie2.grabbedFrame[i].gfImage.isUsingTexture()) { // load textures in proper size
+//            if (!loadedMovie2.grabbedFrame[i].gfToBeGrabbed ) {
+//                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gfImage.isUsingTexture():" + ofToString(loadedMovie2.grabbedFrame[i].gfImage.isUsingTexture()));
+//                loadedMovie2.grabbedFrame[i].gfTexture.loadData(loadedMovie2.grabbedFrame[i].gfImage);
+//            //  loadedMovie2.grabbedFrame[i].gfTexture.loadScreenData(0,0,400,400);
+//                loadedMovie2.grabbedFrame[i].gfImage.update();
+//                loadedMovie2.grabbedFrame[i].gfToBeUpdated = FALSE;
+//                ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
+//            }
+//        }
 
-        int tempX, tempY;
-        tempX = 0 + ((i%4)*160);
-        tempY = 365 + ((i/4)*90);
-        loadedMovie2.grabbedFrame[i].gfTexture.draw(tempX,tempY,155,87);
-    }
+//        int tempX, tempY;
+//        tempX = 0 + ((i%4)*160);
+//        tempY = 365 + ((i/4)*90);
+//        loadedMovie2.grabbedFrame[i].gfTexture.draw(tempX,tempY,155,87);
+//    }
     ofPopMatrix();
     ofPopStyle();
 
@@ -1163,9 +1163,9 @@ void ofApp::keyPressed(int key){
                 {
                     if (useThread) {
                         loadedMovie.start();
-                        loadedMovie2.start();
+//                        loadedMovie2.start();
                     } else {
-                        loadedMovie2.grabToImageAll();
+//                        loadedMovie2.grabToImageAll();
                     }
                 }
                     break;
