@@ -220,6 +220,10 @@ public:
         return gfsTotalFrames;
     }
 
+    float getFrameRate(){
+        return gfsFrameRate;
+    }
+
     void grabNextFrame(int i, bool _useThreads){
         setOneToBeGrabbedAndToBeUpdated(i, TRUE);
         grabbedFrame[i].gfFrameNumber = grabbedFrame[i].gfFrameNumber + 1;

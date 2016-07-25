@@ -128,6 +128,7 @@ public:
         gmTotalFrames = gmMovie.getTotalFrames();
         gmImageRatio = gmMovie.getImageRatio();
         gmPixelRatio = gmMovie.getPixelRatio();
+        gmFrameRate = gmMovie.getFrameRate();
 
         allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
 
