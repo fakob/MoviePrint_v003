@@ -130,7 +130,7 @@ public:
         gmPixelRatio = gmMovie.getPixelRatio();
         gmFrameRate = gmMovie.getFrameRate();
 
-//        allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
+        allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
 
 //        getMovieInformation(vfMovieName);
 
@@ -447,11 +447,11 @@ public:
             ofEnableAlphaBlending();
             ofSetColor(255);
 
-//            grabbedStill[i].gsX = _x;
-//            grabbedStill[i].gsY = _y;
-//            grabbedStill[i].gsDrawWidth = _w;
-//            grabbedStill[i].gsDrawHeight = _h;
-//            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
+            grabbedStill[i].gsX = _x;
+            grabbedStill[i].gsY = _y;
+            grabbedStill[i].gsDrawWidth = _w;
+            grabbedStill[i].gsDrawHeight = _h;
+            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
 
 //            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
 //                if (!grabbedStill[i].gsToBeGrabbed) {
@@ -463,31 +463,28 @@ public:
 //                }
 //            }
 
-//            shader.begin(); // draw still with rounded corners
+            shader.begin(); // draw still with rounded corners
 //            shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
-//            shader.setUniformTexture("maskTex", maskFbo.getTexture(), 1 );
+            shader.setUniformTexture("maskTex", maskFbo.getTexture(), 1 );
 
             ofSetColor(255, 255, 255, 255);
 
 //            grabbedStill[i].gsTexture.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
 
-//            gmMovie.lock();
-            if (gmMovie.grabbedFrame[i].gfToBeUpdated) { // load textures in proper size
+            if (gmMovie.grabbedFrame[i].gfToBeUpdated && !gmMovie.grabbedFrame[i].gfImage.isUsingTexture()) { // load textures in proper size
                 if (!gmMovie.grabbedFrame[i].gfToBeGrabbed ) {
                     ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gfImage.isUsingTexture():" + ofToString(gmMovie.grabbedFrame[i].gfImage.isUsingTexture()));
                     gmMovie.grabbedFrame[i].gfTexture.loadData(gmMovie.grabbedFrame[i].gfImage);
                 //  gmMovie.grabbedFrame[i].gfTexture.loadScreenData(0,0,400,400);
-//                    gmMovie.grabbedFrame[i].gfImage.update();
+                    gmMovie.grabbedFrame[i].gfImage.update();
                     gmMovie.grabbedFrame[i].gfToBeUpdated = FALSE;
                     ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
                 }
             }
-//            if (!gmMovie.isThreadRunning()) {
-                gmMovie.grabbedFrame[i].gfTexture.draw(_x,_y,_w,_h);
-//            }
 
-//            gmMovie.unlock();
-//            shader.end();
+            gmMovie.grabbedFrame[i].gfTexture.draw(_x,_y,_w,_h);
+
+            shader.end();
 
             // draw selection
             ofPushStyle();
@@ -498,96 +495,96 @@ public:
             }
             ofPopStyle();
 
-//            // draw update image
-//            if (gmMovie.grabbedFrame[i].gfToBeGrabbed) {
-//                ofPushMatrix();
-//                ofPushStyle();
-//                ofSetColor(0, 0, 0, 130);
-//                ofDrawRectangle(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
-//                ofSetColor(255, 255, 255, 200);
-//                updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.getWidth()/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.getHeight()/2 - grabbedStill[i].gsDrawHeight/2);
-//                ofPopStyle();
-//                ofPopMatrix();
-//            }
+            // draw update image
+            if (gmMovie.grabbedFrame[i].gfToBeGrabbed) {
+                ofPushMatrix();
+                ofPushStyle();
+                ofSetColor(0, 0, 0, 130);
+                ofDrawRectangle(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+                ofSetColor(255, 255, 255, 200);
+                updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.getWidth()/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.getHeight()/2 - grabbedStill[i].gsDrawHeight/2);
+                ofPopStyle();
+                ofPopMatrix();
+            }
 
-//            if (gmShowFramesUI) { // drawing UI
-//                drawStillUI(i, grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, _alpha);
-//            }
+            if (gmShowFramesUI) { // drawing UI
+                drawStillUI(i, grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, _alpha);
+            }
 
-//            // drawing overlay graphics
-//                if (grabbedStill[i].gsRollOver) {
+            // drawing overlay graphics
+                if (grabbedStill[i].gsRollOver) {
 
-//                    ofSetColor(255, 5);
-//                    if (grabbedStill[i].gsRollOver3) {
-//                        ofSetColor(255, 20);
-//                    }
-//                    ofDrawRectRounded(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
-//                    ofSetColor(255, 50);
-//                    if (grabbedStill[i].gsRollOver3) {
-//                        ofSetColor(255);
-//                    }
-//                    setInPointImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver3) {
+                        ofSetColor(255, 20);
+                    }
+                    ofDrawRectRounded(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
+                    ofSetColor(255, 50);
+                    if (grabbedStill[i].gsRollOver3) {
+                        ofSetColor(255);
+                    }
+                    setInPointImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
 
-//                    ofSetColor(255, 5);
-//                    if (grabbedStill[i].gsRollOver4) {
-//                        ofSetColor(255, 20);
-//                    }
-//                    ofDrawRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
-//                    ofSetColor(255, 50);
-//                    if (grabbedStill[i].gsRollOver4) {
-//                        ofSetColor(255);
-//                    }
-//                    setOutPointImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver4) {
+                        ofSetColor(255, 20);
+                    }
+                    ofDrawRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
+                    ofSetColor(255, 50);
+                    if (grabbedStill[i].gsRollOver4) {
+                        ofSetColor(255);
+                    }
+                    setOutPointImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
 
-//                    ofSetColor(255, 5);
-//                    if (grabbedStill[i].gsRollOver0) {
-//                        ofSetColor(255, 20);
-//                    }
-//                    ofDrawRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight, grabbedStill[i].gsDrawHeight, grabbedStill[0].gsDrawWidth/64);
-//                    ofSetColor(255, 50);
-//                    if (grabbedStill[i].gsRollOver0) {
-//                        ofSetColor(255);
-//                    }
-//            //                    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-//            //                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, scrubImage.getWidth()/2, scrubImage.getHeight()/2);
-//            //                    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
-//                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2 - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight, grabbedStill[i].gsDrawHeight);
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver0) {
+                        ofSetColor(255, 20);
+                    }
+                    ofDrawRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight, grabbedStill[i].gsDrawHeight, grabbedStill[0].gsDrawWidth/64);
+                    ofSetColor(255, 50);
+                    if (grabbedStill[i].gsRollOver0) {
+                        ofSetColor(255);
+                    }
+            //                    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
+            //                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, scrubImage.getWidth()/2, scrubImage.getHeight()/2);
+            //                    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
+                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2 - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight, grabbedStill[i].gsDrawHeight);
 
-//                    ofSetColor(255, 5);
-//                    if (grabbedStill[i].gsRollOver1) {
-//                        ofSetColor(255, 20);
-//                    }
-//                    ofDrawRectRounded(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
-//                    ofSetColor(255, 50);
-//                    if (grabbedStill[i].gsRollOver1) {
-//                        ofSetColor(255);
-//                    }
-//                    if (_superKeyPressed) {
-//                        frameBackward3Image.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-//                    } else if(_shiftKeyPressed){
-//                        frameBackward2Image.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-//                    } else {
-//                        frameBackwardImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-//                    }
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver1) {
+                        ofSetColor(255, 20);
+                    }
+                    ofDrawRectRounded(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
+                    ofSetColor(255, 50);
+                    if (grabbedStill[i].gsRollOver1) {
+                        ofSetColor(255);
+                    }
+                    if (_superKeyPressed) {
+                        frameBackward3Image.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+                    } else if(_shiftKeyPressed){
+                        frameBackward2Image.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+                    } else {
+                        frameBackwardImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+                    }
 
-//                    ofSetColor(255, 5);
-//                    if (grabbedStill[i].gsRollOver2) {
-//                        ofSetColor(255, 20);
-//                    }
-//                    ofDrawRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
-//                    ofSetColor(255, 50);
-//                    if (grabbedStill[i].gsRollOver2) {
-//                        ofSetColor(255);
-//                    }
-//                    if (_superKeyPressed) {
-//                        frameForward3Image.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-//                    } else if(_shiftKeyPressed){
-//                        frameForward2Image.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-//                    } else {
-//                        frameForwardImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-//                    }
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver2) {
+                        ofSetColor(255, 20);
+                    }
+                    ofDrawRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
+                    ofSetColor(255, 50);
+                    if (grabbedStill[i].gsRollOver2) {
+                        ofSetColor(255);
+                    }
+                    if (_superKeyPressed) {
+                        frameForward3Image.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+                    } else if(_shiftKeyPressed){
+                        frameForward2Image.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+                    } else {
+                        frameForwardImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+                    }
 
-//                }
+                }
             ofPopStyle();
             ofSetColor(255);
         } else if (_drawPlaceHolder){
@@ -866,8 +863,7 @@ public:
 
     void printStill(int i, float _x, float _y, float _w, float _h, bool _drawPlaceHolder){
 
-        if (true){
-//            if (_drawPlaceHolder){
+        if (_drawPlaceHolder){
 
             ofPushStyle();
             ofSetColor(FAK_MIDDLEGRAY);
@@ -949,7 +945,7 @@ public:
 //    void grabToImageFunction(){
 
 //        if (gmSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
-////            ();
+////            lock();
 //            do {
 //                //                for (int i = 0; i<gmNumberOfStills; i++) {
 //                //                    if (grabbedStill[i].gsToBeGrabbed) {
@@ -967,7 +963,7 @@ public:
 //                }
 
 //            } while (!allGrabbed());
-////            un();
+////            unlock();
 //        }
 ////        stop(TRUE);
 ////        ofLog(OF_LOG_VERBOSE, "Closing Thread Function-----------------------------------------------" );
@@ -979,7 +975,7 @@ public:
 //    void threadedFunction(){
 
 //        if (gmSetupFinished && isMovieLoaded()) { // only start when setup is finished and movie is loaded
-//            ();
+//            lock();
 //            do {
 //    //                for (int i = 0; i<gmNumberOfStills; i++) {
 //    //                    if (grabbedStill[i].gsToBeGrabbed) {
@@ -997,7 +993,7 @@ public:
 //                }
 
 //            } while (!allGrabbed());
-//            un();
+//            unlock();
 //        }
 //        stop(TRUE);
 //                ofLog(OF_LOG_VERBOSE, "Closing Thread Function-----------------------------------------------" );
@@ -1006,7 +1002,7 @@ public:
 
 //    void start(){
 
-//        startThread(true);   // bing, verbose
+//        startThread(true);   // blocking, verbose
 //        gmThreadCounter = 0;
 
 //    }

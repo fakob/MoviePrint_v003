@@ -2297,9 +2297,7 @@ void ofApp::logPreviousMoviePrintDataSet(){
 //--------------------------------------------------------------
 void ofApp::exit(){
 
-
     loadedMovie.gmMovie.stop(false);
-    loadedMovie.gmMovie.grabbedFrame.clear();
 
 //    delete guiTimeline;
 

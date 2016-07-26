@@ -103,17 +103,11 @@ public:
     }
 
     void allocateNewNumberOfFrames(int _numberOfFrames){
-        ofLog(OF_LOG_VERBOSE, "_____________________________________start allocateNewNumberOfFrames");
 
         gfsNumberOfFrames = _numberOfFrames;
 
         if (isMovieLoaded()) {
             gfsCurrAllocating = true;
-
-            stop(TRUE);
-            while (isThreadRunning()) {
-                ofLog(OF_LOG_VERBOSE, "allocateNewNumberOfFrames is waiting for thread to stop");
-            }
 
             grabbedFrame.clear();
             grabbedFrame.resize(gfsNumberOfFrames);
@@ -136,7 +130,6 @@ public:
             ofLog(OF_LOG_VERBOSE, "Movie not loaded");
         }
         gfsCurrAllocating = false;
-        ofLog(OF_LOG_VERBOSE, "_____________________________________finished allocateNewNumberOfFrames");
     }
 
     string getMoviePath(){
@@ -285,7 +278,6 @@ public:
             str = "In Thread function - ";
         }
         ofLog(OF_LOG_VERBOSE, str + "1 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfsMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfsMovie.getCurrentFrame()));
-        ofLog(OF_LOG_VERBOSE, str + "grabbedFrame[i].gfToBeGrabbed: " + ofToString(grabbedFrame[i].gfToBeGrabbed) + " grabbedFrame[i].gfToBeUpdated: " + ofToString(grabbedFrame[i].gfToBeUpdated));
 
         if (isMovieLoaded()) {
 
@@ -305,7 +297,6 @@ public:
             }
         }
         ofLog(OF_LOG_VERBOSE, str + "2 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfsMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfsMovie.getCurrentFrame()));
-        ofLog(OF_LOG_VERBOSE, str + "grabbedFrame[i].gfToBeGrabbed: " + ofToString(grabbedFrame[i].gfToBeGrabbed) + " grabbedFrame[i].gfToBeUpdated: " + ofToString(grabbedFrame[i].gfToBeUpdated));
     }
 
     bool allGrabbed(){
