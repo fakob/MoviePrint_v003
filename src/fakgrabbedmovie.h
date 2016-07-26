@@ -343,10 +343,11 @@ public:
             gmThumbWidth = _gmThumbWidth;
             gmThumbHeight = _gmThumbHeight;
 
-//            stop(TRUE);
-//            while (isThreadRunning()) {
-//                ofLog(OF_LOG_VERBOSE, "allocateNewNumberOfStills is waiting for thread to stop");
-//            }
+            gmMovie.stop(TRUE);
+            while (gmMovie.isThreadRunning()) {
+                ofLog(OF_LOG_VERBOSE, "allocateNewNumberOfStills is waiting for thread to stop");
+            }
+            gmMovie.allocateNewNumberOfFrames(_numberOfStills);
 
             // unregister All Mouse Events of the Stills (old gmNumberOfStills)
             disableMouseEvents();
