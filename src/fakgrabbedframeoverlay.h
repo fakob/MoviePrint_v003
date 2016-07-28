@@ -65,7 +65,7 @@ public:
             // the circleEvent object will contain the mouse position, so this values are accesible to any class that is listening.
             ofVec2f mousePos = ofVec2f(args.x, args.y);
             ofNotifyEvent(gsClickedInside, gsID, this);
-            ofLog(OF_LOG_VERBOSE, "inside ID:" + ofToString(gsID) + " : " + ofToString(mousePos) );
+//            ofLog(OF_LOG_VERBOSE, "inside ID:" + ofToString(gsID) + " : " + ofToString(mousePos) );
         }
     }
     void mouseScrolled(ofMouseEventArgs & args){
