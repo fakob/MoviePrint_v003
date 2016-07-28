@@ -21,6 +21,7 @@ Project{
             "src/fakgrabframes.h",
             "src/fakmenu.h",
             "src/fakscrollbar.h",
+            "src/faktween.h",
             "src/main.cpp",
             "src/ofApp.cpp",
             "src/ofApp.h",

@@ -1854,7 +1854,7 @@ void ofApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPr
     float tempX = (leftMargin + listWidth * tweenListInOut.value) * _scaleFactor;
 //    float tempX = (leftMargin + listWidth * 0) * _scaleFactor;
     float tempY = (_scrollAmount + headerHeight + topMargin)  * _scaleFactor;
-    ofLog(OF_LOG_VERBOSE, "tempX:"+ ofToString(tempX) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
+//    ofLog(OF_LOG_VERBOSE, "tempX:"+ ofToString(tempX) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
     loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
     ofPopStyle();
     ofPopMatrix();
