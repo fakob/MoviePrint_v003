@@ -6,6 +6,7 @@
 #include "fakgrabbedlistitem.h"
 #include "fakscrollbar.h"
 #include "fakgrabframes.h"
+#include "faktween.h"
 
 #include "ofxNotify.h"
 #include "ofxEasing.h"
@@ -55,14 +56,14 @@ public:
     };
 
 
-    //--------------------------------------------------------------
-    struct tweenStruct {
-        float value;
-        float initialTime;
-        float duration;
-        float minValue;
-        float maxValue;
-    };
+//    //--------------------------------------------------------------
+//    struct tweenStruct {
+//        float value;
+//        float initialTime;
+//        float duration;
+//        float minValue;
+//        float maxValue;
+//    };
 
     moviePrintDataStruct moviePrintDataSet;
     deque<moviePrintDataStruct> previousMoviePrintDataSet;
@@ -278,14 +279,14 @@ public:
 //    ofxTween tweenTimeDelay;
 
 
-    tweenStruct initTime;
-    tweenStruct tweenTimelineInOut;
-    tweenStruct tweenListInOut;
-    tweenStruct tweenMoviePrintPreview;
-    tweenStruct tweenBlendStartDropImage;
-    tweenStruct tweenBlendStartDropImageCounter;
-    tweenStruct tweenFading;
-    tweenStruct tweenTimeDelay;
+    fakTween initTime;
+    fakTween tweenTimelineInOut;
+    fakTween tweenListInOut;
+    fakTween tweenMoviePrintPreview;
+    fakTween tweenBlendStartDropImage;
+    fakTween tweenBlendStartDropImageCounter;
+    fakTween tweenFading;
+    fakTween tweenTimeDelay;
 
 //    ofxEasingBack 	easingback;
 //    ofxEasingBounce 	easingbounce;

@@ -183,8 +183,8 @@ void ofApp::setup(){
     scrollBar.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
 
     scrollBar.setScrollHeight((float)displayGridHeight);
-//    scrollBar.registerMouseEvents();
-//    ofAddListener(scrollBar.sbScrollingGoingOn, this, &ofApp::scrollEvent);
+    scrollBar.registerMouseEvents();
+    ofAddListener(scrollBar.sbScrollingGoingOn, this, &ofApp::scrollEvent);
 
 //    scrollBarList.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
 //    scrollBarList.registerMouseEvents();
@@ -525,15 +525,15 @@ void ofApp::update(){
     }
 
     if (scrollBar.sbActive) {
-    //        ofLog(OF_LOG_VERBOSE, "scrollBar Active:" + ofToString(scrollAmountRel) );
+//            ofLog(OF_LOG_VERBOSE, "scrollBar Active:" + ofToString(scrollAmountRel) );
         if (scrollGrid) {
-    //            ofLog(OF_LOG_VERBOSE, "scrollGrid True:" + ofToString(scrollAmountRel) );
+//                ofLog(OF_LOG_VERBOSE, "scrollGrid True:" + ofToString(scrollAmountRel) );
             if (!scrollBar.sbCalculateScrollInertia && !scrollBar.sbScrollBarDrag) {
                 scrollGrid = false;
             } else {
             scrollBar.update();
             scrollAmountRel = scrollBar.getRelativePos();
-    //            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
+//                ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
             }
         }
     } else {
@@ -1519,7 +1519,7 @@ void ofApp::moveToMovie(){
 
 //    scrollBarList.unregisterMouseEvents();
 //    scrollBarList.unregisterTouchEvents();
-//    scrollBar.registerMouseEvents();
+    scrollBar.registerMouseEvents();
 //    scrollBar.registerTouchEvents();
 
 //    guiTimeline->setVisible(TRUE);
@@ -1854,7 +1854,7 @@ void ofApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPr
     float tempX = (leftMargin + listWidth * tweenListInOut.value) * _scaleFactor;
 //    float tempX = (leftMargin + listWidth * 0) * _scaleFactor;
     float tempY = (_scrollAmount + headerHeight + topMargin)  * _scaleFactor;
-//    ofLog(OF_LOG_VERBOSE, "tempX:"+ ofToString(tempX) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
+    ofLog(OF_LOG_VERBOSE, "tempX:"+ ofToString(tempX) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
     loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
     ofPopStyle();
     ofPopMatrix();
