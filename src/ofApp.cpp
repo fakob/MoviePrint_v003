@@ -1365,7 +1365,6 @@ void ofApp::mouseReleased(int x, int y, int button){
                     loadedMovie.gmMovie.stop(false);
                 }
                 if (updateInOut) {
-                    ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
                     //      tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     tweenFading.minValue = 255.0;
                     tweenFading.maxValue = 0.0;
@@ -1376,7 +1375,6 @@ void ofApp::mouseReleased(int x, int y, int button){
                     addToUndo = true;
                 }
                 if (updateScrub) {
-                    ofLog(OF_LOG_VERBOSE, "mouseReleased - updateScrub True" );
                     //     tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     tweenFading.minValue = 255.0;
                     tweenFading.maxValue = 0.0;
@@ -2413,7 +2411,7 @@ void ofApp::drawScrubScreen(float _scaleFactor){
     // draw the scrubMovie
     ofSetColor(255,(int)tweenFading.value);
     int j = loadedMovie.gmScrubID;
-//    loadedMovie.gmMovie.scrubImg.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+    loadedMovie.gmMovie.scrubImg.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
     loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(tweenFading.value/255));
 
     // drawing frame
@@ -2446,7 +2444,7 @@ void ofApp::drawScrubScreen(float _scaleFactor){
 
     ofDisableAlphaBlending();
     ofSetColor(255);
-    if(tweenFading.value < 5){
+    if(tweenFading.value < 0.05){
         updateScrub = FALSE;
         ofLog(OF_LOG_VERBOSE, "tweenFading.value < 5 - updateScrub false" );
         loadedMovie.gmScrubMovie = FALSE;
