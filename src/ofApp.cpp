@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
-    drawNotify = true; // ofxNotify
+    drawNotify = false; // ofxNotify
     showPlaceHolder = false; // added for developing
 
 //    // used for ofxAvCodec addon
@@ -269,8 +269,6 @@ void ofApp::setGUITimeline(){
 //--------------------------------------------------------------
 void ofApp::update(){
     loadedMovie.update();
-    ofLog(OF_LOG_VERBOSE, "_____________________________________ tweenFading.value: " + ofToString(tweenFading.value));
-//    ofLog(OF_LOG_VERBOSE, "_____________________________________ tweenListInOut.value: " + ofToString(tweenListInOut.value));
 
     tweenTimelineInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimelineInOut.initialTime, (tweenTimelineInOut.initialTime + tweenTimelineInOut.duration), tweenTimelineInOut.minValue, tweenTimelineInOut.maxValue, &ofxeasing::exp::easeInOut);
     tweenListInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenListInOut.initialTime, (tweenListInOut.initialTime + tweenListInOut.duration), tweenListInOut.minValue, tweenListInOut.maxValue, &ofxeasing::exp::easeInOut);
@@ -2405,10 +2403,6 @@ void ofApp::drawLoadMovieScreen(){
 //--------------------------------------------------------------
 void ofApp::drawScrubScreen(float _scaleFactor){
 
-    ofLog(OF_LOG_VERBOSE, "_____________________________________ drawScrubScreen");
-    ofLog(OF_LOG_VERBOSE, "_____________________________________ tweenListInOut.value: " + ofToString(tweenListInOut.value));
-    ofLog(OF_LOG_VERBOSE, "_____________________________________ tweenFading.value: " + ofToString(tweenFading.value));
-
     ofPushStyle();
     ofEnableAlphaBlending();
     ofSetColor(0,(tweenFading.value/255)*100);
@@ -2452,7 +2446,7 @@ void ofApp::drawScrubScreen(float _scaleFactor){
     ofSetColor(255);
     if(tweenFading.value < 0.05){
         updateScrub = FALSE;
-        ofLog(OF_LOG_VERBOSE, "tweenFading.value < 5 - updateScrub false" );
+        ofLog(OF_LOG_VERBOSE, "tweenFading.value < 0.05 - updateScrub false" );
         loadedMovie.gmScrubMovie = FALSE;
         scrubbingJustStarted = true;
     }
@@ -2748,6 +2742,36 @@ void ofApp::updateAllLimits(){
     }
     loadedMovie.setAllLimitsLower(ofGetHeight());
     loadedMovie.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
+}
+
+//--------------------------------------------------------------
+void ofApp::setInOutPoint(int _inPoint, int _outPoint){
+    int i = _inPoint;
+    int j = outPoint;
+    if ((outPoint-i < numberOfStills)) {
+        j = i + (numberOfStills - 1);
+        if (j > (totalFrames-1)) {
+            j = (totalFrames-1);
+            i = j - (numberOfStills - 1);
+        }
+    }
+    inPoint = i;
+    outPoint = j;
+    int i2 = inPoint;
+    int j2 = _outPoint;
+    if ((j2 - inPoint < numberOfStills)) {
+        i2 = j2 - (numberOfStills - 1);
+        if (i2 < 0) {
+            i2 = 0;
+            j2 = (numberOfStills - 1);
+
+        }
+    }
+    inPoint = i;
+    outPoint = j;
+    updateGridTimeArrayWithAutomaticInterval();
+    updateAllStills();
+    ofLog(OF_LOG_VERBOSE, "manipulated In- and OutPoint" );
 }
 
 //--------------------------------------------------------------

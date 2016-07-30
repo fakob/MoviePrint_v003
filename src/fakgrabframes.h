@@ -308,11 +308,11 @@ public:
         grabbedFrame[_i].gfFrameNumber = _frame;
 
         if (movieFileScrub.get(CV_CAP_PROP_POS_FRAMES) < (double)_frame) {
-        movieFileScrub.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
-        movieFile.read(matOrigScrub);
+            movieFileScrub.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
+            movieFile.read(matOrigScrub);
 //            movieFile.grab();
 //            movieFile.retrieve(matOrigScrub);
-        ofxCv::copy(matOrigScrub, scrubImg);
+            ofxCv::copy(matOrigScrub, scrubImg);
             scrubImg.update();
         }
     }

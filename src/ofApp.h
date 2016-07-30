@@ -112,6 +112,7 @@ public:
     int getLowestFrameNumber();
     int getHighestFrameNumber();
     void updateOneThumb(int _thumbID, int _newFrameNumber);
+    void setInOutPoint(int _inPoint, int _outPoint);
     void setInPoint(int _inPoint);
     void setOutPoint(int _inPoint);
     void updateTimeSlider(bool _wholeRange);
