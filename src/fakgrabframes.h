@@ -303,12 +303,18 @@ public:
     }
 
     void setFrameScrub(int _i, int _frame){
+        ofLog(OF_LOG_VERBOSE, "setFrameScrub: " + ofToString(_i) + " frame: " + ofToString(_frame));
         _frame = min((gfsTotalFrames-1), max(_frame, 0));
         grabbedFrame[_i].gfFrameNumber = _frame;
 
+        if (movieFileScrub.get(CV_CAP_PROP_POS_FRAMES) < (double)_frame) {
         movieFileScrub.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
         movieFile.read(matOrigScrub);
+//            movieFile.grab();
+//            movieFile.retrieve(matOrigScrub);
         ofxCv::copy(matOrigScrub, scrubImg);
+            scrubImg.update();
+        }
     }
 
     void grabToImage(int i, int _frame, bool _inThread){
