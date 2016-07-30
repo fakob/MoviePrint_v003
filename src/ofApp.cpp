@@ -269,6 +269,8 @@ void ofApp::setGUITimeline(){
 //--------------------------------------------------------------
 void ofApp::update(){
     loadedMovie.update();
+    ofLog(OF_LOG_VERBOSE, "_____________________________________ tweenFading.value: " + ofToString(tweenFading.value));
+//    ofLog(OF_LOG_VERBOSE, "_____________________________________ tweenListInOut.value: " + ofToString(tweenListInOut.value));
 
     tweenTimelineInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimelineInOut.initialTime, (tweenTimelineInOut.initialTime + tweenTimelineInOut.duration), tweenTimelineInOut.minValue, tweenTimelineInOut.maxValue, &ofxeasing::exp::easeInOut);
     tweenListInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenListInOut.initialTime, (tweenListInOut.initialTime + tweenListInOut.duration), tweenListInOut.minValue, tweenListInOut.maxValue, &ofxeasing::exp::easeInOut);
@@ -373,6 +375,7 @@ void ofApp::update(){
 
             updateInOut = FALSE;
             updateScrub = TRUE;
+            ofLog(OF_LOG_VERBOSE, "loadedMovie.gmScrubMovie - updateScrub true" );
             int i = loadedMovie.gmScrubID;
 
             if (scrubbingJustStarted) {
@@ -428,17 +431,17 @@ void ofApp::update(){
                 newFrameNumber = 0;
             }
 
-            if (loadedMovie.gmHasNoFrames) {
-                int tempNewFrameNumber = newFrameNumber;
-                if (tempNewFrameNumber < 5) {
-                    tempNewFrameNumber = 5;
-                }
-                loadedMovie.gmMovieScrub.setPosition((float)(tempNewFrameNumber - 2)/(float)(loadedMovie.gmTotalFrames-1));
-                loadedMovie.gmMovieScrub.nextFrame();
-                loadedMovie.gmMovieScrub.nextFrame();
-            } else {
-                loadedMovie.gmMovieScrub.setFrame(newFrameNumber);
-            }
+//            if (loadedMovie.gmHasNoFrames) {
+//                int tempNewFrameNumber = newFrameNumber;
+//                if (tempNewFrameNumber < 5) {
+//                    tempNewFrameNumber = 5;
+//                }
+//                loadedMovie.gmMovieScrub.setPosition((float)(tempNewFrameNumber - 2)/(float)(loadedMovie.gmTotalFrames-1));
+//                loadedMovie.gmMovieScrub.nextFrame();
+//                loadedMovie.gmMovieScrub.nextFrame();
+//            } else {
+                loadedMovie.gmMovie.setFrameScrub(i, newFrameNumber);
+//            }
             loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber = newFrameNumber;
         }
 
@@ -482,6 +485,7 @@ void ofApp::update(){
     if (updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed()) {
         updateInOut = FALSE;
         updateScrub = FALSE;
+        ofLog(OF_LOG_VERBOSE, "updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed() - updateScrub false" );
 
         if(tweenTimeDelay.value < 5){
             updateNewPrintGrid = FALSE;
@@ -559,6 +563,7 @@ void ofApp::update(){
 
     if (currPrintingList) {
         updateScrub = FALSE;
+        ofLog(OF_LOG_VERBOSE, "currPrintingList - updateScrub false" );
         updateInOut = FALSE;
         printListToFile();
     }
@@ -619,8 +624,8 @@ void ofApp::draw(){
                 ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
                 ofSetColor(255,255,255,(int)tweenFading.value);
 
-                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * 1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+                loadedMovie.gmMovie.scrubImg.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+//                loadedMovie.gmMovie.scrubImg.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * 1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
                 loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (tweenFading.value/255));
 
                 ofSetColor(255, 255, 255, (int)(tweenFading.value/255)*255);
@@ -670,6 +675,7 @@ void ofApp::draw(){
         }
     }
 
+//    loadedMovie.gmMovieScrub.draw(0,0,3600,1800);
 
     ofxNotify::draw(drawNotify);
 }
@@ -1370,6 +1376,7 @@ void ofApp::mouseReleased(int x, int y, int button){
                     addToUndo = true;
                 }
                 if (updateScrub) {
+                    ofLog(OF_LOG_VERBOSE, "mouseReleased - updateScrub True" );
                     //     tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     tweenFading.minValue = 255.0;
                     tweenFading.maxValue = 0.0;
@@ -2393,6 +2400,11 @@ void ofApp::drawLoadMovieScreen(){
 
 //--------------------------------------------------------------
 void ofApp::drawScrubScreen(float _scaleFactor){
+
+    ofLog(OF_LOG_VERBOSE, "_____________________________________ drawScrubScreen");
+    ofLog(OF_LOG_VERBOSE, "_____________________________________ tweenListInOut.value: " + ofToString(tweenListInOut.value));
+    ofLog(OF_LOG_VERBOSE, "_____________________________________ tweenFading.value: " + ofToString(tweenFading.value));
+
     ofPushStyle();
     ofEnableAlphaBlending();
     ofSetColor(0,(tweenFading.value/255)*100);
@@ -2401,7 +2413,7 @@ void ofApp::drawScrubScreen(float _scaleFactor){
     // draw the scrubMovie
     ofSetColor(255,(int)tweenFading.value);
     int j = loadedMovie.gmScrubID;
-    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+//    loadedMovie.gmMovie.scrubImg.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
     loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(tweenFading.value/255));
 
     // drawing frame
@@ -2436,6 +2448,7 @@ void ofApp::drawScrubScreen(float _scaleFactor){
     ofSetColor(255);
     if(tweenFading.value < 5){
         updateScrub = FALSE;
+        ofLog(OF_LOG_VERBOSE, "tweenFading.value < 5 - updateScrub false" );
         loadedMovie.gmScrubMovie = FALSE;
         scrubbingJustStarted = true;
     }
