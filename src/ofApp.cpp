@@ -885,13 +885,19 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             moviePrintDataSet.printSizeWidth = 4096;
         }
 
-        if (ImGui::SliderInt("InPoint", &inPoint, 0,totalFrames-1)) {
+        ImGui::PushItemWidth(30);
+        if (ImGui::SliderInt("##InPoint", &inPoint, 0,totalFrames-1)) {
             setInPoint(inPoint);
         }
-
-        if (ImGui::SliderInt("OutPoint", &outPoint, 0,totalFrames-1)) {
+        ImGui::SameLine();
+        if (ImGui::SliderInt("##MidPoint", &outPoint, 0,totalFrames-1)) {
             setOutPoint(outPoint);
         }
+        ImGui::SameLine();
+        if (ImGui::SliderInt("##OutPoint", &outPoint, 0,totalFrames-1)) {
+            setOutPoint(outPoint);
+        }
+        ImGui::PopItemWidth();
 
         ImGui::End();
 
