@@ -62,6 +62,7 @@ public:
     void setup(string vfMovieName, int _numberOfFrames){
         gfsSetupFinished = false;
         loadNewMovieToBeGrabbed(vfMovieName);
+        loadNewMovieToBeScrubbed(vfMovieName);
         allocateNewNumberOfFrames(_numberOfFrames);
         gfsSetupFinished = true;
     }
@@ -94,12 +95,34 @@ public:
         ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function" + ofToString(vfMovieName));
 
         if (isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "Width: " + ofToString(gfsFrameWidth) + " Height: " + ofToString(gfsFrameHeight) + " ImageRatio:" + ofToString(gfsImageRatio) + " PixelRatio:" + ofToString(gfsPixelRatio)  + " Framerate:" + ofToString(gfsFrameRate) + " totalFrames:" + ofToString(gfsTotalFrames) + " getDuration:" + ofToString(gfsMovie.getDuration()));
+            ofLog(OF_LOG_VERBOSE, "Width: " + ofToString(gfsFrameWidth) + " Height: " + ofToString(gfsFrameHeight) + " ImageRatio:" + ofToString(gfsImageRatio) + " PixelRatio:" + ofToString(gfsPixelRatio)  + " Framerate:" + ofToString(gfsFrameRate) + " totalFrames:" + ofToString(gfsTotalFrames));
             ofLog(OF_LOG_VERBOSE, "Movie loaded");
         } else {
             ofLog(OF_LOG_VERBOSE, "Movie not loaded");
         }
         return isMovieLoaded();
+    }
+
+    bool loadNewMovieToBeScrubbed(string vfMovieName){
+//        stop(FALSE);
+
+        ofLog(OF_LOG_VERBOSE, "_____________________________________ Scrub start loadMovie function" + ofToString(vfMovieName));
+        ofFile fileToRead(vfMovieName);
+        gfsMoviePath = fileToRead.getAbsolutePath();
+        movieFileScrub.open(gfsMoviePath);
+
+        while (!isScrubMovieLoaded()) {
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ Scrub waiting for movie to load - " + ofToString(gfsMoviePath));
+        }
+
+        ofLog(OF_LOG_VERBOSE, "_____________________________________ Scrub end loadMovie function" + ofToString(vfMovieName));
+
+        if (isScrubMovieLoaded()) {
+            ofLog(OF_LOG_VERBOSE, "Scrub Movie loaded");
+        } else {
+            ofLog(OF_LOG_VERBOSE, "Scrub Movie not loaded");
+        }
+        return isScrubMovieLoaded();
     }
 
     void allocateNewNumberOfFrames(int _numberOfFrames){
@@ -159,6 +182,9 @@ public:
 //                }
 //            }
         }
+        if (isScrubMovieLoaded()) {
+
+        }
     }
 
 
@@ -193,10 +219,15 @@ public:
         return movieFile.isOpened();
     }
 
+    bool isScrubMovieLoaded(){
+        //        ofLog(OF_LOG_VERBOSE, "____________isMovieLoaded() "+ ofToString(isMovieLoaded()));
+        return movieFileScrub.isOpened();
+    }
+
     void play(){
         if (isMovieLoaded()) {
             ofLog(OF_LOG_VERBOSE, "____________gfsMovie.play() ");
-            gfsMovie.play();
+//            gfsMovie.play();
         }
     }
 
@@ -271,13 +302,22 @@ public:
         }
     }
 
+    void setFrameScrub(int _i, int _frame){
+        _frame = min((gfsTotalFrames-1), max(_frame, 0));
+        grabbedFrame[_i].gfFrameNumber = _frame;
+
+        movieFileScrub.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
+        movieFile.read(matOrigScrub);
+        ofxCv::copy(matOrigScrub, scrubImg);
+    }
+
     void grabToImage(int i, int _frame, bool _inThread){
 
         string str = "";
         if (_inThread) {
             str = "In Thread function - ";
         }
-        ofLog(OF_LOG_VERBOSE, str + "1 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfsMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfsMovie.getCurrentFrame()));
+//        ofLog(OF_LOG_VERBOSE, str + "1 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfsMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfsMovie.getCurrentFrame()));
 
         if (isMovieLoaded()) {
 
@@ -296,7 +336,7 @@ public:
                 ofLog(OF_LOG_VERBOSE, str + "CRASH AVOIDED grabbedFrame[i].gfImage.isAllocated() FALSE _______________________________");
             }
         }
-        ofLog(OF_LOG_VERBOSE, str + "2 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfsMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfsMovie.getCurrentFrame()));
+//        ofLog(OF_LOG_VERBOSE, str + "2 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfsMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfsMovie.getCurrentFrame()));
     }
 
     bool allGrabbed(){
@@ -370,7 +410,7 @@ public:
 
     //properties
 
-    ofVideoPlayer gfsMovie;
+//    ofVideoPlayer gfsMovie;
 
 //    vector<grabbedFrameStruct> grabbedFrame;
     vector<fakGrabbedFrame> grabbedFrame;
@@ -390,7 +430,12 @@ public:
     string gfsMoviePath;
 
     cv::VideoCapture movieFile;
+    cv::VideoCapture movieFileScrub;
     cv::Mat matOrig;
+    cv::Mat matOrigScrub;
+
+    ofImage scrubImg;
+
 };
 
 

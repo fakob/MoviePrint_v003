@@ -269,7 +269,6 @@ void ofApp::setGUITimeline(){
 //--------------------------------------------------------------
 void ofApp::update(){
     loadedMovie.update();
-//    loadedMovie2.update();
 
     tweenTimelineInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimelineInOut.initialTime, (tweenTimelineInOut.initialTime + tweenTimelineInOut.duration), tweenTimelineInOut.minValue, tweenTimelineInOut.maxValue, &ofxeasing::exp::easeInOut);
     tweenListInOut.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenListInOut.initialTime, (tweenListInOut.initialTime + tweenListInOut.duration), tweenListInOut.minValue, tweenListInOut.maxValue, &ofxeasing::exp::easeInOut);
@@ -277,6 +276,7 @@ void ofApp::update(){
     tweenBlendStartDropImage.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenBlendStartDropImage.initialTime, (tweenBlendStartDropImage.initialTime + tweenBlendStartDropImage.duration), tweenBlendStartDropImage.minValue, tweenBlendStartDropImage.maxValue, &ofxeasing::exp::easeInOut);
     tweenTimeDelay.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimeDelay.initialTime, (tweenTimeDelay.initialTime + tweenTimeDelay.duration), tweenTimeDelay.minValue, tweenTimeDelay.maxValue, &ofxeasing::exp::easeInOut);
     tweenMoviePrintPreview.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenMoviePrintPreview.initialTime, (tweenMoviePrintPreview.initialTime + tweenMoviePrintPreview.duration), tweenMoviePrintPreview.minValue, tweenMoviePrintPreview.maxValue, &ofxeasing::exp::easeInOut);
+    tweenFading.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenFading.initialTime, (tweenFading.initialTime + tweenFading.duration), tweenFading.minValue, tweenFading.maxValue, &ofxeasing::exp::easeInOut);
 
     threadIsRunning = loadedMovie.gmMovie.isThreadRunning();
 
@@ -340,7 +340,7 @@ void ofApp::update(){
 
     // update Movie for Scrubbing or InOut manipulations
     if (loadedMovie.gmScrubMovie || updateInOut) {
-        loadedMovie.gmMovieScrub.update();
+        loadedMovie.gmMovie.update();
     }
 
 //    handlingEventOverlays();
@@ -577,13 +577,13 @@ void ofApp::update(){
     }
 
 
-    // sollte kurze wait schleife fuer das scrubvideoloading sein - leider funktioniert das nicht so ganz - man kann zwar das scrubvideo etwas spaeter loaden, waerenddessen haelt aber trotzdem alles an
-    if (loadNewMovieToBeScrubbedBool) {
-        if (timer.getElapsedSeconds() > 0.1) {
-            loadedMovie.loadNewMovieToBeScrubbed(loadedMovie.gmMovie.getMoviePath());
-            loadNewMovieToBeScrubbedBool = FALSE;
-        }
-    }
+//    // sollte kurze wait schleife fuer das scrubvideoloading sein - leider funktioniert das nicht so ganz - man kann zwar das scrubvideo etwas spaeter loaden, waerenddessen haelt aber trotzdem alles an
+//    if (loadNewMovieToBeScrubbedBool) {
+//        if (timer.getElapsedSeconds() > 0.1) {
+//            loadedMovie.loadNewMovieToBeScrubbed(loadedMovie.gmMovie.getMoviePath());
+//            loadNewMovieToBeScrubbedBool = FALSE;
+//        }
+//    }
 }
 
 //--------------------------------------------------------------
@@ -670,37 +670,6 @@ void ofApp::draw(){
         }
     }
 
-    ofPushStyle();
-    ofPushMatrix();
-//    loadedMovie2.gfMovie.draw(0,0,640,360);
-//    for(int i=0; i<loadedMovie2.returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfsNumberOfFrames(); i++)
-//    {
-////        ofDrawRectangle(640 + (i*105),320,100,100);
-////        loadedMovie2.grabbedFrame[i].gsImage.draw(640 + (i*105),320,100,100);
-////        loadedMovie2.getImage(i).draw(640 + (i*105),320,100,100);
-////        loadedMovie2.grabbedFrame[i].g
-////        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "]: " + ofToString(loadedMovie2.grabbedFrame[i].gsFrameNumber) + "#");
-////        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsToBeUpdated: " + ofToString(loadedMovie2.grabbedFrame[i].gsToBeUpdated));
-////        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsToBeGrabbed: " + ofToString(loadedMovie2.grabbedFrame[i].gsToBeGrabbed));
-////        ofLog(OF_LOG_VERBOSE, "loadedMovie2.grabbedFrame[" + ofToString(i) + "].gsImage.isUsingTexture(): " + ofToString(loadedMovie2.grabbedFrame[i].gsImage.isUsingTexture()));
-//        if (loadedMovie2.grabbedFrame[i].gfToBeUpdated && !loadedMovie2.grabbedFrame[i].gfImage.isUsingTexture()) { // load textures in proper size
-//            if (!loadedMovie2.grabbedFrame[i].gfToBeGrabbed ) {
-//                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gfImage.isUsingTexture():" + ofToString(loadedMovie2.grabbedFrame[i].gfImage.isUsingTexture()));
-//                loadedMovie2.grabbedFrame[i].gfTexture.loadData(loadedMovie2.grabbedFrame[i].gfImage);
-//            //  loadedMovie2.grabbedFrame[i].gfTexture.loadScreenData(0,0,400,400);
-//                loadedMovie2.grabbedFrame[i].gfImage.update();
-//                loadedMovie2.grabbedFrame[i].gfToBeUpdated = FALSE;
-//                ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
-//            }
-//        }
-
-//        int tempX, tempY;
-//        tempX = 0 + ((i%4)*160);
-//        tempY = 365 + ((i/4)*90);
-//        loadedMovie2.grabbedFrame[i].gfTexture.draw(tempX,tempY,155,87);
-//    }
-    ofPopMatrix();
-    ofPopStyle();
 
     ofxNotify::draw(drawNotify);
 }
@@ -1330,7 +1299,7 @@ void ofApp::mousePressed(int x, int y, int button){
     if (!lockedDueToInteraction && !lockedDueToPrinting) {
     //        ofLog(OF_LOG_VERBOSE, "which button is clicked:" + ofToString(button));
 
-        if (loadedMovie.isMovieLoaded() && loadedMovie.gmMovieScrub.isLoaded()) {
+        if (loadedMovie.isMovieLoaded() && loadedMovie.gmMovie.isScrubMovieLoaded()) {
             if(button == 0){
                 if (y > ofGetHeight() - footerHeight/1.2) {
                     if (showTimeline) {

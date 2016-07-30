@@ -139,13 +139,13 @@ public:
         return isMovieLoaded();
     }
 
-    void loadNewMovieToBeScrubbed(string vfMovieName){
+//    void loadNewMovieToBeScrubbed(string vfMovieName){
 
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function SCRUB");
-            gmMovieScrub.load(vfMovieName);
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function SCRUB");
+//            ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function SCRUB");
+//            gmMovieScrub.load(vfMovieName);
+//            ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function SCRUB");
 
-    }
+//    }
 
     string ReplaceString(string subject, const string& search, const string& replace) {
         size_t pos = 0;
@@ -238,7 +238,7 @@ public:
     }
 
      void scrubMovie(int & i){
-        if (isMovieLoaded()) {
+        if (gmMovie.isScrubMovieLoaded()) {
             gmScrubID = i;
 //            ofLog(OF_LOG_VERBOSE, "rollOverMovieID" + ofToString(gmRollOverMovieID) + "gmRollOverMovieButtonID" + ofToString(gmRollOverMovieButtonID));
             if (gmRollOverMovieButtonID == 0) {
@@ -1022,8 +1022,9 @@ public:
 //    ofxAvVideoPlayer gmMovie;
 
 //    ofVideoPlayer gmMovie;
-    ofVideoPlayer gmMovieScrub;
+//    ofVideoPlayer gmMovieScrub;
 
+//    fakGrabFrames gmMovieScrub;
     fakGrabFrames gmMovie;
 
     vector<fakGrabbedFrameOverlay> grabbedStill;
