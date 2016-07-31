@@ -56,7 +56,8 @@ void ofApp::setup(){
     bottomMargin = 5;
     headerHeight = 40;
     headerHeightMinusLine = headerHeight - 13;
-    footerHeight = 40;
+    footerHeight = 60;
+    footerHeightTimeline = 20;
     displayGridMargin = 5;
     loaderBarHeight = 20;
     timeSliderHeight = 10;
@@ -215,7 +216,7 @@ void ofApp::setup(){
     ofAddListener(menuHelp.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
     ofAddListener(menuHelp.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
-    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, 'B', false);
+    menuTimeline.setupMenu(0,0,0,0,0,footerHeightTimeline, true, 'B', false);
     menuTimeline.registerMouseEvents();
 
     menuMoveToList.setupMenu(6,0,0,0,0,leftMargin*2, true, 'L', false);
@@ -780,7 +781,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     if (!showListView) {
         if (loadedMovie.isMovieLoaded()) {
             menuTimeline.setPosition(0, ofGetWindowHeight());
-            menuTimeline.setSize(ofGetWindowWidth(), footerHeight);
+            menuTimeline.setSize(ofGetWindowWidth(), footerHeight - footerHeightTimeline);
             menuTimeline.drawMenu();
         }
     }
@@ -1312,7 +1313,7 @@ void ofApp::keyReleased(int key){
 void ofApp::mouseMoved(int x, int y ){
     if (!lockedDueToInteraction && !lockedDueToPrinting) {
 
-        if (y > ofGetHeight() - footerHeight/1.2) {
+        if (y > ofGetHeight() - (footerHeight-footerHeightTimeline)/1.2) {
             if (!showTimeline) {
                 ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
                 finishedTimeline = FALSE;
@@ -1355,7 +1356,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
         if (loadedMovie.isMovieLoaded() && loadedMovie.gmMovie.isScrubMovieLoaded()) {
             if(button == 0){
-                if (y > ofGetHeight() - footerHeight/1.2) {
+                if (y > ofGetHeight() - (footerHeight-footerHeightTimeline)/1.2) {
                     if (showTimeline) {
                         ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
                         finishedTimeline = FALSE;

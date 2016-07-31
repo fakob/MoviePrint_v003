@@ -313,6 +313,7 @@ public:
     int headerHeight;
     int headerHeightMinusLine;
     int footerHeight;
+    int footerHeightTimeline;
     int displayGridMargin;
     int scrollBarWidth;
     int scrollBarMargin;
