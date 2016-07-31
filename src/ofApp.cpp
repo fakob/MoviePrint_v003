@@ -845,8 +845,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         }
 
         ImGui::PopStyleVar();
-        drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
-        fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
     }
 
     tempXPos = gridColumns-2;
@@ -861,20 +859,9 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         ImGui::Begin("HelpMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
         ImGui::End();
     }
-
     ImGui::PopStyleVar();
 
-    ofSetColor(255, 255, 255, menuHelp.getRelSizeH() * 255);
-    helpMenuImage.draw((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*1, helpMenuImage.getWidth(), helpMenuImage.getHeight() * menuHelp.getRelSizeH());
-
-
     tempXPos = gridColumns-1;
-    ofSetColor(255, 255, 255, 255);
-    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-    float tempXPosLerp = ofLerp((ofGetWindowWidth()-scrollBarWidth)/2.0, ((leftMargin + (thumbWidth + displayGridMargin)*tempXPos)/2.0) * _scaleFactor, menuMoviePrintSettings.getRelSizeH());
-    float tempYPos = headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin;
-    fboToPreview.draw(tempXPosLerp, tempYPos, tweenMoviePrintPreview.value * fboToPreviewWidth, tweenMoviePrintPreview.value * fboToPreviewHeight);
-    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
 
     menuMoviePrintSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
@@ -1092,8 +1079,25 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
     ImGui::PopStyleColor(18);
 
-
     gui.end();
+
+    if (loadedMovie.isMovieLoaded()) {
+        tempXPos = 0;
+        drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
+        fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
+    }
+
+    tempXPos = gridColumns-2;
+    ofSetColor(255, 255, 255, menuHelp.getRelSizeH() * 255);
+    helpMenuImage.draw((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*1, helpMenuImage.getWidth(), helpMenuImage.getHeight() * menuHelp.getRelSizeH());
+
+    tempXPos = gridColumns-1;
+    ofSetColor(255, 255, 255, 255);
+    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
+    float tempXPosLerp = ofLerp((ofGetWindowWidth()-scrollBarWidth)/2.0, ((leftMargin + (thumbWidth + displayGridMargin)*tempXPos)/2.0) * _scaleFactor, menuMoviePrintSettings.getRelSizeH());
+    float tempYPos = headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin;
+    fboToPreview.draw(tempXPosLerp, tempYPos, tweenMoviePrintPreview.value * fboToPreviewWidth, tweenMoviePrintPreview.value * fboToPreviewHeight);
+    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
 
     if (loadedMovie.isMovieLoaded() && !showListView) {
         // draw fake timeline
