@@ -215,14 +215,14 @@ void ofApp::setup(){
     ofAddListener(menuHelp.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
     ofAddListener(menuHelp.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
-//    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, 'B', false);
-//    menuTimeline.registerMouseEvents();
+    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, 'B', false);
+    menuTimeline.registerMouseEvents();
 
     menuMoveToList.setupMenu(6,0,0,0,0,leftMargin*2, true, 'L', false);
     menuMoveToList.registerMouseEvents();
     ofAddListener(menuMoveToList.mMenuIsBeingClicked, this, &ofApp::menuIsClicked);
 
-//    moveInOutTimeline();
+    moveInOutTimeline();
 
 
     previousMoviePrintDataSet.clear();
@@ -321,12 +321,14 @@ void ofApp::update(){
     }
     if (showTimeline) {
         if (finishedTimeline) {
-            if (tweenTimelineInOut.value > 0.5) {
+            if (timer.getElapsedSeconds() > 0.5) {
+//                ofLog(OF_LOG_VERBOSE, "showTimeline = FALSE;--------------------------------------------");
                 showTimeline = FALSE;
                 moveInOutTimeline();
             }
         }
     }
+//    ofLog(OF_LOG_VERBOSE, "showTimeline " + ofToString(showTimeline) + " finishedTimeline " + ofToString(finishedTimeline) + " tweenTimelineInOut.value " + ofToString(tweenTimelineInOut.value));
 
     if (movieIsBeingGrabbed) {
         if (loadedMovie.allGrabbed() || !loadedMovie.isMovieLoaded()) {
@@ -354,6 +356,8 @@ void ofApp::update(){
     }
 
 //    // calculate rollout of ofxUI pos, scal
+    ImGui::SetWindowPos("timelineMenu", ImVec2(menuTimeline.getPositionX(), menuTimeline.getPositionY() + menuTimeline.mMenuRollOverDimension - (menuTimeline.mMenuRollOverDimension + menuTimeline.mMenuHeight * menuTimeline.getRelSizeH())), ImGuiSetCond_Always);
+    ImGui::SetWindowSize("timelineMenu", ImVec2((menuTimeline.getSizeW() - leftMargin - rightMargin), menuTimeline.getSizeH()), ImGuiSetCond_Always);
     ImGui::SetWindowPos("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
     ImGui::SetWindowSize("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getSizeW(), menuMoviePrintSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
 
@@ -771,6 +775,15 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
 
+    ofSetColor(255, 255, 255, 255);
+
+    if (!showListView) {
+        if (loadedMovie.isMovieLoaded()) {
+            menuTimeline.setPosition(0, ofGetWindowHeight());
+            menuTimeline.setSize(ofGetWindowWidth(), footerHeight);
+            menuTimeline.drawMenu();
+        }
+    }
 
     // gui MoviePrint settings
     gui.begin();
@@ -888,10 +901,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             setInPoint(inPoint);
         }
         ImGui::SameLine();
-        if (ImGui::SliderInt("##MidPoint", &outPoint, 0,totalFrames-1)) {
-            setOutPoint(outPoint);
-        }
-        ImGui::SameLine();
         if (ImGui::SliderInt("##OutPoint", &outPoint, 0,totalFrames-1)) {
             setOutPoint(outPoint);
         }
@@ -942,6 +951,43 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     }
 
     ImGui::PopStyleVar();
+
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, menuTimeline.getRelSizeH());
+
+    if ((menuTimeline.getRelSizeH())>0) {
+
+        ImGui::Begin("timelineMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoScrollbar);
+
+        ImGui::PushItemWidth((menuTimeline.getSizeW()/3.0) - leftMargin*2 - rightMargin*2);
+        if (ImGui::SliderInt("##InPoint", &inPoint, 0,totalFrames-1, "Inpoint: %.0f")) {
+            setInPoint(inPoint);
+        }
+        ImGui::SameLine();
+        int tempRange = outPoint - inPoint;
+        int tempMidPoint = inPoint + (tempRange/2);
+        if (ImGui::DragInt("##MidPoint", &tempMidPoint, 1.0, tempRange/2 ,totalFrames-1-tempRange/2, "Midpoint: %.0f")) {
+//            setInPoint(tempMidPoint - tempRange/2);
+//            setOutPoint(tempMidPoint + tempRange/2);
+            setInOutPoint(tempMidPoint - tempRange/2, tempMidPoint + tempRange/2);
+        }
+        ImGui::SameLine();
+        if (ImGui::SliderInt("##OutPoint", &outPoint, 0,totalFrames-1, "Outpoint: %.0f")) {
+            setOutPoint(outPoint);
+        }
+        ImGui::PopItemWidth();
+
+        ImGui::End();
+
+    }
+
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(5);
+
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0);
 
     if (!(tweenListInOut.value == 0.0)) { // stop drawing when position is at showMovieView
@@ -987,16 +1033,14 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
     gui.end();
 
-
-
-    ofSetColor(255, 255, 255, 255);
-
-    if (!showListView) {
         if (loadedMovie.isMovieLoaded()) {
-            menuTimeline.setPosition(0, ofGetWindowHeight());
-            menuTimeline.setSize(ofGetWindowWidth(), footerHeight/2);
-            menuTimeline.drawMenu();
-        }
+        // draw fake timeline
+        ofPushStyle();
+        ofSetColor(170,50,0,255);
+        int tempInPos = (menuTimeline.getSizeW()/(totalFrames-1))*inPoint;
+        int tempWidth = (menuTimeline.getSizeW()/(totalFrames-1))*outPoint - tempInPos;
+        ofDrawRectangle(menuTimeline.getPositionX()+leftMargin + tempInPos, menuTimeline.getPositionY() + 3 - (menuTimeline.mMenuRollOverDimension + menuTimeline.mMenuHeight * menuTimeline.getRelSizeH()), tempWidth - leftMargin - rightMargin, menuTimeline.mMenuRollOverDimension-6);
+        ofPopStyle();
     }
 
     ofPopStyle();
@@ -1316,7 +1360,7 @@ void ofApp::mousePressed(int x, int y, int button){
                         ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
                         finishedTimeline = FALSE;
                         showTimeline = TRUE;
-                        //                    moveInOutTimeline();
+                        moveInOutTimeline();
                     }
                 }
 
@@ -1501,8 +1545,8 @@ void ofApp::moveToMovie(){
 //    scrollBar.registerTouchEvents();
 
 //    guiTimeline->setVisible(TRUE);
-//    menuTimeline.registerMouseEvents();
-//    menuTimeline.setMenuActive();
+    menuTimeline.registerMouseEvents();
+    menuTimeline.setMenuActive();
 
     printListNotImage = FALSE;
     updateInOut = FALSE;
@@ -1912,8 +1956,8 @@ void ofApp::moveToList(){
     loadedMovie.disableMouseEvents();
 
 //    guiTimeline->setVisible(FALSE);
-//    menuTimeline.unRegisterMouseEvents();
-//    menuTimeline.setMenuInactive();
+    menuTimeline.unRegisterMouseEvents();
+    menuTimeline.setMenuInactive();
 
     printListNotImage = TRUE;
 
@@ -2746,31 +2790,8 @@ void ofApp::updateAllLimits(){
 
 //--------------------------------------------------------------
 void ofApp::setInOutPoint(int _inPoint, int _outPoint){
-    int i = _inPoint;
-    int j = outPoint;
-    if ((outPoint-i < numberOfStills)) {
-        j = i + (numberOfStills - 1);
-        if (j > (totalFrames-1)) {
-            j = (totalFrames-1);
-            i = j - (numberOfStills - 1);
-        }
-    }
-    inPoint = i;
-    outPoint = j;
-    int i2 = inPoint;
-    int j2 = _outPoint;
-    if ((j2 - inPoint < numberOfStills)) {
-        i2 = j2 - (numberOfStills - 1);
-        if (i2 < 0) {
-            i2 = 0;
-            j2 = (numberOfStills - 1);
-
-        }
-    }
-    inPoint = i;
-    outPoint = j;
-    updateGridTimeArrayWithAutomaticInterval();
-    updateAllStills();
+    setInPoint(_inPoint);
+    setOutPoint(_outPoint);
     ofLog(OF_LOG_VERBOSE, "manipulated In- and OutPoint" );
 }
 
