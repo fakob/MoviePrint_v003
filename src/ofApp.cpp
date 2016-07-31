@@ -1084,7 +1084,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     if (loadedMovie.isMovieLoaded()) {
         tempXPos = 0;
         drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
-        fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
+        fontStashHelveticaMedium.draw(loadedMovie.gmMovie.gfsMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
     }
 
     tempXPos = gridColumns-2;
@@ -1721,51 +1721,51 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
     }
 
 
-//    stringMovieInfo.clear();
-//    stringMovieInfo.push_back("Format: ");
-//    stringMovieInfo.push_back("Format/String: ");
-//    stringMovieInfo.push_back("FileSize: ");
-//    stringMovieInfo.push_back("Duration: ");
-//    stringMovieInfo.push_back("FrameCount: ");
-//    stringMovieInfo.push_back("Size: ");
-//    stringMovieInfo.push_back("DisplayAspectRatio: ");
-//    stringMovieInfo.push_back("FrameRate: ");
-//    stringMovieInfo.push_back("Codec: ");
-//    stringMovieInfo.push_back("Codec/Info: ");
-//    stringMovieInfo.push_back("BitRate: ");
-//    stringMovieInfo.push_back("PixelAspectRatio: ");
-//    stringMovieInfo.push_back("DisplayAspectRatio: ");
-//    stringMovieInfo.push_back("FrameRate_Mode: ");
-//    stringMovieInfo.push_back("ColorSpace: ");
-//    stringMovieInfo.push_back("ChromaSubsampling: ");
-//    stringMovieInfo.push_back("BitDepth: ");
-//    stringMovieInfo.push_back("Interlacement: ");
-//    stringMovieInfo.push_back("AudioCodec: ");
-//    stringMovieInfo.push_back("Channels: ");
-//    stringMovieInfo.push_back("SamplingRate: ");
+    stringMovieInfo.clear();
+    stringMovieInfo.push_back("Format: ");
+    stringMovieInfo.push_back("Format/String: ");
+    stringMovieInfo.push_back("FileSize: ");
+    stringMovieInfo.push_back("Duration: ");
+    stringMovieInfo.push_back("FrameCount: ");
+    stringMovieInfo.push_back("Size: ");
+    stringMovieInfo.push_back("DisplayAspectRatio: ");
+    stringMovieInfo.push_back("FrameRate: ");
+    stringMovieInfo.push_back("Codec: ");
+    stringMovieInfo.push_back("Codec/Info: ");
+    stringMovieInfo.push_back("BitRate: ");
+    stringMovieInfo.push_back("PixelAspectRatio: ");
+    stringMovieInfo.push_back("DisplayAspectRatio: ");
+    stringMovieInfo.push_back("FrameRate_Mode: ");
+    stringMovieInfo.push_back("ColorSpace: ");
+    stringMovieInfo.push_back("ChromaSubsampling: ");
+    stringMovieInfo.push_back("BitDepth: ");
+    stringMovieInfo.push_back("Interlacement: ");
+    stringMovieInfo.push_back("AudioCodec: ");
+    stringMovieInfo.push_back("Channels: ");
+    stringMovieInfo.push_back("SamplingRate: ");
 
-//    stringMovieData.clear();
-//    stringMovieData.push_back(loadedMovie.gmMIFormat);
-//    stringMovieData.push_back(loadedMovie.gmMIFormatString);
-//    stringMovieData.push_back(loadedMovie.gmMIFileSizeString);
-//    stringMovieData.push_back(loadedMovie.gmMIDurationString1);
-//    stringMovieData.push_back(loadedMovie.gmMIFrameCount);
-//    stringMovieData.push_back(loadedMovie.gmMIWidth);
-//    stringMovieData.push_back(loadedMovie.gmMIDisplayAspectRatioString);
-//    stringMovieData.push_back(loadedMovie.gmMIFrameRateString);
-//    stringMovieData.push_back(loadedMovie.gmMIVFormat);
-//    stringMovieData.push_back(loadedMovie.gmMIFormatInfo);
-//    stringMovieData.push_back(loadedMovie.gmMIBitRate);
-//    stringMovieData.push_back(loadedMovie.gmMIPixelAspectRatio);
-//    stringMovieData.push_back(loadedMovie.gmMIDisplayAspectRatio);
-//    stringMovieData.push_back(loadedMovie.gmMIFrameRate_ModeString);
-//    stringMovieData.push_back(loadedMovie.gmMIColorSpace);
-//    stringMovieData.push_back(loadedMovie.gmMIChromaSubsampling);
-//    stringMovieData.push_back(loadedMovie.gmMIBitDepthString);
-//    stringMovieData.push_back(loadedMovie.gmMIInterlacementString);
-//    stringMovieData.push_back(loadedMovie.gmMIAFormat);
-//    stringMovieData.push_back(loadedMovie.gmMIAChannelsString);
-//    stringMovieData.push_back(loadedMovie.gmMIASamplingRate);
+    stringMovieData.clear();
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFormat);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFormatString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFileSizeString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDurationString1);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFrameCount);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIWidth);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDisplayAspectRatioString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFrameRateString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIVFormat);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFormatInfo);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIBitRate);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIPixelAspectRatio);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDisplayAspectRatio);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFrameRate_ModeString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIColorSpace);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIChromaSubsampling);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIBitDepthString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIInterlacementString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIAFormat);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIAChannelsString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIASamplingRate);
 
 }
 

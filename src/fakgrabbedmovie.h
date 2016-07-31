@@ -158,10 +158,6 @@ public:
 
     void getMovieInformation(string _vfMovieName){
 
-        gmMIFilePathOhne = getMoviePathName();
-        gmMIFilePath = "FilePath: " + gmMIFilePath;
-
-
 //        //Information about MediaInfo
 //        MediaInfo MI;
 //        MI.Open(__T(_vfMovieName));
@@ -220,12 +216,12 @@ public:
         return strToConvert;
     }
 
-    string getMoviePathName(){
-        gmMIFilePath = ofToString(gmMovie.getMoviePath());
-        vector<string> tempVectorString = ofSplitString(gmMIFilePath, "/");
-        tempVectorString.pop_back();
-        return ofJoinString(tempVectorString, "/") + "/";
-    }
+//    string getMoviePathName(){
+//        gmMIFilePath = ofToString(gmMovie.getMoviePath());
+//        vector<string> tempVectorString = ofSplitString(gmMIFilePath, "/");
+//        tempVectorString.pop_back();
+//        return ofJoinString(tempVectorString, "/") + "/";
+//    }
 
     int CountNewlines(string s){
         int len = s.length();
@@ -1088,9 +1084,9 @@ public:
     bool gmSetTitleInfo;
     string gmInfCollected;
     string gmInfCol1, gmInfCol2, gmInfCol3;
-    string gmMIFileName, gmMIFileExtension, gmMIFormat, gmMIFormatString, gmMIFileSizeString, gmMIDurationString1, gmMIFrameCount, gmMIWidth, gmMIHeight, gmMIDisplayAspectRatioString, gmMIFrameRateString;
-    string gmMIVFormat, gmMIFormatInfo, gmMIBitRate, gmMIPixelAspectRatio, gmMIDisplayAspectRatio, gmMIFrameRate_ModeString, gmMIColorSpace, gmMIChromaSubsampling, gmMIBitDepthString, gmMIInterlacementString;
-    string gmMIAFormat, gmMIAChannelsString, gmMIASamplingRate, gmMIFilePath;
+//    string gmMIFileName, gmMIFileExtension, gmMIFormat, gmMIFormatString, gmMIFileSizeString, gmMIDurationString1, gmMIFrameCount, gmMIWidth, gmMIHeight, gmMIDisplayAspectRatioString, gmMIFrameRateString;
+//    string gmMIVFormat, gmMIFormatInfo, gmMIBitRate, gmMIPixelAspectRatio, gmMIDisplayAspectRatio, gmMIFrameRate_ModeString, gmMIColorSpace, gmMIChromaSubsampling, gmMIBitDepthString, gmMIInterlacementString;
+//    string gmMIAFormat, gmMIAChannelsString, gmMIASamplingRate, gmMIFilePath;
 
     string gmMIFileNameClean, gmMIFilePathOhne;
 

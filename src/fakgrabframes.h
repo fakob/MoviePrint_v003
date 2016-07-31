@@ -87,6 +87,34 @@ public:
             //                double posMsec = movieFile.get(CV_CAP_PROP_POS_MSEC);
             gfsImageRatio = gfsFrameWidth/(float)gfsFrameHeight;
             gfsPixelRatio = 1.0;
+
+//            gfsMIFilePathOhne = getMoviePathName();
+            gfsMIFilePath = "FilePath: " + fileToRead.path();;
+
+            gfsMIFileName = fileToRead.getBaseName();
+            gfsMIFileExtension = fileToRead.getExtension();
+            gfsMIFormat = ofToString(movieFile.get(CV_CAP_PROP_FOURCC));
+            gfsMIFormatString = "";
+            gfsMIFileSizeString = ofToString(fileToRead.getSize());
+            gfsMIDurationString1 = ofToString((float)gfsTotalFrames/(float)gfsFrameRate) + " sec";
+            gfsMIFrameCount = ofToString(gfsTotalFrames);
+            gfsMIWidth = ofToString(gfsFrameWidth) + " x " + ofToString(gfsFrameHeight);
+            gfsMIDisplayAspectRatioString = ofToString((float)gfsFrameWidth/(float)gfsFrameHeight);
+            gfsMIFrameRateString = ofToString(gfsFrameRate) + " fps";
+            gfsMIVFormat = "";
+            gfsMIFormatInfo = "";
+            gfsMIBitRate = "";
+            gfsMIPixelAspectRatio = "";
+            gfsMIDisplayAspectRatio = "";
+            gfsMIFrameRate_ModeString = "";
+            gfsMIColorSpace = "";
+            gfsMIChromaSubsampling = "";
+            gfsMIBitDepthString = "";
+            gfsMIInterlacementString = "";
+            gfsMIAFormat = "";
+            gfsMIAChannelsString = "";
+            gfsMIASamplingRate = "";
+
         }
         while (!isMovieLoaded()) {
             ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load - " + ofToString(gfsMoviePath));
@@ -450,6 +478,11 @@ public:
     cv::Mat matOrigScrub;
 
     ofImage scrubImg;
+
+    string gfsMIFileName, gfsMIFileExtension, gfsMIFormat, gfsMIFormatString, gfsMIFileSizeString, gfsMIDurationString1, gfsMIFrameCount, gfsMIWidth, gfsMIHeight, gfsMIDisplayAspectRatioString, gfsMIFrameRateString;
+    string gfsMIVFormat, gfsMIFormatInfo, gfsMIBitRate, gfsMIPixelAspectRatio, gfsMIDisplayAspectRatio, gfsMIFrameRate_ModeString, gfsMIColorSpace, gfsMIChromaSubsampling, gfsMIBitDepthString, gfsMIInterlacementString;
+    string gfsMIAFormat, gfsMIAChannelsString, gfsMIASamplingRate, gfsMIFilePath;
+
 
 };
 
