@@ -365,6 +365,12 @@ void ofApp::update(){
     ImGui::SetWindowPos("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
     ImGui::SetWindowSize("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getSizeW(), menuMoviePrintSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
 
+    ImGui::SetWindowPos("HelpMenu", ImVec2(menuHelp.getPositionX(), menuHelp.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
+    ImGui::SetWindowSize("HelpMenu", ImVec2(menuHelp.getSizeW(), menuHelp.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
+
+    ImGui::SetWindowPos("MovieInfoMenu", ImVec2(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
+    ImGui::SetWindowSize("MovieInfoMenu", ImVec2(menuMovieInfo.getSizeW(), menuMovieInfo.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
+
     ImGui::SetWindowPos("moviePrintMenu", ImVec2(menuSettings.getPositionX(), menuSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
     ImGui::SetWindowSize("moviePrintMenu", ImVec2(menuSettings.getSizeW(), menuSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
 
@@ -698,6 +704,33 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ofPushStyle();
     ofSetColor(255);
 
+    // gui MoviePrint settings
+    gui.begin();
+
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.00f, 0.00f, 0.00f, 0.10f));
+
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Header, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Column, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ColumnActive, ImColor(255, 0, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ColumnHovered, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImColor(238, 71, 0, 255));
+    style.GrabMinSize = 20;
+    style.GrabRounding = 4;
+    style.FrameRounding = 6;
+
     // overlay von MoviePrintPreview
     ofPushStyle();
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
@@ -715,6 +748,48 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             }
         }
     }
+
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0);
+
+    if (!(tweenListInOut.value == 0.0)) { // stop drawing when position is at showMovieView
+
+        ImGui::Begin("droppedList", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+        //        glFontStash.drawMultiLine("ID", tempSize, _x + tempFontMargin, _y + _scrollAmount + tempSize);
+        //        glFontStash.drawMultiLine("Name", tempSize, _x + glDroppedItem[0].gliIDWidth + tempFontMargin, _y + _scrollAmount + tempSize);
+        //        glFontStash.drawMultiLine("Tried", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth - 5, _y + _scrollAmount + tempSize);
+        //        glFontStash.drawMultiLine("Printed", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth + tempFontMargin - glFontStash.getBBox("Printed", tempSize,0,0).getMaxY(), _y + _scrollAmount + tempSize);
+        ImGui::Columns(4, "mycolumns");
+        ImGui::Separator();
+        ImGui::Text("ID"); ImGui::NextColumn();
+        ImGui::Text("Name"); ImGui::NextColumn();
+        ImGui::Text("Tried"); ImGui::NextColumn();
+        ImGui::Text("Printed"); ImGui::NextColumn();
+
+        for(int k = 0; k < droppedItem.size(); k++){
+            static int selectedItem = -1;
+            if (ImGui::Selectable(ofToString(droppedItem[k].itemProperties.ipID).c_str(), selectedItem == k, ImGuiSelectableFlags_SpanAllColumns))
+                selectedItem = k;
+            if (ImGui::IsItemActive()) {
+                ofLog(OF_LOG_VERBOSE, "droppedItem[k].itemProperties.ipID:" + ofToString(droppedItem[k].itemProperties.ipID));
+                activeItemID = droppedItem[k].itemProperties.ipID;
+                updateMovieFromList = TRUE;
+            }
+            //        ImGui::Text(ofToString(droppedItem[k].itemProperties.ipID).c_str());
+            ImGui::NextColumn();
+            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipName).c_str());
+            ImGui::NextColumn();
+            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipTriedToPrint).c_str());
+            ImGui::NextColumn();
+            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipPrinted).c_str());
+            ImGui::NextColumn();
+        }
+        ImGui::End();
+    }
+
+    ImGui::PopStyleVar();
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImColor(255, 80, 6, 255));
 
     layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
 
@@ -761,6 +836,15 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         menuMovieInfo.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
         menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
         menuMovieInfo.drawMenu();
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuMovieInfo.getSizeH()-headerHeight)/30));
+
+        if ((menuMovieInfo.getSizeH()-headerHeight)>0) {
+
+            ImGui::Begin("MovieInfoMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
+            ImGui::End();
+        }
+
+        ImGui::PopStyleVar();
         drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
         fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
     }
@@ -769,6 +853,17 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuHelp.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuHelp.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuHelp.drawMenu();
+
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuHelp.getSizeH()-headerHeight)/30));
+
+    if ((menuHelp.getSizeH()-headerHeight)>0) {
+
+        ImGui::Begin("HelpMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
+        ImGui::End();
+    }
+
+    ImGui::PopStyleVar();
+
     ofSetColor(255, 255, 255, menuHelp.getRelSizeH() * 255);
     helpMenuImage.draw((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*1, helpMenuImage.getWidth(), helpMenuImage.getHeight() * menuHelp.getRelSizeH());
 
@@ -794,33 +889,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             menuTimeline.drawMenu();
         }
     }
-
-    // gui MoviePrint settings
-    gui.begin();
-
-    ImGuiStyle& style = ImGui::GetStyle();
-
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.00f, 0.00f, 0.00f, 0.10f));
-
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(75, 21, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(238, 71, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(170, 50, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_Button, ImColor(75, 21, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(238, 71, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(170, 50, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_Header, ImColor(75, 21, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImColor(170, 50, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImColor(238, 71, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_Column, ImColor(75, 21, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_ColumnActive, ImColor(255, 0, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_ColumnHovered, ImColor(238, 71, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(238, 71, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(170, 50, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImColor(238, 71, 0, 255));
-    style.GrabMinSize = 20;
-    style.GrabRounding = 4;
-    style.FrameRounding = 6;
 
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuMoviePrintSettings.getSizeH()-headerHeight)/30));
 
@@ -926,7 +994,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             moviePrintDataSet.printSizeWidth = 4096;
         }
 
-        ImGui::PopItemWidth();
+//        ImGui::PopItemWidth();
 
         ImGui::End();
 
@@ -1022,51 +1090,12 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
     ImGui::PopStyleVar();
 
-    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0);
-
-    if (!(tweenListInOut.value == 0.0)) { // stop drawing when position is at showMovieView
-
-        ImGui::Begin("droppedList", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
-
-        //        glFontStash.drawMultiLine("ID", tempSize, _x + tempFontMargin, _y + _scrollAmount + tempSize);
-        //        glFontStash.drawMultiLine("Name", tempSize, _x + glDroppedItem[0].gliIDWidth + tempFontMargin, _y + _scrollAmount + tempSize);
-        //        glFontStash.drawMultiLine("Tried", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth - 5, _y + _scrollAmount + tempSize);
-        //        glFontStash.drawMultiLine("Printed", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth + tempFontMargin - glFontStash.getBBox("Printed", tempSize,0,0).getMaxY(), _y + _scrollAmount + tempSize);
-        ImGui::Columns(4, "mycolumns");
-        ImGui::Separator();
-        ImGui::Text("ID"); ImGui::NextColumn();
-        ImGui::Text("Name"); ImGui::NextColumn();
-        ImGui::Text("Tried"); ImGui::NextColumn();
-        ImGui::Text("Printed"); ImGui::NextColumn();
-
-        for(int k = 0; k < droppedItem.size(); k++){
-            static int selectedItem = -1;
-            if (ImGui::Selectable(ofToString(droppedItem[k].itemProperties.ipID).c_str(), selectedItem == k, ImGuiSelectableFlags_SpanAllColumns))
-                selectedItem = k;
-            if (ImGui::IsItemActive()) {
-                ofLog(OF_LOG_VERBOSE, "droppedItem[k].itemProperties.ipID:" + ofToString(droppedItem[k].itemProperties.ipID));
-                activeItemID = droppedItem[k].itemProperties.ipID;
-                updateMovieFromList = TRUE;
-            }
-            //        ImGui::Text(ofToString(droppedItem[k].itemProperties.ipID).c_str());
-            ImGui::NextColumn();
-            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipName).c_str());
-            ImGui::NextColumn();
-            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipTriedToPrint).c_str());
-            ImGui::NextColumn();
-            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipPrinted).c_str());
-            ImGui::NextColumn();
-        }
-        ImGui::End();
-    }
-
-    ImGui::PopStyleColor(17);
-    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(18);
 
 
     gui.end();
 
-        if (loadedMovie.isMovieLoaded()) {
+    if (loadedMovie.isMovieLoaded() && !showListView) {
         // draw fake timeline
         ofPushStyle();
         ofSetColor(170,50,0,255);
