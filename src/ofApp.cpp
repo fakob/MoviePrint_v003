@@ -797,12 +797,32 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
     // gui MoviePrint settings
     gui.begin();
-//    bool* opened;
-//    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiSetCond_Always);
 
-    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuMoviePrintSettings.getSizeH()-headerHeight)/30));
+    ImGuiStyle& style = ImGui::GetStyle();
+
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.00f, 0.00f, 0.00f, 0.10f));
+
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Header, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Column, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ColumnActive, ImColor(255, 0, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ColumnHovered, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImColor(238, 71, 0, 255));
+    style.GrabMinSize = 20;
+    style.GrabRounding = 4;
+    style.FrameRounding = 6;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuMoviePrintSettings.getSizeH()-headerHeight)/30));
 
     if ((menuMoviePrintSettings.getSizeH()-headerHeight)>0) {
 
@@ -906,14 +926,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             moviePrintDataSet.printSizeWidth = 4096;
         }
 
-        ImGui::PushItemWidth(30);
-        if (ImGui::SliderInt("##InPoint", &inPoint, 0,totalFrames-1)) {
-            setInPoint(inPoint);
-        }
-        ImGui::SameLine();
-        if (ImGui::SliderInt("##OutPoint", &outPoint, 0,totalFrames-1)) {
-            setOutPoint(outPoint);
-        }
         ImGui::PopItemWidth();
 
         ImGui::End();
@@ -962,11 +974,11 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
     ImGui::PopStyleVar();
 
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(75, 21, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(238, 71, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(170, 50, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(238, 71, 0, 255));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(170, 50, 0, 255));
+//    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(75, 21, 0, 255));
+//    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(238, 71, 0, 255));
+//    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(170, 50, 0, 255));
+//    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(238, 71, 0, 255));
+//    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(170, 50, 0, 255));
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, menuTimeline.getRelSizeH());
 
     if ((menuTimeline.getRelSizeH())>0) {
@@ -1009,7 +1021,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     }
 
     ImGui::PopStyleVar();
-    ImGui::PopStyleColor(5);
 
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0);
 
@@ -1049,8 +1060,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         ImGui::End();
     }
 
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
+    ImGui::PopStyleColor(17);
     ImGui::PopStyleVar();
 
 
@@ -1062,7 +1072,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         ofSetColor(170,50,0,255);
         int tempInPos = (menuTimeline.getSizeW()/(totalFrames-1))*inPoint;
         int tempWidth = (menuTimeline.getSizeW()/(totalFrames-1))*outPoint - tempInPos;
-        ofDrawRectangle(menuTimeline.getPositionX()+leftMargin + tempInPos, menuTimeline.getPositionY() + 3 - (menuTimeline.mMenuRollOverDimension + menuTimeline.mMenuHeight * menuTimeline.getRelSizeH()), tempWidth - leftMargin - rightMargin, menuTimeline.mMenuRollOverDimension-6);
+        ofDrawRectRounded(menuTimeline.getPositionX()+leftMargin + tempInPos, menuTimeline.getPositionY() + 3 - (menuTimeline.mMenuRollOverDimension + menuTimeline.mMenuHeight * menuTimeline.getRelSizeH()), tempWidth - leftMargin - rightMargin, menuTimeline.mMenuRollOverDimension-6, 3);
         ofPopStyle();
     }
 
