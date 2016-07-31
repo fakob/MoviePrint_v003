@@ -309,6 +309,7 @@ public:
 
         movieFileScrub.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
         movieFileScrub.read(matOrigScrub);
+        cv::cvtColor(matOrigScrub, matOrigScrub, cv::COLOR_BGR2RGB);
         ofxCv::copy(matOrigScrub, scrubImg);
         scrubImg.update();
     }
@@ -330,6 +331,7 @@ public:
             movieFile.read(matOrig);
 
             if (grabbedFrame[i].gfImage.isAllocated() && !gfsCurrAllocating) {
+                cv::cvtColor(matOrig, matOrig, cv::COLOR_BGR2RGB);
                 ofxCv::copy(matOrig, grabbedFrame[i].gfImage);
                 grabbedFrame[i].gfImage.update();
                 grabbedFrame[i].gfToBeGrabbed = FALSE;
