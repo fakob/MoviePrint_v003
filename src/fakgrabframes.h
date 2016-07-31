@@ -302,6 +302,17 @@ public:
         }
     }
 
+    void setScrub(int _frame){
+        ofLog(OF_LOG_VERBOSE, "setScrub: " + ofToString(_frame));
+        _frame = min((gfsTotalFrames-1), max(_frame, 0));
+
+        movieFileScrub.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
+        movieFileScrub.read(matOrigScrub);
+        cv::cvtColor(matOrigScrub, matOrigScrub, cv::COLOR_BGR2RGB);
+        ofxCv::copy(matOrigScrub, scrubImg);
+        scrubImg.update();
+    }
+
     void setFrameScrub(int _i, int _frame){
         ofLog(OF_LOG_VERBOSE, "setFrameScrub: " + ofToString(_i) + " frame: " + ofToString(_frame));
         _frame = min((gfsTotalFrames-1), max(_frame, 0));

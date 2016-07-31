@@ -187,6 +187,9 @@ public:
     bool lockedDueToPrinting;
     bool updateNewPrintGrid;
     bool updateMovieFromList;
+    bool updateInPoint;
+    bool updateOutPoint;
+    bool updateInOutPoint;
 
     bool updateGridTimeArrayToMoviePrintDataSet;
 

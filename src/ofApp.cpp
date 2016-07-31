@@ -95,6 +95,9 @@ void ofApp::setup(){
     finishedUpdating = TRUE;
     showTimeline = FALSE;
     finishedTimeline = TRUE;
+    updateInPoint = FALSE;
+    updateOutPoint = FALSE;
+    updateInOutPoint = FALSE;
 
     updateMovieFromDrop = FALSE;
 
@@ -630,25 +633,31 @@ void ofApp::draw(){
                 ofSetColor(255,255,255,(int)tweenFading.value);
 
                 loadedMovie.gmMovie.scrubImg.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-//                loadedMovie.gmMovie.scrubImg.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * 1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
                 loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (tweenFading.value/255));
 
                 ofSetColor(255, 255, 255, (int)(tweenFading.value/255)*255);
 
-//                if (uiRangeSliderTimeline->hitLow) {
-//                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
-//                }
-//                if (uiRangeSliderTimeline->hitHigh) {
-//                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
-//                }
-//                if (uiRangeSliderTimeline->hitCenter) {
-//                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
-//                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
-//                }
+                if (updateInPoint) {
+                    ofLog(OF_LOG_VERBOSE, "updateInPoint:" + ofToString(updateInPoint));
+                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
+                }
+                if (updateOutPoint) {
+                    ofLog(OF_LOG_VERBOSE, "updateOutPoint:" + ofToString(updateOutPoint));
+                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
+                }
+                if (updateInOutPoint) {
+                    ofLog(OF_LOG_VERBOSE, "updateInOutPoint:" + ofToString(updateInOutPoint));
+                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
+                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
+                }
 
-                if(tweenFading.value < 5){
+//                ofLog(OF_LOG_VERBOSE, "tweenFading.value:" + ofToString(tweenFading.value));
+                if(tweenFading.value < 0.05){
                     updateInOut = FALSE;
                     manipulateSlider = FALSE;
+                    updateInPoint = FALSE;
+                    updateOutPoint = FALSE;
+                    updateInOutPoint = FALSE;
                 }
 
                 ofSetColor(255);
@@ -679,8 +688,6 @@ void ofApp::draw(){
             drawUpdateScreen();
         }
     }
-
-//    loadedMovie.gmMovieScrub.draw(0,0,3600,1800);
 
     ofxNotify::draw(drawNotify);
 }
@@ -968,19 +975,32 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
         ImGui::PushItemWidth((menuTimeline.getSizeW()/3.0) - leftMargin*2 - rightMargin*2);
         if (ImGui::SliderInt("##InPoint", &inPoint, 0,totalFrames-1, "Inpoint: %.0f")) {
+            updateScrub = FALSE;
+            updateInOut = TRUE;
+            updateInPoint = TRUE;
+            scrubWindowGridNumber = 0;
             setInPoint(inPoint);
+            loadedMovie.gmMovie.setScrub(inPoint);
         }
         ImGui::SameLine();
         int tempRange = outPoint - inPoint;
         int tempMidPoint = inPoint + (tempRange/2);
         if (ImGui::DragInt("##MidPoint", &tempMidPoint, 1.0, tempRange/2 ,totalFrames-1-tempRange/2, "Midpoint: %.0f")) {
-//            setInPoint(tempMidPoint - tempRange/2);
-//            setOutPoint(tempMidPoint + tempRange/2);
+            updateScrub = FALSE;
+            updateInOut = TRUE;
+            updateInOutPoint = TRUE;
+            scrubWindowGridNumber = numberOfStills/2;
             setInOutPoint(tempMidPoint - tempRange/2, tempMidPoint + tempRange/2);
+            loadedMovie.gmMovie.setScrub(tempMidPoint);
         }
         ImGui::SameLine();
         if (ImGui::SliderInt("##OutPoint", &outPoint, 0,totalFrames-1, "Outpoint: %.0f")) {
+            updateScrub = FALSE;
+            updateInOut = TRUE;
+            updateOutPoint = TRUE;
+            scrubWindowGridNumber = numberOfStills-1;
             setOutPoint(outPoint);
+            loadedMovie.gmMovie.setScrub(outPoint);
         }
         ImGui::PopItemWidth();
 
