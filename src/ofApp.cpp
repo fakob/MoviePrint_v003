@@ -399,7 +399,7 @@ void ofApp::update(){
                 scrubMouseDelta = scrubMouseDelta + thumbWidth/6.0;
             }
 
-            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta before:" + ofToString(scrubMouseDelta));
+//            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta before:" + ofToString(scrubMouseDelta));
 
             float expScrubMouseDelta;
 
@@ -423,8 +423,8 @@ void ofApp::update(){
             }
 
 
-            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta after:" + ofToString(expScrubMouseDelta));
-            ofLog(OF_LOG_VERBOSE, "scrubDelta:" + ofToString(scrubDelta));
+//            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta after:" + ofToString(expScrubMouseDelta));
+//            ofLog(OF_LOG_VERBOSE, "scrubDelta:" + ofToString(scrubDelta));
             // new Frame Number is being cropped by the movies first and last frame
             int newFrameNumber = scrubDelta + scrubInitialFrame;
             if (newFrameNumber > loadedMovie.gmTotalFrames-1) {
@@ -443,7 +443,9 @@ void ofApp::update(){
 //                loadedMovie.gmMovieScrub.nextFrame();
 //                loadedMovie.gmMovieScrub.nextFrame();
 //            } else {
+            if (loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber != newFrameNumber) {
                 loadedMovie.gmMovie.setFrameScrub(i, newFrameNumber);
+            }
 //            }
             loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber = newFrameNumber;
         }
