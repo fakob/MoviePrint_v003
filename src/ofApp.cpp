@@ -281,6 +281,7 @@ void ofApp::update(){
     tweenTimeDelay.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimeDelay.initialTime, (tweenTimeDelay.initialTime + tweenTimeDelay.duration), tweenTimeDelay.minValue, tweenTimeDelay.maxValue, &ofxeasing::exp::easeInOut);
     tweenMoviePrintPreview.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenMoviePrintPreview.initialTime, (tweenMoviePrintPreview.initialTime + tweenMoviePrintPreview.duration), tweenMoviePrintPreview.minValue, tweenMoviePrintPreview.maxValue, &ofxeasing::exp::easeInOut);
     tweenFading.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenFading.initialTime, (tweenFading.initialTime + tweenFading.duration), tweenFading.minValue, tweenFading.maxValue, &ofxeasing::exp::easeInOut);
+//    ofLog(OF_LOG_VERBOSE, "tweenFading.value:" + ofToString(tweenFading.value));
 
     threadIsRunning = loadedMovie.gmMovie.isThreadRunning();
 
@@ -459,41 +460,27 @@ void ofApp::update(){
             loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber = newFrameNumber;
         }
 
-//        // update while Slider sends event
-//        if (manipulateSlider) {
-//            updateScrub = FALSE;
-//            updateInOut = TRUE;
-//            if (uiRangeSliderTimeline->hitLow) {
-//                scrubWindowGridNumber = 0;
-//                if (loadedMovie.gmHasNoFrames) {
-//                    loadedMovie.gmMovieScrub.setPosition((float)(uiSliderValueLow - 1)/(float)(loadedMovie.gmTotalFrames-1));
-//                    loadedMovie.gmMovieScrub.nextFrame();
-//                } else {
-//                    loadedMovie.gmMovieScrub.setFrame(uiSliderValueLow);
-//                }
-//                loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = uiSliderValueLow;
-//            } else if (uiRangeSliderTimeline->hitHigh)
-//            {
-//                scrubWindowGridNumber = numberOfStills-1;
-//                if (loadedMovie.gmHasNoFrames) {
-//                    loadedMovie.gmMovieScrub.setPosition((float)(uiSliderValueHigh - 1)/(float)(loadedMovie.gmTotalFrames-1));
-//                    loadedMovie.gmMovieScrub.nextFrame();
-//                } else {
-//                    loadedMovie.gmMovieScrub.setFrame(uiSliderValueHigh);
-//                }
-//                loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = uiSliderValueHigh;
-//            } else if (uiRangeSliderTimeline->hitCenter)
-//            {
-//                scrubWindowGridNumber = numberOfStills/2;
-//                if (loadedMovie.gmHasNoFrames) {
-//                    loadedMovie.gmMovieScrub.setPosition((float)(((uiSliderValueHigh - uiSliderValueLow)/2 + uiSliderValueLow) - 1)/(float)(loadedMovie.gmTotalFrames-1));
-//                    loadedMovie.gmMovieScrub.nextFrame();
-//                } else {
-//                    loadedMovie.gmMovieScrub.setFrame((uiSliderValueHigh - uiSliderValueLow)/2 + uiSliderValueLow);
-//                }
-//                loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = (uiSliderValueHigh - uiSliderValueLow)/2 + uiSliderValueLow;
-//            }
-//        }
+        // update while Slider sends event
+        if (manipulateSlider) {
+            updateScrub = FALSE;
+            updateInOut = TRUE;
+            if (updateInPoint) {
+                scrubWindowGridNumber = 0;
+                loadedMovie.gmMovie.setScrub(inPoint);
+                loadedMovie.gmMovie.grabbedFrame[scrubWindowGridNumber].gfFrameNumber = inPoint;
+            } else if (updateOutPoint)
+            {
+                scrubWindowGridNumber = numberOfStills-1;
+                loadedMovie.gmMovie.setScrub(outPoint);
+                loadedMovie.gmMovie.grabbedFrame[scrubWindowGridNumber].gfFrameNumber = outPoint;
+            } else if (updateInOutPoint)
+            {
+                scrubWindowGridNumber = numberOfStills/2;
+                loadedMovie.gmMovie.setScrub((outPoint - inPoint)/2 + inPoint);
+                loadedMovie.gmMovie.grabbedFrame[scrubWindowGridNumber].gfFrameNumber = (outPoint - inPoint)/2 + inPoint;
+            }
+        }
+
     }
 
     if (updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed()) {
@@ -1042,34 +1029,57 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
         ImGui::PushItemWidth((menuTimeline.getSizeW()/3.0) - leftMargin*2 - rightMargin*2);
         if (ImGui::SliderInt("##InPoint", &inPoint, 0,totalFrames-1, "Inpoint: %.0f")) {
-            updateScrub = FALSE;
-            updateInOut = TRUE;
+//            updateScrub = FALSE;
+//            updateInOut = TRUE;
             updateInPoint = TRUE;
-            scrubWindowGridNumber = 0;
-            setInPoint(inPoint);
-            loadedMovie.gmMovie.setScrub(inPoint);
+            manipulateSlider = TRUE;
+//            scrubWindowGridNumber = 0;
+            limitInPoint(inPoint);
+//            loadedMovie.gmMovie.setScrub(inPoint);
         }
         ImGui::SameLine();
         int tempRange = outPoint - inPoint;
         int tempMidPoint = inPoint + (tempRange/2);
         if (ImGui::DragInt("##MidPoint", &tempMidPoint, 1.0, tempRange/2 ,totalFrames-1-tempRange/2, "Midpoint: %.0f")) {
-            updateScrub = FALSE;
-            updateInOut = TRUE;
+//            updateScrub = FALSE;
+//            updateInOut = TRUE;
             updateInOutPoint = TRUE;
-            scrubWindowGridNumber = numberOfStills/2;
-            setInOutPoint(tempMidPoint - tempRange/2, tempMidPoint + tempRange/2);
-            loadedMovie.gmMovie.setScrub(tempMidPoint);
+            manipulateSlider = TRUE;
+            limitInPoint(tempMidPoint - tempRange/2);
+            limitOutPoint(tempMidPoint + tempRange/2);
+//            scrubWindowGridNumber = numberOfStills/2;
+//            setInOutPoint(tempMidPoint - tempRange/2, tempMidPoint + tempRange/2);
+//            loadedMovie.gmMovie.setScrub(tempMidPoint);
         }
         ImGui::SameLine();
         if (ImGui::SliderInt("##OutPoint", &outPoint, 0,totalFrames-1, "Outpoint: %.0f")) {
-            updateScrub = FALSE;
-            updateInOut = TRUE;
+//            updateScrub = FALSE;
+//            updateInOut = TRUE;
             updateOutPoint = TRUE;
-            scrubWindowGridNumber = numberOfStills-1;
-            setOutPoint(outPoint);
-            loadedMovie.gmMovie.setScrub(outPoint);
+            manipulateSlider = TRUE;
+//            scrubWindowGridNumber = numberOfStills-1;
+            limitOutPoint(outPoint);
+//            loadedMovie.gmMovie.setScrub(outPoint);
         }
         ImGui::PopItemWidth();
+
+        if (ImGui::IsMouseReleased(0)) {
+    //        ofLog(OF_LOG_VERBOSE, "ImGui mouseReleased" );
+            if (loadedMovie.gmMovie.isThreadRunning()) {
+                loadedMovie.gmMovie.stop(false);
+            }
+            if (updateInOut) {
+                ofDrawRectangle(0,0,640,360);
+                //      tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+                tweenFading.minValue = 255.0;
+                tweenFading.maxValue = 0.0;
+                tweenFading.duration = 0.5;
+                tweenFading.initialTime = ofGetElapsedTimef();
+                updateGridTimeArrayWithAutomaticInterval();
+                updateAllStills();
+                addToUndo = true;
+            }
+        }
 
         ImGui::End();
 
@@ -1470,24 +1480,25 @@ void ofApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
+    ofLog(OF_LOG_VERBOSE, "mouseReleased" );
     if (!lockedDueToInteraction && !lockedDueToPrinting) {
         if (loadedMovie.isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "mouseReleased" );
+            ofLog(OF_LOG_VERBOSE, "mouseReleased and movieloaded" );
 
             if (!showListView) {
                 if (loadedMovie.gmMovie.isThreadRunning()) {
                     loadedMovie.gmMovie.stop(false);
                 }
-                if (updateInOut) {
-                    //      tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
-                    tweenFading.minValue = 255.0;
-                    tweenFading.maxValue = 0.0;
-                    tweenFading.duration = 0.5;
-                    tweenFading.initialTime = ofGetElapsedTimef();
-                    updateGridTimeArrayWithAutomaticInterval();
-                    updateAllStills();
-                    addToUndo = true;
-                }
+//                if (updateInOut) {
+//                    //      tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+//                    tweenFading.minValue = 255.0;
+//                    tweenFading.maxValue = 0.0;
+//                    tweenFading.duration = 0.5;
+//                    tweenFading.initialTime = ofGetElapsedTimef();
+//                    updateGridTimeArrayWithAutomaticInterval();
+//                    updateAllStills();
+//                    addToUndo = true;
+//                }
                 if (updateScrub) {
                     //     tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     tweenFading.minValue = 255.0;
@@ -2176,6 +2187,7 @@ void ofApp::addMoviePrintDataSet(int _addToPosition){
             addGridTimeArrayToMoviePrintDataSet();
         }
     }
+    logPreviousMoviePrintDataSet();
 }
 
 //--------------------------------------------------------------
@@ -2233,6 +2245,7 @@ bool ofApp::hasChangedMoviePrintDataSet(){
 
 //--------------------------------------------------------------
 void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
+    ofLog(OF_LOG_VERBOSE, "applyMoviePrintDataSet:" + ofToString(undoPosition));
     string tempName;
 //    ofxUIWidget *tempWidget;
     bool tempHasTheNumberOfThumbsChanged = false;
@@ -2862,7 +2875,7 @@ void ofApp::setInOutPoint(int _inPoint, int _outPoint){
 }
 
 //--------------------------------------------------------------
-void ofApp::setInPoint(int _inPoint){
+void ofApp::limitInPoint(int _inPoint){
     int i = _inPoint;
     int j = outPoint;
     if ((outPoint-i < numberOfStills)) {
@@ -2872,17 +2885,13 @@ void ofApp::setInPoint(int _inPoint){
             i = j - (numberOfStills - 1);
         }
     }
-    //    uiRangeSliderTimeline->setValueLow(i);
-    //    uiRangeSliderTimeline->setValueHigh(j);
     inPoint = i;
     outPoint = j;
-    updateGridTimeArrayWithAutomaticInterval();
-    updateAllStills();
-    ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+    ofLog(OF_LOG_VERBOSE, "limited InPoint" );
 }
 
 //--------------------------------------------------------------
-void ofApp::setOutPoint(int _outPoint){
+void ofApp::limitOutPoint(int _outPoint){
     int i = inPoint;
     int j = _outPoint;
     if ((j - inPoint < numberOfStills)) {
@@ -2893,10 +2902,22 @@ void ofApp::setOutPoint(int _outPoint){
 
         }
     }
-    //    uiRangeSliderTimeline->setValueLow(i);
-    //    uiRangeSliderTimeline->setValueHigh(j);
     inPoint = i;
     outPoint = j;
+    ofLog(OF_LOG_VERBOSE, "limited OutPoint" );
+}
+
+//--------------------------------------------------------------
+void ofApp::setInPoint(int _inPoint){
+    limitInPoint(_inPoint);
+    updateGridTimeArrayWithAutomaticInterval();
+    updateAllStills();
+    ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+}
+
+//--------------------------------------------------------------
+void ofApp::setOutPoint(int _outPoint){
+    limitOutPoint(_outPoint);
     updateGridTimeArrayWithAutomaticInterval();
     updateAllStills();
     ofLog(OF_LOG_VERBOSE, "manipulated OutPoint" );

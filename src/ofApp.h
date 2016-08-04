@@ -114,7 +114,9 @@ public:
     void updateOneThumb(int _thumbID, int _newFrameNumber);
     void setInOutPoint(int _inPoint, int _outPoint);
     void setInPoint(int _inPoint);
-    void setOutPoint(int _inPoint);
+    void setOutPoint(int _outPoint);
+    void limitInPoint(int _inPoint);
+    void limitOutPoint(int _outPoint);
     void updateTimeSlider(bool _wholeRange);
     void startPrinting();
     void startListPrinting();
