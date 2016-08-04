@@ -196,7 +196,7 @@ public:
 //                grabbedFrame[i].gfToBeUpdated = TRUE;
                 grabbedFrame[i].gfToBeGrabbed = TRUE;
                 grabbedFrame[i].gfFrameNumber = ofMap(i, 0, (returnSizeOfgrabbedFrameAndLogIfItDiffersFromGfsNumberOfFrames() - 1), 0, (gfsTotalFrames - 1), TRUE);
-                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gfFrameNumber: " + ofToString(grabbedFrame[i].gfFrameNumber) + " gfsTotalFrames: " + ofToString(gfsTotalFrames));
+//                ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gfFrameNumber: " + ofToString(grabbedFrame[i].gfFrameNumber) + " gfsTotalFrames: " + ofToString(gfsTotalFrames));
             }
             ofLog(OF_LOG_VERBOSE, "Allocations worked");
         } else{
@@ -276,7 +276,7 @@ public:
 
     void play(){
         if (isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "____________gfsMovie.play() ");
+//            ofLog(OF_LOG_VERBOSE, "____________gfsMovie.play() ");
 //            gfsMovie.play();
         }
     }
@@ -396,9 +396,9 @@ public:
                 ofxCv::copy(matOrig, grabbedFrame[i].gfImage);
                 grabbedFrame[i].gfImage.update();
                 grabbedFrame[i].gfToBeGrabbed = FALSE;
-                ofLog(OF_LOG_VERBOSE, str + "Frame " + ofToString(i) + " saved");
+//                ofLog(OF_LOG_VERBOSE, str + "Frame " + ofToString(i) + " saved");
             } else {
-                ofLog(OF_LOG_VERBOSE, str + "CRASH AVOIDED grabbedFrame[i].gfImage.isAllocated() FALSE _______________________________");
+//                ofLog(OF_LOG_VERBOSE, str + "CRASH AVOIDED grabbedFrame[i].gfImage.isAllocated() FALSE _______________________________");
             }
         }
 //        ofLog(OF_LOG_VERBOSE, str + "2 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfsMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfsMovie.getCurrentFrame()));
@@ -446,7 +446,7 @@ public:
                 for (int i = 0; i<grabbedFrame.size(); i++) {
                     if (grabbedFrame[i].gfToBeGrabbed) {
                         gfsThreadCounter++;
-                        ofLog(OF_LOG_VERBOSE, "In Thread Function - i:" + ofToString(i) + " Frame:" + ofToString(grabbedFrame[i].gfFrameNumber));
+//                        ofLog(OF_LOG_VERBOSE, "In Thread Function - i:" + ofToString(i) + " Frame:" + ofToString(grabbedFrame[i].gfFrameNumber));
                         grabToImage(i, grabbedFrame[i].gfFrameNumber, true);                    }
                 }
             } while (!allGrabbed());
@@ -469,6 +469,7 @@ public:
         if (!rightNow) {
             waitForThread();
         }
+        ofLog(OF_LOG_VERBOSE, "Stoping Thread Function-----------------------------------------------" );
         stopThread();
 
     }

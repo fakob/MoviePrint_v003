@@ -469,12 +469,12 @@ public:
 
             if (gmMovie.grabbedFrame[i].gfToBeUpdated && !gmMovie.grabbedFrame[i].gfImage.isUsingTexture()) { // load textures in proper size
                 if (!gmMovie.grabbedFrame[i].gfToBeGrabbed ) {
-                    ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gfImage.isUsingTexture():" + ofToString(gmMovie.grabbedFrame[i].gfImage.isUsingTexture()));
+//                    ofLog(OF_LOG_VERBOSE, "grabbedFrame[i].gfImage.isUsingTexture():" + ofToString(gmMovie.grabbedFrame[i].gfImage.isUsingTexture()));
                     gmMovie.grabbedFrame[i].gfTexture.loadData(gmMovie.grabbedFrame[i].gfImage);
                 //  gmMovie.grabbedFrame[i].gfTexture.loadScreenData(0,0,400,400);
                     gmMovie.grabbedFrame[i].gfImage.update();
                     gmMovie.grabbedFrame[i].gfToBeUpdated = FALSE;
-                    ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
+//                    ofLog(OF_LOG_VERBOSE, "Texture updated:" + ofToString(i));
                 }
             }
 
