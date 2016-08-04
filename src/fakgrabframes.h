@@ -93,7 +93,22 @@ public:
 
             gfsMIFileName = fileToRead.getBaseName();
             gfsMIFileExtension = fileToRead.getExtension();
-            gfsMIFormat = ofToString(movieFile.get(CV_CAP_PROP_FOURCC));
+
+
+//getting CV_CAP_PROP_FOURCC does not work yet
+//            int ex = static_cast<int>(movieFile.get(CV_CAP_PROP_FOURCC));     // Get Codec Type- Int form
+//            char EXT[] = {(char)(ex & 0XFF) , (char)((ex & 0XFF00) >> 8),(char)((ex & 0XFF0000) >> 16),(char)((ex & 0XFF000000) >> 24), 0};
+//            ofLog(OF_LOG_VERBOSE, "EXT[]: " + ofToString(EXT));
+
+//            printf("fourcc=%d\n", f); // outputs fourcc=6
+//            char fourcc[5];
+//            fourCCStringFromCode((int)f, fourcc);
+//            printf("fourcc=%s\n", fourcc);
+
+            double f = movieFile.get(CV_CAP_PROP_FOURCC);
+            gfsMIFormat = ofToString(f);
+//            ofLog(OF_LOG_VERBOSE, "CV_CAP_PROP_FOURCC: " + ofToString(f));
+
             gfsMIFormatString = "";
             gfsMIFileSizeString = ofToString(fileToRead.getSize());
             gfsMIDurationString1 = ofToString((float)gfsTotalFrames/(float)gfsFrameRate) + " sec";
@@ -130,6 +145,13 @@ public:
         }
         return isMovieLoaded();
     }
+
+//    void fourCCStringFromCode(int code, char fourCC[5]) {
+//        for (int i = 0; i < 4; i++) {
+//            fourCC[3 - i] = code >> (i * 8);
+//        }
+//        fourCC[4] = '\0';
+//    }
 
     bool loadNewMovieToBeScrubbed(string vfMovieName){
 //        stop(FALSE);
