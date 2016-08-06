@@ -132,6 +132,7 @@ public:
     void scrollEvent(ofVec2f & e);
     void updateTheScrollBar();
     void updatePrintGridColumnsOrRows(bool _addToUndo);
+    void updatePrintDisplayTimecodeFramesOff(bool _addToUndo);
 
     // Movie
     fakGrabbedMovie loadedMovie;

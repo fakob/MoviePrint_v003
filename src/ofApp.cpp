@@ -75,7 +75,7 @@ void ofApp::setup(){
     moviePrintDataSet.printGridRows = 3;
     moviePrintDataSet.printGridMargin = 5;
     moviePrintDataSet.printDisplayVideoAudioInfo = true;
-    moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
+    moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
     moviePrintDataSet.printSingleFrames = false;
     moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
     moviePrintDataSet.printSizeWidth = 1024;
@@ -921,22 +921,25 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             calculateNewPrintSize();
             addToUndo = true;
         }
-        if (ImGui::RadioButton("Display Frames", &moviePrintDataSet.printDisplayTimecodeFramesOff, 0)) {
-            moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
-            loadedMovie.gmShowFramesUI = TRUE;
-            loadedMovie.vfFramesToTimeSwitch = FALSE;
-            addToUndo = true;
+        if (ImGui::RadioButton("Display Frames", &moviePrintDataSet.printDisplayTimecodeFramesOff, 2)) {
+//            moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
+//            loadedMovie.gmShowFramesUI = TRUE;
+//            loadedMovie.vfFramesToTimeSwitch = FALSE;
+//            addToUndo = true;
+            updatePrintDisplayTimecodeFramesOff(true);
         }
         if (ImGui::RadioButton("Display TimeCode", &moviePrintDataSet.printDisplayTimecodeFramesOff, 1)) {
-            moviePrintDataSet.printDisplayTimecodeFramesOff = 1;
-            loadedMovie.gmShowFramesUI = TRUE;
-            loadedMovie.vfFramesToTimeSwitch = TRUE;
-            addToUndo = true;
+//            moviePrintDataSet.printDisplayTimecodeFramesOff = 1;
+//            loadedMovie.gmShowFramesUI = TRUE;
+//            loadedMovie.vfFramesToTimeSwitch = TRUE;
+//            addToUndo = true;
+            updatePrintDisplayTimecodeFramesOff(true);
         }
-        if (ImGui::RadioButton("off", &moviePrintDataSet.printDisplayTimecodeFramesOff, 2)) {
-            moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
-            loadedMovie.gmShowFramesUI = FALSE;
-            addToUndo = true;
+        if (ImGui::RadioButton("off", &moviePrintDataSet.printDisplayTimecodeFramesOff, 0)) {
+//            moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
+//            loadedMovie.gmShowFramesUI = FALSE;
+//            addToUndo = true;
+            updatePrintDisplayTimecodeFramesOff(true);
         }
         ImGui::Separator();
         ImGui::Checkbox("Save also individual frames", &moviePrintDataSet.printSingleFrames);
@@ -1075,6 +1078,10 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
                 updateGridTimeArrayWithAutomaticInterval();
                 updateAllStills();
                 addToUndo = true;
+                if (addToUndo) {
+                    addMoviePrintDataSet(undoPosition);
+                    addToUndo = false;
+                }
             }
         }
 
@@ -2250,6 +2257,29 @@ void ofApp::updatePrintGridColumnsOrRows(bool _addToUndo){
 }
 
 //--------------------------------------------------------------
+void ofApp::updatePrintDisplayTimecodeFramesOff(bool _addToUndo){
+    switch (moviePrintDataSet.printDisplayTimecodeFramesOff) {
+    // 0=off, 1=timecode, 2=frames
+    case 2:
+        loadedMovie.gmShowFramesUI = TRUE;
+        loadedMovie.vfFramesToTimeSwitch = FALSE;
+        break;
+    case 1:
+        loadedMovie.gmShowFramesUI = TRUE;
+        loadedMovie.vfFramesToTimeSwitch = TRUE;
+        break;
+    case 0:
+        loadedMovie.gmShowFramesUI = FALSE;
+        break;
+    default:
+        break;
+    }
+    if (_addToUndo) {
+        addToUndo = true;
+    }
+}
+
+//--------------------------------------------------------------
 void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
     ofLog(OF_LOG_VERBOSE, "applyMoviePrintDataSet:" + ofToString(undoPosition));
     string tempName;
@@ -2314,6 +2344,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
 //        uiRadioSetFrameDisplay->activateToggle(tempName);
 //        tempWidget = guiSettingsMoviePrint->getWidget(tempName);
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
+        updatePrintDisplayTimecodeFramesOff(false);
     }
 
     // printSingleFrames
@@ -2388,6 +2419,8 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
 
 //        uiRangeSliderTimeline->setValueLow(getLowestFrameNumber());
 //        uiRangeSliderTimeline->setValueHigh(getHighestFrameNumber());
+        inPoint = getLowestFrameNumber();
+        outPoint = getHighestFrameNumber();
 
     }
 }
