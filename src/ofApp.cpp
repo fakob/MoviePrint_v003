@@ -597,10 +597,10 @@ void ofApp::update(){
             updateGridTimeArrayWithAutomaticInterval();
             updateAllStills();
             addToUndo = true;
-            if (addToUndo) {
-                addMoviePrintDataSet(undoPosition);
-                addToUndo = false;
-            }
+        }
+        if (addToUndo) {
+            addMoviePrintDataSet(undoPosition);
+            addToUndo = false;
         }
     }
 
@@ -964,30 +964,45 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             updatePrintDisplayTimecodeFramesOff(true);
         }
         ImGui::Separator();
-        ImGui::Checkbox("Save also individual frames", &moviePrintDataSet.printSingleFrames);
+
+        if (ImGui::Checkbox("Save also individual frames", &moviePrintDataSet.printSingleFrames)) {
+            addToUndo = true;
+        }
         ImGui::Separator();
 
         // has problem as it does not load moviePrintDataSet.printFormat -> see int and enum for solution
-        static int tempR = 0;
-        if (ImGui::RadioButton("png with alpha", &tempR, 0)) {
+        static int tempR = (int)moviePrintDataSet.printFormat;
+        if (ImGui::RadioButton("png with alpha", &tempR, 13)) {
+//            moviePrintDataSet.printFormat = (ofImageFormat)tempR; //OF_IMAGE_FORMAT_PNG;
             moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
+            addToUndo = true;
+//            ofLog(OF_LOG_VERBOSE, "tempR:" + ofToString(tempR) );
+//            ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.printFormat:" + ofToString(moviePrintDataSet.printFormat) );
         }
-        if (ImGui::RadioButton("jpg", &tempR, 1)) {
+        if (ImGui::RadioButton("jpg", &tempR, 2)) {
+//            moviePrintDataSet.printFormat = (ofImageFormat)tempR; //OF_IMAGE_FORMAT_JPEG;
             moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_JPEG;
+            addToUndo = true;
+//            ofLog(OF_LOG_VERBOSE, "tempR:" + ofToString(tempR) );
+//            ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.printFormat:" + ofToString(moviePrintDataSet.printFormat) );
         }
         ImGui::Separator();
-        static int tempS = 0;
-        if (ImGui::RadioButton("1024px width", &tempS, 0)) {
-            moviePrintDataSet.printSizeWidth = 1024;
+//        static int tempS = 0;
+        if (ImGui::RadioButton("1024px width", &moviePrintDataSet.printSizeWidth, 1024)) {
+//            moviePrintDataSet.printSizeWidth = 1024;
+            addToUndo = true;
         }
-        if (ImGui::RadioButton("2048px width", &tempS, 1)) {
-            moviePrintDataSet.printSizeWidth = 2048;
+        if (ImGui::RadioButton("2048px width", &moviePrintDataSet.printSizeWidth, 2048)) {
+//            moviePrintDataSet.printSizeWidth = 2048;
+            addToUndo = true;
         }
-        if (ImGui::RadioButton("3072px width", &tempS, 2)) {
-            moviePrintDataSet.printSizeWidth = 3072;
+        if (ImGui::RadioButton("3072px width", &moviePrintDataSet.printSizeWidth, 3072)) {
+//            moviePrintDataSet.printSizeWidth = 3072;
+            addToUndo = true;
         }
-        if (ImGui::RadioButton("4096px width", &tempS, 3)) {
-            moviePrintDataSet.printSizeWidth = 4096;
+        if (ImGui::RadioButton("4096px width", &moviePrintDataSet.printSizeWidth, 4096)) {
+//            moviePrintDataSet.printSizeWidth = 4096;
+            addToUndo = true;
         }
 
 //        ImGui::PopItemWidth();
@@ -1085,9 +1100,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         }
         ImGui::PopItemWidth();
 
-
         ImGui::End();
-
     }
 
     ImGui::PopStyleVar();
@@ -2373,6 +2386,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
 //        uiRadioPrintOutputFormat->activateToggle(tempName);
 //        tempWidget = guiSettingsMoviePrint->getWidget(tempName);
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
+//        ofLog(OF_LOG_VERBOSE, "apply dataset ---- moviePrintDataSet.printFormat:" + ofToString(moviePrintDataSet.printFormat) );
     }
 
     // printSizeWidth
