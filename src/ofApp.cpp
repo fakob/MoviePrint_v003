@@ -582,6 +582,28 @@ void ofApp::update(){
         }
     }
 
+    if (ImGui::IsMouseReleased(0)) {
+//        ofLog(OF_LOG_VERBOSE, "ImGui mouseReleased" );
+        if (loadedMovie.gmMovie.isThreadRunning()) {
+            loadedMovie.gmMovie.stop(false);
+        }
+        if (updateInOut) {
+            ofDrawRectangle(0,0,640,360);
+            //      tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+            tweenFading.minValue = 255.0;
+            tweenFading.maxValue = 0.0;
+            tweenFading.duration = 0.5;
+            tweenFading.initialTime = ofGetElapsedTimef();
+            updateGridTimeArrayWithAutomaticInterval();
+            updateAllStills();
+            addToUndo = true;
+            if (addToUndo) {
+                addMoviePrintDataSet(undoPosition);
+                addToUndo = false;
+            }
+        }
+    }
+
 
 //    // sollte kurze wait schleife fuer das scrubvideoloading sein - leider funktioniert das nicht so ganz - man kann zwar das scrubvideo etwas spaeter loaden, waerenddessen haelt aber trotzdem alles an
 //    if (loadNewMovieToBeScrubbedBool) {
@@ -1063,27 +1085,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         }
         ImGui::PopItemWidth();
 
-        if (ImGui::IsMouseReleased(0)) {
-    //        ofLog(OF_LOG_VERBOSE, "ImGui mouseReleased" );
-            if (loadedMovie.gmMovie.isThreadRunning()) {
-                loadedMovie.gmMovie.stop(false);
-            }
-            if (updateInOut) {
-                ofDrawRectangle(0,0,640,360);
-                //      tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
-                tweenFading.minValue = 255.0;
-                tweenFading.maxValue = 0.0;
-                tweenFading.duration = 0.5;
-                tweenFading.initialTime = ofGetElapsedTimef();
-                updateGridTimeArrayWithAutomaticInterval();
-                updateAllStills();
-                addToUndo = true;
-                if (addToUndo) {
-                    addMoviePrintDataSet(undoPosition);
-                    addToUndo = false;
-                }
-            }
-        }
 
         ImGui::End();
 
