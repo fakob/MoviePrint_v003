@@ -65,6 +65,7 @@ public:
         loadNewMovieToBeScrubbed(vfMovieName);
         allocateNewNumberOfFrames(_numberOfFrames);
         gfsSetupFinished = true;
+        isFrameAccurate = true; //false uses CV_CAP_PROP_POS_MSEC and jumps to milliseconds, but it is not faster only really unaccurate apparently
     }
 
     bool loadNewMovieToBeGrabbed(string vfMovieName){
@@ -79,7 +80,7 @@ public:
 
         if(movieFile.isOpened()){
             // get some meta data about frame.
-            gfsFrameRate = int(movieFile.get(CV_CAP_PROP_FPS));
+            gfsFrameRate = float(movieFile.get(CV_CAP_PROP_FPS));
             gfsTotalFrames = int(movieFile.get(CV_CAP_PROP_FRAME_COUNT));
             gfsFrameHeight = int(movieFile.get(CV_CAP_PROP_FRAME_HEIGHT));
             gfsFrameWidth = int(movieFile.get(CV_CAP_PROP_FRAME_WIDTH));
@@ -87,6 +88,7 @@ public:
             //                double posMsec = movieFile.get(CV_CAP_PROP_POS_MSEC);
             gfsImageRatio = gfsFrameWidth/(float)gfsFrameHeight;
             gfsPixelRatio = 1.0;
+            gfsFrameMS = 1000 / gfsFrameRate;
 
             gfsMIFilePath = fileToRead.path();
             gfsMIFilePathOhne = extractMoviePathWithoutFilename(gfsMIFilePath);
@@ -110,9 +112,15 @@ public:
             gfsMIFormat = ofToString(f);
 //            ofLog(OF_LOG_VERBOSE, "CV_CAP_PROP_FOURCC: " + ofToString(f));
 
+            // Seek to the end of the video.
+            movieFile.set(CV_CAP_PROP_POS_AVI_RATIO, 1);
+            // Get video length (because we're at the end).
+            gfsDurationMS = movieFile.get(CV_CAP_PROP_POS_MSEC);
+
             gfsMIFormatString = "";
             gfsMIFileSizeString = ofToString(fileToRead.getSize());
-            gfsMIDurationString1 = ofToString((float)gfsTotalFrames/(float)gfsFrameRate) + " sec";
+            gfsMIDuration = ofToString(gfsDurationMS/1000);
+            gfsMIDurationCalculated = ofToString((float)gfsTotalFrames/gfsFrameRate) + " sec";
             gfsMIFrameCount = ofToString(gfsTotalFrames);
             gfsMIWidth = ofToString(gfsFrameWidth) + " x " + ofToString(gfsFrameHeight);
             gfsMIDisplayAspectRatioString = ofToString((float)gfsFrameWidth/(float)gfsFrameHeight);
@@ -359,30 +367,43 @@ public:
         }
     }
 
-    void setScrub(int _frame){
-        ofLog(OF_LOG_VERBOSE, "setScrub: " + ofToString(_frame));
+    int setMoviePosition(bool _scrub, int _frame, bool _isFrameAccurate){
         _frame = min((gfsTotalFrames-1), max(_frame, 0));
+        if (_scrub) {
+            ofLog(OF_LOG_VERBOSE, "setMoviePosition: " + ofToString(_frame));
+            if (_isFrameAccurate) {
+                movieFileScrub.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
+            } else {
+                movieFileScrub.set(CV_CAP_PROP_POS_MSEC, (double)(_frame * gfsFrameMS));
+            }
+            movieFileScrub.read(matOrigScrub);
+        } else {
+            ofLog(OF_LOG_VERBOSE, "setScrubMoviePosition: " + ofToString(_frame));
+            if (_isFrameAccurate) {
+                movieFile.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
+            } else {
+                movieFile.set(CV_CAP_PROP_POS_MSEC, (double)(_frame * gfsFrameMS));
+            }
+            movieFile.read(matOrig);
+        }
+        return _frame;
+    }
 
-        movieFileScrub.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
-        movieFileScrub.read(matOrigScrub);
+    void setScrub(int _frame){
+        setMoviePosition(true, _frame, isFrameAccurate);
         cv::cvtColor(matOrigScrub, matOrigScrub, cv::COLOR_BGR2RGB);
         ofxCv::copy(matOrigScrub, scrubImg);
         scrubImg.update();
     }
 
     void setFrameScrub(int _i, int _frame){
-        ofLog(OF_LOG_VERBOSE, "setFrameScrub: " + ofToString(_i) + " frame: " + ofToString(_frame));
-        _frame = min((gfsTotalFrames-1), max(_frame, 0));
-        grabbedFrame[_i].gfFrameNumber = _frame;
-
-        movieFileScrub.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
-        movieFileScrub.read(matOrigScrub);
+        grabbedFrame[_i].gfFrameNumber = setMoviePosition(true, _frame, isFrameAccurate);
         cv::cvtColor(matOrigScrub, matOrigScrub, cv::COLOR_BGR2RGB);
         ofxCv::copy(matOrigScrub, scrubImg);
         scrubImg.update();
     }
 
-    void grabToImage(int i, int _frame, bool _inThread){
+    void grabToImage(int _i, int _frame, bool _inThread){
 
         string str = "";
         if (_inThread) {
@@ -391,21 +412,16 @@ public:
 //        ofLog(OF_LOG_VERBOSE, str + "1 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfsMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfsMovie.getCurrentFrame()));
 
         if (isMovieLoaded()) {
+            grabbedFrame[_i].gfFrameNumber = setMoviePosition(false, _frame, isFrameAccurate);
 
-            _frame = min((gfsTotalFrames-1), max(_frame, 0));
-            grabbedFrame[i].gfFrameNumber = _frame;
-
-            movieFile.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
-            movieFile.read(matOrig);
-
-            if (grabbedFrame[i].gfImage.isAllocated() && !gfsCurrAllocating) {
+            if (grabbedFrame[_i].gfImage.isAllocated() && !gfsCurrAllocating) {
                 cv::cvtColor(matOrig, matOrig, cv::COLOR_BGR2RGB);
-                ofxCv::copy(matOrig, grabbedFrame[i].gfImage);
-                grabbedFrame[i].gfImage.update();
-                grabbedFrame[i].gfToBeGrabbed = FALSE;
+                ofxCv::copy(matOrig, grabbedFrame[_i].gfImage);
+                grabbedFrame[_i].gfImage.update();
+                grabbedFrame[_i].gfToBeGrabbed = FALSE;
 //                ofLog(OF_LOG_VERBOSE, str + "Frame " + ofToString(i) + " saved");
             } else {
-//                ofLog(OF_LOG_VERBOSE, str + "CRASH AVOIDED grabbedFrame[i].gfImage.isAllocated() FALSE _______________________________");
+//                ofLog(OF_LOG_VERBOSE, str + "CRASH AVOIDED grabbedFrame[_i].gfImage.isAllocated() FALSE _______________________________");
             }
         }
 //        ofLog(OF_LOG_VERBOSE, str + "2 _frame: " + ofToString(_frame) + " getPosition: " + ofToString(gfsMovie.getPosition()) + " getCurrentFrame: " + ofToString(gfsMovie.getCurrentFrame()));
@@ -509,11 +525,13 @@ public:
 
     ofImage scrubImg;
 
-    string gfsMIFileName, gfsMIFileExtension, gfsMIFormat, gfsMIFormatString, gfsMIFileSizeString, gfsMIDurationString1, gfsMIFrameCount, gfsMIWidth, gfsMIHeight, gfsMIDisplayAspectRatioString, gfsMIFrameRateString;
+    string gfsMIFileName, gfsMIFileExtension, gfsMIFormat, gfsMIFormatString, gfsMIFileSizeString, gfsMIDurationCalculated, gfsMIDuration, gfsMIFrameCount, gfsMIWidth, gfsMIHeight, gfsMIDisplayAspectRatioString, gfsMIFrameRateString;
     string gfsMIVFormat, gfsMIFormatInfo, gfsMIBitRate, gfsMIPixelAspectRatio, gfsMIDisplayAspectRatio, gfsMIFrameRate_ModeString, gfsMIColorSpace, gfsMIChromaSubsampling, gfsMIBitDepthString, gfsMIInterlacementString;
     string gfsMIAFormat, gfsMIAChannelsString, gfsMIASamplingRate, gfsMIFilePath, gfsMIFilePathOhne, gfsMIFileNameAndExtension;
 
-
+    double gfsDurationMS;
+    double gfsFrameMS;
+    bool isFrameAccurate;
 };
 
 

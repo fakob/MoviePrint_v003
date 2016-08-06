@@ -1756,6 +1756,7 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
     stringMovieInfo.push_back("Format/String: ");
     stringMovieInfo.push_back("FileSize: ");
     stringMovieInfo.push_back("Duration: ");
+    stringMovieInfo.push_back("Duration calculated: ");
     stringMovieInfo.push_back("FrameCount: ");
     stringMovieInfo.push_back("Size: ");
     stringMovieInfo.push_back("DisplayAspectRatio: ");
@@ -1778,7 +1779,8 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
     stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFormat);
     stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFormatString);
     stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFileSizeString);
-    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDurationString1);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDuration);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDurationCalculated);
     stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFrameCount);
     stringMovieData.push_back(loadedMovie.gmMovie.gfsMIWidth);
     stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDisplayAspectRatioString);
