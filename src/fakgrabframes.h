@@ -88,11 +88,12 @@ public:
             gfsImageRatio = gfsFrameWidth/(float)gfsFrameHeight;
             gfsPixelRatio = 1.0;
 
-//            gfsMIFilePathOhne = getMoviePathName();
-            gfsMIFilePath = "FilePath: " + fileToRead.path();;
+            gfsMIFilePath = fileToRead.path();
+            gfsMIFilePathOhne = extractMoviePathWithoutFilename(gfsMIFilePath);
 
             gfsMIFileName = fileToRead.getBaseName();
             gfsMIFileExtension = fileToRead.getExtension();
+            gfsMIFileNameAndExtension = gfsMIFileName + "." + gfsMIFileExtension;
 
 
 //getting CV_CAP_PROP_FOURCC does not work yet
@@ -131,9 +132,9 @@ public:
             gfsMIASamplingRate = "";
 
         }
-        while (!isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load - " + ofToString(gfsMoviePath));
-        }
+//        while (!isMovieLoaded()) {
+//            ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load - " + ofToString(gfsMoviePath));
+//        }
 
         ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function" + ofToString(vfMovieName));
 
@@ -144,6 +145,12 @@ public:
             ofLog(OF_LOG_VERBOSE, "Movie not loaded");
         }
         return isMovieLoaded();
+    }
+
+    string extractMoviePathWithoutFilename(string _gfsMIFilePath){
+        vector<string> tempVectorString = ofSplitString(_gfsMIFilePath, "/");
+        tempVectorString.pop_back();
+        return ofJoinString(tempVectorString, "/") + "/";
     }
 
 //    void fourCCStringFromCode(int code, char fourCC[5]) {
@@ -161,9 +168,9 @@ public:
         gfsMoviePath = fileToRead.getAbsolutePath();
         movieFileScrub.open(gfsMoviePath);
 
-        while (!isScrubMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "_____________________________________ Scrub waiting for movie to load - " + ofToString(gfsMoviePath));
-        }
+//        while (!isScrubMovieLoaded()) {
+//            ofLog(OF_LOG_VERBOSE, "_____________________________________ Scrub waiting for movie to load - " + ofToString(gfsMoviePath));
+//        }
 
         ofLog(OF_LOG_VERBOSE, "_____________________________________ Scrub end loadMovie function" + ofToString(vfMovieName));
 
@@ -504,7 +511,7 @@ public:
 
     string gfsMIFileName, gfsMIFileExtension, gfsMIFormat, gfsMIFormatString, gfsMIFileSizeString, gfsMIDurationString1, gfsMIFrameCount, gfsMIWidth, gfsMIHeight, gfsMIDisplayAspectRatioString, gfsMIFrameRateString;
     string gfsMIVFormat, gfsMIFormatInfo, gfsMIBitRate, gfsMIPixelAspectRatio, gfsMIDisplayAspectRatio, gfsMIFrameRate_ModeString, gfsMIColorSpace, gfsMIChromaSubsampling, gfsMIBitDepthString, gfsMIInterlacementString;
-    string gfsMIAFormat, gfsMIAChannelsString, gfsMIASamplingRate, gfsMIFilePath;
+    string gfsMIAFormat, gfsMIAChannelsString, gfsMIASamplingRate, gfsMIFilePath, gfsMIFilePathOhne, gfsMIFileNameAndExtension;
 
 
 };

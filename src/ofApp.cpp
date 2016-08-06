@@ -13,7 +13,7 @@ void ofApp::setup(){
     io->Fonts->AddFontFromFileTTF(&ofToDataPath("fonts/HelveticaNeueLTCom-Lt.ttf")[0], 14.f);
     gui.setup();
 
-//    setResourcePath();
+    setResourcePath();
 
     useThread = true;
 
@@ -166,8 +166,8 @@ void ofApp::setup(){
 
     // load standard movie
 //    loadedFile = "movies/FrameTestMovie_4zu3_v001.mov";
-    loadedFile = "Original - Short from Vucko.mp4";
-//    loadedFile = "";
+//    loadedFile = "Original - Short from Vucko.mp4";
+    loadedFile = "";
     saveMoviePrintPath = appPathUpStr + "/MoviePrints/";
 
     loadedMovie.gmUpperLimitY = headerHeight;
@@ -906,6 +906,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             } else {
                 formatExtension = "png";
             }
+            ofLog(OF_LOG_VERBOSE, "movieFileName: " + ofToString(movieFileName));
 
             ofFileDialogResult saveFileResult = ofSystemSaveDialog(movieFileName + "." + formatExtension, "Select a Folder");
             if (saveFileResult.bSuccess){
@@ -1112,7 +1113,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     if (loadedMovie.isMovieLoaded()) {
         tempXPos = 0;
         drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
-        fontStashHelveticaMedium.draw(loadedMovie.gmMovie.gfsMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
+        fontStashHelveticaMedium.draw(loadedMovie.gmMovie.gfsMIFileNameAndExtension, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
     }
 
     tempXPos = gridColumns-2;
@@ -2138,7 +2139,7 @@ void ofApp::setResourcePath(){
     ofLog(OF_LOG_VERBOSE, "appPathStr: " + ofToString(appPathStr) );
     ofLog(OF_LOG_VERBOSE, "appPathUpStr: " + ofToString(appPathUpStr) );
     ofLog(OF_LOG_VERBOSE, "newDataPath: " + ofToString(newPath) );
-    ofSetDataPathRoot(newPath); // tell OF to look for resources here
+//    ofSetDataPathRoot(newPath); // tell OF to look for resources here
 }
 
 //--------------------------------------------------------------

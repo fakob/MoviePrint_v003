@@ -216,13 +216,6 @@ public:
         return strToConvert;
     }
 
-//    string getMoviePathName(){
-//        gmMIFilePath = ofToString(gmMovie.getMoviePath());
-//        vector<string> tempVectorString = ofSplitString(gmMIFilePath, "/");
-//        tempVectorString.pop_back();
-//        return ofJoinString(tempVectorString, "/") + "/";
-//    }
-
     int CountNewlines(string s){
         int len = s.length();
         int c = 0;
@@ -813,12 +806,12 @@ public:
                 if ((((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName) <= tempWidthOfPathName) {
                     tempFontScale = tempFontScale * (((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName)/tempWidthOfPathName*0.75;
                 }
-                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, 0, 0).getWidth();
+                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(gmMovie.gfsMIFilePathOhne, tempFontHeightSmall * tempFontScale, 0, 0).getWidth();
 
                 ofSetColor(255, 255, 255, 255);
                 gmFontStashFranchise.draw("movieprint",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
-                gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
-                gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+                gmFontStashHelveticaLight.draw(gmMovie.gfsMIFilePathOhne, tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+                gmFontStashHelveticaMedium.draw(gmMovie.gfsMIFileNameAndExtension, tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
             }
 
             ofPopMatrix();
@@ -1088,7 +1081,7 @@ public:
 //    string gmMIVFormat, gmMIFormatInfo, gmMIBitRate, gmMIPixelAspectRatio, gmMIDisplayAspectRatio, gmMIFrameRate_ModeString, gmMIColorSpace, gmMIChromaSubsampling, gmMIBitDepthString, gmMIInterlacementString;
 //    string gmMIAFormat, gmMIAChannelsString, gmMIASamplingRate, gmMIFilePath;
 
-    string gmMIFileNameClean, gmMIFilePathOhne;
+//    string gmMIFileNameClean, gmMIFilePathOhne;
 
     // used for rounded corner mask
     ofShader shader;
