@@ -131,6 +131,7 @@ public:
     void updateAllLimits();
     void scrollEvent(ofVec2f & e);
     void updateTheScrollBar();
+    void updatePrintGridColumnsOrRows(bool _addToUndo);
 
     // Movie
     fakGrabbedMovie loadedMovie;

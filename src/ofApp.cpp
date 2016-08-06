@@ -631,15 +631,15 @@ void ofApp::draw(){
                 ofSetColor(255, 255, 255, (int)(tweenFading.value/255)*255);
 
                 if (updateInPoint) {
-                    ofLog(OF_LOG_VERBOSE, "updateInPoint:" + ofToString(updateInPoint));
+//                    ofLog(OF_LOG_VERBOSE, "updateInPoint:" + ofToString(updateInPoint));
                     inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
                 }
                 if (updateOutPoint) {
-                    ofLog(OF_LOG_VERBOSE, "updateOutPoint:" + ofToString(updateOutPoint));
+//                    ofLog(OF_LOG_VERBOSE, "updateOutPoint:" + ofToString(updateOutPoint));
                     outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
                 }
                 if (updateInOutPoint) {
-                    ofLog(OF_LOG_VERBOSE, "updateInOutPoint:" + ofToString(updateInOutPoint));
+//                    ofLog(OF_LOG_VERBOSE, "updateInOutPoint:" + ofToString(updateInOutPoint));
                     inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
                     outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
                 }
@@ -902,8 +902,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         ImGui::Separator();
         if (ImGui::SliderInt("PrintColumns", &moviePrintDataSet.printGridColumns, 1,10)) {
             if (printGridSetWithColumnsAndRows) {
-                printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
-                calculateNewPrintGrid();
+                updatePrintGridColumnsOrRows(false);
             } else {
                 moviePrintDataSet.printGridRows = ceil(numberOfStills/(float)moviePrintDataSet.printGridColumns);
                 calculateNewPrintSize();
@@ -911,9 +910,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             addToUndo = true;
         }
         if (ImGui::SliderInt("PrintRows", &moviePrintDataSet.printGridRows, 1,20)) {
-            printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
-            calculateNewPrintGrid();
-            addToUndo = true;
+            updatePrintGridColumnsOrRows(true);
         }
         if (ImGui::SliderInt("PrintMargin", &moviePrintDataSet.printGridMargin, 0,30)) {
             calculateNewPrintSize();
@@ -1451,7 +1448,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
 
                 if (!showListView) {
-                    if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) || menuSettings.getMenuActivated()) {
+                    if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated() || menuSettings.getMenuActivated())) {
                         if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
 
                             rollOverMovieID = loadedMovie.gmRollOverMovieID;
@@ -2244,6 +2241,15 @@ bool ofApp::hasChangedMoviePrintDataSet(){
 }
 
 //--------------------------------------------------------------
+void ofApp::updatePrintGridColumnsOrRows(bool _addToUndo){
+    printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
+    calculateNewPrintGrid();
+    if (_addToUndo) {
+        addToUndo = true;
+    }
+}
+
+//--------------------------------------------------------------
 void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
     ofLog(OF_LOG_VERBOSE, "applyMoviePrintDataSet:" + ofToString(undoPosition));
     string tempName;
@@ -2253,6 +2259,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
     // printGridColumns
     if (moviePrintDataSet.printGridColumns != _newMoviePrintDataSet.printGridColumns) {
         moviePrintDataSet.printGridColumns = _newMoviePrintDataSet.printGridColumns;
+        updatePrintGridColumnsOrRows(false);
 //        uiSliderPrintColumns->setValue(moviePrintDataSet.printGridColumns);
 //        tempWidget = guiSettingsMoviePrint->getWidget("PrintColumns");
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
@@ -2262,6 +2269,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
     // printGridRows
     if (moviePrintDataSet.printGridRows != _newMoviePrintDataSet.printGridRows) {
         moviePrintDataSet.printGridRows = _newMoviePrintDataSet.printGridRows;
+        updatePrintGridColumnsOrRows(false);
 //        uiSliderPrintRows->setValue(moviePrintDataSet.printGridRows);
 //        tempWidget = guiSettingsMoviePrint->getWidget("PrintRows");
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
@@ -2274,6 +2282,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
 //        uiSliderPrintMargin->setValue(moviePrintDataSet.printGridMargin);
 //        tempWidget = guiSettingsMoviePrint->getWidget("PrintMargin");
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
+        calculateNewPrintSize();
     }
 
     // printDisplayVideoAudioInfo
@@ -2282,6 +2291,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
 //        uiToggleHeaderDisplay->setValue(moviePrintDataSet.printDisplayVideoAudioInfo);
 //        tempWidget = guiSettingsMoviePrint->getWidget("Display Header");
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
+        calculateNewPrintSize();
     }
 
     // printDisplayTimecodeFramesOff
