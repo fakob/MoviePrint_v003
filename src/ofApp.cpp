@@ -1820,7 +1820,7 @@ bool ofApp::checkExtension(string _tempExtension){
 //        _tempExtension == "jpg" ||
 //        _tempExtension == "jpe" ||
 //        _tempExtension == "jpeg" ||
-//        _tempExtension == "gif" ||
+        _tempExtension == "gif" ||
 //        _tempExtension == "png" ||
 //        _tempExtension == "tif" ||
 //        _tempExtension == "tiff" ||
@@ -1831,9 +1831,9 @@ bool ofApp::checkExtension(string _tempExtension){
         _tempExtension == "3gpp" ||
         _tempExtension == "mkv" ||
         _tempExtension == "dv" ||
-//        _tempExtension == "flv" ||
+        _tempExtension == "flv" ||
 //        _tempExtension == "swf" ||
-//        _tempExtension == "vob" ||
+        _tempExtension == "vob" ||
         _tempExtension == "divx" ||
 //        _tempExtension == "mxf" ||
         _tempExtension == "m1v" ||

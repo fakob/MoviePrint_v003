@@ -370,7 +370,7 @@ public:
     int setMoviePosition(bool _scrub, int _frame, bool _isFrameAccurate){
         _frame = min((gfsTotalFrames-1), max(_frame, 0));
         if (_scrub) {
-            ofLog(OF_LOG_VERBOSE, "setMoviePosition: " + ofToString(_frame));
+//            ofLog(OF_LOG_VERBOSE, "setScrubMoviePosition: " + ofToString(_frame));
             if (_isFrameAccurate) {
                 movieFileScrub.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
             } else {
@@ -378,7 +378,7 @@ public:
             }
             movieFileScrub.read(matOrigScrub);
         } else {
-            ofLog(OF_LOG_VERBOSE, "setScrubMoviePosition: " + ofToString(_frame));
+//            ofLog(OF_LOG_VERBOSE, "setMoviePosition: " + ofToString(_frame));
             if (_isFrameAccurate) {
                 movieFile.set(CV_CAP_PROP_POS_FRAMES, (double)_frame);
             } else {
@@ -390,6 +390,7 @@ public:
     }
 
     void setScrub(int _frame){
+//        ofLog(OF_LOG_VERBOSE, "setScrub: " + ofToString(_frame));
         setMoviePosition(true, _frame, isFrameAccurate);
         cv::cvtColor(matOrigScrub, matOrigScrub, cv::COLOR_BGR2RGB);
         ofxCv::copy(matOrigScrub, scrubImg);
@@ -397,6 +398,7 @@ public:
     }
 
     void setFrameScrub(int _i, int _frame){
+//        ofLog(OF_LOG_VERBOSE, "setFrameScrub: " + ofToString(_frame));
         grabbedFrame[_i].gfFrameNumber = setMoviePosition(true, _frame, isFrameAccurate);
         cv::cvtColor(matOrigScrub, matOrigScrub, cv::COLOR_BGR2RGB);
         ofxCv::copy(matOrigScrub, scrubImg);
