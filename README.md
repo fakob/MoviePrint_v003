@@ -21,4 +21,4 @@ ofxOpenCV
 - No support for Pixel aspect ratio different then 1.0
 - First frame is currently ignored
 
-// This version has not been thorougly tested
+// This version has not been thoroughly tested!
