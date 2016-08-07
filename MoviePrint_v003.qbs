@@ -67,6 +67,36 @@ Project{
         Depends{
             name: "openFrameworks"
         }
+
+//        Properties{
+//            condition: qbs.buildVariant.contains("debug") && platform === "osx"
+//            bundle.infoPlist: ({"CFBundleIconFile":"MoviePrint_Logo_v002_00000.icns"})
+//        }
+
+//        Properties{
+//            condition: qbs.buildVariant.contains("release") && platform === "osx"
+//            bundle.infoPlist: ({"CFBundleIconFile":"MoviePrint_Logo_v002_00000.icns"})
+//        }
+
+//        Properties{
+//            condition: qbs.buildVariant.contains("release") && platform === "osx"
+//            bundle.infoPlist: ({"CFBundleIdentifier":"com.fakob.MoviePrint"})
+//        }
+
+//        Properties{
+//            condition: qbs.buildVariant.contains("release") && platform === "osx"
+//            bundle.infoPlist: ({"CFBundleShortVersionString":"0.3.3.0"})
+//        }
+
+//        Properties{
+//            condition: qbs.buildVariant.contains("release") && platform === "osx"
+//            bundle.infoPlist: ({"CFBundleVersion":"0.3.3.0"})
+//        }
+
+//        Properties{
+//            condition: qbs.buildVariant.contains("release") && platform === "osx"
+//            bundle.infoPlist: ({"LSApplicationCategoryType":"public.app-category.video"})
+//        }
     }
 
     references: [FileInfo.joinPaths(of_root, "/libs/openFrameworksCompiled/project/qtcreator/openFrameworks.qbs")]

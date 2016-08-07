@@ -1,5 +1,51 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file>data/images/HelpMenu_v001.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>bin/data/images/MoviePrint_FrameBackward_v001_00001.png</file>
+        <file>bin/data/images/MoviePrint_FrameBackward_v001_00002.png</file>
+        <file>bin/data/images/MoviePrint_FrameForward_v001_00001.png</file>
+        <file>bin/data/images/MoviePrint_FrameForward_v001_00002.png</file>
+        <file>bin/data/images/MoviePrint_PrintList_v002_00000.png</file>
+        <file>bin/data/images/MoviePrint_SetOutPoint_v001_00000.png</file>
+        <file>bin/data/images/MoviePrint_StillUpdating_v002_00000.png</file>
+        <file>bin/data/images/MoviePrint_Updating_v002_00000.png</file>
+        <file>bin/data/images/HelpMenu_v001.png</file>
+        <file>bin/data/images/MoviePrint_Background_v002_00000.jpg</file>
+        <file>bin/data/images/MoviePrint_Background_v002_00000.png</file>
+        <file>bin/data/images/MoviePrint_Corrupt_00000.jpg</file>
+        <file>bin/data/images/MoviePrint_Corrupt_v001_00000.jpg</file>
+        <file>bin/data/images/MoviePrint_DropZone_v002_00000.png</file>
+        <file>bin/data/images/MoviePrint_FrameBackward_v001_00000.png</file>
+        <file>bin/data/images/MoviePrint_FrameForward_v001_00000.png</file>
+        <file>bin/data/images/MoviePrint_InPoint_v001_00000.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Header_v001_00000.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu1_v001_00001.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu1_v001_00002.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu2_v001_00001.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu2_v001_00002.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu3_v001_00001.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu3_v001_00002.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu4_v001_00001.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu4_v001_00002.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu5_v001_00001.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu5_v001_00002.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu6_v001_00001.png</file>
+        <file>bin/data/images/MoviePrint_Layout_Menu6_v001_00002.png</file>
+        <file>bin/data/images/MoviePrint_Loading_v002_00000.png</file>
+        <file>bin/data/images/MoviePrint_OutPoint_v001_00000.png</file>
+        <file>bin/data/images/MoviePrint_PreviewBackground_v001_00000.png</file>
+        <file>bin/data/images/MoviePrint_Print_v002_00000.png</file>
+        <file>bin/data/images/MoviePrint_Scrubb_v001_00000.png</file>
+        <file>bin/data/images/MoviePrint_Scrubb_v002_00000.png</file>
+        <file>bin/data/images/MoviePrint_SetInPoint_v001_00000.png</file>
+        <file>bin/data/images/MoviePrint_StartBildschirm_v002_00000.png</file>
+        <file>bin/data/fonts/HelveticaNeueLTCom-ThCn.ttf</file>
+        <file>bin/data/fonts/Ubuntu-Light.ttf</file>
+        <file>bin/data/fonts/verdana.ttf</file>
+        <file>bin/data/fonts/Franchise-Bold.ttf</file>
+        <file>bin/data/fonts/HelveticaNeueLTCom-Cn.ttf</file>
+        <file>bin/data/fonts/HelveticaNeueLTCom-Lt.ttf</file>
+        <file>bin/data/fonts/HelveticaNeueLTCom-LtCn.ttf</file>
+        <file>bin/data/fonts/HelveticaNeueLTCom-Md.ttf</file>
+        <file>bin/data/fonts/HelveticaNeueLTCom-MdCn.ttf</file>
+    </qresource>
 </RCC>
