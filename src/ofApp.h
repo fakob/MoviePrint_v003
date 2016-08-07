@@ -5,6 +5,8 @@
 #include "fakmenu.h"
 #include "fakgrabbedlistitem.h"
 #include "fakscrollbar.h"
+#include "fakgrabframes.h"
+#include "faktween.h"
 
 #include "ofxNotify.h"
 #include "ofxEasing.h"
@@ -12,8 +14,8 @@
 #include "ofxImgui.h"
 #include "ofxFontStash.h"
 
-#include "ofxAvAudioPlayer.h"
-#include "ofxAvVideoPlayer.h"
+//#include "ofxAvAudioPlayer.h"
+//#include "ofxAvVideoPlayer.h"
 
 class ofApp : public ofBaseApp{
 
@@ -54,14 +56,14 @@ public:
     };
 
 
-    //--------------------------------------------------------------
-    struct tweenStruct {
-        float value;
-        float initialTime;
-        float duration;
-        float minValue;
-        float maxValue;
-    };
+//    //--------------------------------------------------------------
+//    struct tweenStruct {
+//        float value;
+//        float initialTime;
+//        float duration;
+//        float minValue;
+//        float maxValue;
+//    };
 
     moviePrintDataStruct moviePrintDataSet;
     deque<moviePrintDataStruct> previousMoviePrintDataSet;
@@ -70,7 +72,6 @@ public:
 
     void moveToMovie();
     void loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBackground, bool _loadScrubMovie);
-    void loadNewMovie2(string _newMoviePath);
     bool checkExtension(string _tempExtension);
     void updateGridTimeArrayWithAutomaticInterval();
     void updateAllStills();
@@ -111,8 +112,11 @@ public:
     int getLowestFrameNumber();
     int getHighestFrameNumber();
     void updateOneThumb(int _thumbID, int _newFrameNumber);
+    void setInOutPoint(int _inPoint, int _outPoint);
     void setInPoint(int _inPoint);
-    void setOutPoint(int _inPoint);
+    void setOutPoint(int _outPoint);
+    void limitInPoint(int _inPoint);
+    void limitOutPoint(int _outPoint);
     void updateTimeSlider(bool _wholeRange);
     void startPrinting();
     void startListPrinting();
@@ -127,11 +131,12 @@ public:
     void updateAllLimits();
     void scrollEvent(ofVec2f & e);
     void updateTheScrollBar();
+    void updatePrintGridColumnsOrRows(bool _addToUndo);
+    void updatePrintDisplayTimecodeFramesOff(bool _addToUndo);
 
     // Movie
     fakGrabbedMovie loadedMovie;
-    fakGrabbedMovie loadedMovie2;
-
+    fakGrabFrames loadedMovie2;
     vector<string> stringMovieInfo;
     vector<string> stringMovieData;
 
@@ -154,6 +159,8 @@ public:
     bool shiftKeyPressed = FALSE;
 
     bool threadIsRunning;
+
+    bool useThread;
 
     bool addToUndo;
 
@@ -184,6 +191,9 @@ public:
     bool lockedDueToPrinting;
     bool updateNewPrintGrid;
     bool updateMovieFromList;
+    bool updateInPoint;
+    bool updateOutPoint;
+    bool updateInOutPoint;
 
     bool updateGridTimeArrayToMoviePrintDataSet;
 
@@ -277,14 +287,14 @@ public:
 //    ofxTween tweenTimeDelay;
 
 
-    tweenStruct initTime;
-    tweenStruct tweenTimelineInOut;
-    tweenStruct tweenListInOut;
-    tweenStruct tweenMoviePrintPreview;
-    tweenStruct tweenBlendStartDropImage;
-    tweenStruct tweenBlendStartDropImageCounter;
-    tweenStruct tweenFading;
-    tweenStruct tweenTimeDelay;
+    fakTween initTime;
+    fakTween tweenTimelineInOut;
+    fakTween tweenListInOut;
+    fakTween tweenMoviePrintPreview;
+    fakTween tweenBlendStartDropImage;
+    fakTween tweenBlendStartDropImageCounter;
+    fakTween tweenFading;
+    fakTween tweenTimeDelay;
 
 //    ofxEasingBack 	easingback;
 //    ofxEasingBounce 	easingbounce;
@@ -310,6 +320,7 @@ public:
     int headerHeight;
     int headerHeightMinusLine;
     int footerHeight;
+    int footerHeightTimeline;
     int displayGridMargin;
     int scrollBarWidth;
     int scrollBarMargin;
@@ -338,8 +349,8 @@ public:
     fakMenu menuTimeline;
     fakMenu menuMoveToList;
 
-//    ofxFontStash fontStashHelveticaLight;
-//    ofxFontStash fontStashHelveticaMedium;
+    ofxFontStash fontStashHelveticaLight;
+    ofxFontStash fontStashHelveticaMedium;
 
 
     // Printing

@@ -6,14 +6,16 @@ void ofApp::setup(){
     drawNotify = true; // ofxNotify
     showPlaceHolder = false; // added for developing
 
-    // used for ofxAvCodec addon
-    soundStream.setup(this, 2, 0, 44100, 512, 4);
+//    // used for ofxAvCodec addon
+//    soundStream.setup(this, 2, 0, 44100, 512, 4);
 
     ImGuiIO * io = &ImGui::GetIO();
     io->Fonts->AddFontFromFileTTF(&ofToDataPath("fonts/HelveticaNeueLTCom-Lt.ttf")[0], 14.f);
     gui.setup();
 
-    //    setResourcePath();
+    setResourcePath();
+
+    useThread = true;
 
     setupFinished = FALSE;
     updateNewPrintGrid = FALSE;
@@ -54,7 +56,8 @@ void ofApp::setup(){
     bottomMargin = 5;
     headerHeight = 40;
     headerHeightMinusLine = headerHeight - 13;
-    footerHeight = 40;
+    footerHeight = 60;
+    footerHeightTimeline = 20;
     displayGridMargin = 5;
     loaderBarHeight = 20;
     timeSliderHeight = 10;
@@ -72,7 +75,7 @@ void ofApp::setup(){
     moviePrintDataSet.printGridRows = 3;
     moviePrintDataSet.printGridMargin = 5;
     moviePrintDataSet.printDisplayVideoAudioInfo = true;
-    moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
+    moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
     moviePrintDataSet.printSingleFrames = false;
     moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
     moviePrintDataSet.printSizeWidth = 1024;
@@ -92,6 +95,9 @@ void ofApp::setup(){
     finishedUpdating = TRUE;
     showTimeline = FALSE;
     finishedTimeline = TRUE;
+    updateInPoint = FALSE;
+    updateOutPoint = FALSE;
+    updateInOutPoint = FALSE;
 
     updateMovieFromDrop = FALSE;
 
@@ -154,12 +160,13 @@ void ofApp::setup(){
     helpMenuImage.load("images/HelpMenu_v001.png");
     backgroundImagePreview.load("images/MoviePrint_PreviewBackground_v001_00000.png");
 
-//    fontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
-//    fontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
+    fontStashHelveticaLight.setup("fonts/HelveticaNeueLTCom-Lt.ttf");
+    fontStashHelveticaMedium.setup("fonts/HelveticaNeueLTCom-Md.ttf");
 
 
     // load standard movie
 //    loadedFile = "movies/FrameTestMovie_4zu3_v001.mov";
+//    loadedFile = "Original - Short from Vucko.mp4";
     loadedFile = "";
     saveMoviePrintPath = appPathUpStr + "/MoviePrints/";
 
@@ -180,8 +187,8 @@ void ofApp::setup(){
     scrollBar.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
 
     scrollBar.setScrollHeight((float)displayGridHeight);
-//    scrollBar.registerMouseEvents();
-//    ofAddListener(scrollBar.sbScrollingGoingOn, this, &ofApp::scrollEvent);
+    scrollBar.registerMouseEvents();
+    ofAddListener(scrollBar.sbScrollingGoingOn, this, &ofApp::scrollEvent);
 
 //    scrollBarList.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
 //    scrollBarList.registerMouseEvents();
@@ -212,14 +219,14 @@ void ofApp::setup(){
     ofAddListener(menuHelp.mMenuIsBeingOpened, this, &ofApp::menuIsOpened);
     ofAddListener(menuHelp.mMenuIsBeingClosed, this, &ofApp::menuIsClosed);
 
-//    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, 'B', false);
-//    menuTimeline.registerMouseEvents();
+    menuTimeline.setupMenu(0,0,0,0,0,footerHeightTimeline, true, 'B', false);
+    menuTimeline.registerMouseEvents();
 
     menuMoveToList.setupMenu(6,0,0,0,0,leftMargin*2, true, 'L', false);
     menuMoveToList.registerMouseEvents();
     ofAddListener(menuMoveToList.mMenuIsBeingClicked, this, &ofApp::menuIsClicked);
 
-//    moveInOutTimeline();
+    moveInOutTimeline();
 
 
     previousMoviePrintDataSet.clear();
@@ -230,6 +237,11 @@ void ofApp::setup(){
 //    uiSliderValueHigh = 1000;    // added this temporarily until new timeline slider is in place
 
     setupFinished = TRUE;
+
+//   loadedMovie2.setup("Original - Short from Vucko.mp4", 5);
+//   loadedMovie2.gfsMovie.play();
+//   loadedMovie2.gfsMovie.stop();
+
 }
 
 //--------------------------------------------------------------
@@ -268,8 +280,10 @@ void ofApp::update(){
     tweenBlendStartDropImage.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenBlendStartDropImage.initialTime, (tweenBlendStartDropImage.initialTime + tweenBlendStartDropImage.duration), tweenBlendStartDropImage.minValue, tweenBlendStartDropImage.maxValue, &ofxeasing::exp::easeInOut);
     tweenTimeDelay.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenTimeDelay.initialTime, (tweenTimeDelay.initialTime + tweenTimeDelay.duration), tweenTimeDelay.minValue, tweenTimeDelay.maxValue, &ofxeasing::exp::easeInOut);
     tweenMoviePrintPreview.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenMoviePrintPreview.initialTime, (tweenMoviePrintPreview.initialTime + tweenMoviePrintPreview.duration), tweenMoviePrintPreview.minValue, tweenMoviePrintPreview.maxValue, &ofxeasing::exp::easeInOut);
+    tweenFading.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenFading.initialTime, (tweenFading.initialTime + tweenFading.duration), tweenFading.minValue, tweenFading.maxValue, &ofxeasing::exp::easeInOut);
+//    ofLog(OF_LOG_VERBOSE, "tweenFading.value:" + ofToString(tweenFading.value));
 
-    threadIsRunning = loadedMovie.isThreadRunning();
+    threadIsRunning = loadedMovie.gmMovie.isThreadRunning();
 
     // set window to minium width !!NOT WORKING
     //    if (windowWasResized && !ofGetMousePressed()) {
@@ -312,12 +326,14 @@ void ofApp::update(){
     }
     if (showTimeline) {
         if (finishedTimeline) {
-            if (tweenTimelineInOut.value > 0.5) {
+            if (timer.getElapsedSeconds() > 0.5) {
+//                ofLog(OF_LOG_VERBOSE, "showTimeline = FALSE;--------------------------------------------");
                 showTimeline = FALSE;
                 moveInOutTimeline();
             }
         }
     }
+//    ofLog(OF_LOG_VERBOSE, "showTimeline " + ofToString(showTimeline) + " finishedTimeline " + ofToString(finishedTimeline) + " tweenTimelineInOut.value " + ofToString(tweenTimelineInOut.value));
 
     if (movieIsBeingGrabbed) {
         if (loadedMovie.allGrabbed() || !loadedMovie.isMovieLoaded()) {
@@ -331,7 +347,7 @@ void ofApp::update(){
 
     // update Movie for Scrubbing or InOut manipulations
     if (loadedMovie.gmScrubMovie || updateInOut) {
-        loadedMovie.gmMovieScrub.update();
+        loadedMovie.gmMovie.update();
     }
 
 //    handlingEventOverlays();
@@ -345,8 +361,16 @@ void ofApp::update(){
     }
 
 //    // calculate rollout of ofxUI pos, scal
+    ImGui::SetWindowPos("timelineMenu", ImVec2(menuTimeline.getPositionX(), menuTimeline.getPositionY() + menuTimeline.mMenuRollOverDimension - (menuTimeline.mMenuRollOverDimension + menuTimeline.mMenuHeight * menuTimeline.getRelSizeH())), ImGuiSetCond_Always);
+    ImGui::SetWindowSize("timelineMenu", ImVec2((menuTimeline.getSizeW() - leftMargin - rightMargin), menuTimeline.getSizeH()), ImGuiSetCond_Always);
     ImGui::SetWindowPos("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
     ImGui::SetWindowSize("SettingsMoviePrint", ImVec2(menuMoviePrintSettings.getSizeW(), menuMoviePrintSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
+
+    ImGui::SetWindowPos("HelpMenu", ImVec2(menuHelp.getPositionX(), menuHelp.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
+    ImGui::SetWindowSize("HelpMenu", ImVec2(menuHelp.getSizeW(), menuHelp.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
+
+    ImGui::SetWindowPos("MovieInfoMenu", ImVec2(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
+    ImGui::SetWindowSize("MovieInfoMenu", ImVec2(menuMovieInfo.getSizeW(), menuMovieInfo.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
 
     ImGui::SetWindowPos("moviePrintMenu", ImVec2(menuSettings.getPositionX(), menuSettings.getPositionY() + headerHeightMinusLine), ImGuiSetCond_Always);
     ImGui::SetWindowSize("moviePrintMenu", ImVec2(menuSettings.getSizeW(), menuSettings.getSizeH()-headerHeightMinusLine-1), ImGuiSetCond_Always);
@@ -364,13 +388,14 @@ void ofApp::update(){
 
             updateInOut = FALSE;
             updateScrub = TRUE;
+            ofLog(OF_LOG_VERBOSE, "loadedMovie.gmScrubMovie - updateScrub true" );
             int i = loadedMovie.gmScrubID;
 
             if (scrubbingJustStarted) {
                 scrubbingJustStarted = false;
                 scrubDelta = 0.0;
                 scrubMouseDelta = 0.0;
-                scrubInitialFrame = loadedMovie.grabbedStill[i].gsFrameNumber;
+                scrubInitialFrame = loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber;
             }
 
             scrubMouseDelta = (ofGetMouseX() - loadedMovie.grabbedStill[i].gsX - thumbWidth/2);
@@ -384,7 +409,7 @@ void ofApp::update(){
                 scrubMouseDelta = scrubMouseDelta + thumbWidth/6.0;
             }
 
-            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta before:" + ofToString(scrubMouseDelta));
+//            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta before:" + ofToString(scrubMouseDelta));
 
             float expScrubMouseDelta;
 
@@ -408,8 +433,8 @@ void ofApp::update(){
             }
 
 
-            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta after:" + ofToString(expScrubMouseDelta));
-            ofLog(OF_LOG_VERBOSE, "scrubDelta:" + ofToString(scrubDelta));
+//            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta after:" + ofToString(expScrubMouseDelta));
+//            ofLog(OF_LOG_VERBOSE, "scrubDelta:" + ofToString(scrubDelta));
             // new Frame Number is being cropped by the movies first and last frame
             int newFrameNumber = scrubDelta + scrubInitialFrame;
             if (newFrameNumber > loadedMovie.gmTotalFrames-1) {
@@ -419,60 +444,49 @@ void ofApp::update(){
                 newFrameNumber = 0;
             }
 
-            if (loadedMovie.gmHasNoFrames) {
-                int tempNewFrameNumber = newFrameNumber;
-                if (tempNewFrameNumber < 5) {
-                    tempNewFrameNumber = 5;
-                }
-                loadedMovie.gmMovieScrub.setPosition((float)(tempNewFrameNumber - 2)/(float)(loadedMovie.gmTotalFrames-1));
-                loadedMovie.gmMovieScrub.nextFrame();
-                loadedMovie.gmMovieScrub.nextFrame();
-            } else {
-                loadedMovie.gmMovieScrub.setFrame(newFrameNumber);
+//            if (loadedMovie.gmHasNoFrames) {
+//                int tempNewFrameNumber = newFrameNumber;
+//                if (tempNewFrameNumber < 5) {
+//                    tempNewFrameNumber = 5;
+//                }
+//                loadedMovie.gmMovieScrub.setPosition((float)(tempNewFrameNumber - 2)/(float)(loadedMovie.gmTotalFrames-1));
+//                loadedMovie.gmMovieScrub.nextFrame();
+//                loadedMovie.gmMovieScrub.nextFrame();
+//            } else {
+            if (loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber != newFrameNumber) {
+                loadedMovie.gmMovie.setFrameScrub(i, newFrameNumber);
             }
-            loadedMovie.grabbedStill[i].gsFrameNumber = newFrameNumber;
+//            }
+            loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber = newFrameNumber;
         }
 
-//        // update while Slider sends event
-//        if (manipulateSlider) {
-//            updateScrub = FALSE;
-//            updateInOut = TRUE;
-//            if (uiRangeSliderTimeline->hitLow) {
-//                scrubWindowGridNumber = 0;
-//                if (loadedMovie.gmHasNoFrames) {
-//                    loadedMovie.gmMovieScrub.setPosition((float)(uiSliderValueLow - 1)/(float)(loadedMovie.gmTotalFrames-1));
-//                    loadedMovie.gmMovieScrub.nextFrame();
-//                } else {
-//                    loadedMovie.gmMovieScrub.setFrame(uiSliderValueLow);
-//                }
-//                loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = uiSliderValueLow;
-//            } else if (uiRangeSliderTimeline->hitHigh)
-//            {
-//                scrubWindowGridNumber = numberOfStills-1;
-//                if (loadedMovie.gmHasNoFrames) {
-//                    loadedMovie.gmMovieScrub.setPosition((float)(uiSliderValueHigh - 1)/(float)(loadedMovie.gmTotalFrames-1));
-//                    loadedMovie.gmMovieScrub.nextFrame();
-//                } else {
-//                    loadedMovie.gmMovieScrub.setFrame(uiSliderValueHigh);
-//                }
-//                loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = uiSliderValueHigh;
-//            } else if (uiRangeSliderTimeline->hitCenter)
-//            {
-//                scrubWindowGridNumber = numberOfStills/2;
-//                if (loadedMovie.gmHasNoFrames) {
-//                    loadedMovie.gmMovieScrub.setPosition((float)(((uiSliderValueHigh - uiSliderValueLow)/2 + uiSliderValueLow) - 1)/(float)(loadedMovie.gmTotalFrames-1));
-//                    loadedMovie.gmMovieScrub.nextFrame();
-//                } else {
-//                    loadedMovie.gmMovieScrub.setFrame((uiSliderValueHigh - uiSliderValueLow)/2 + uiSliderValueLow);
-//                }
-//                loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = (uiSliderValueHigh - uiSliderValueLow)/2 + uiSliderValueLow;
-//            }
-//        }
+        // update while Slider sends event
+        if (manipulateSlider) {
+            updateScrub = FALSE;
+            updateInOut = TRUE;
+            if (updateInPoint) {
+                scrubWindowGridNumber = 0;
+                loadedMovie.gmMovie.setScrub(inPoint);
+                loadedMovie.gmMovie.grabbedFrame[scrubWindowGridNumber].gfFrameNumber = inPoint;
+            } else if (updateOutPoint)
+            {
+                scrubWindowGridNumber = numberOfStills-1;
+                loadedMovie.gmMovie.setScrub(outPoint);
+                loadedMovie.gmMovie.grabbedFrame[scrubWindowGridNumber].gfFrameNumber = outPoint;
+            } else if (updateInOutPoint)
+            {
+                scrubWindowGridNumber = numberOfStills/2;
+                loadedMovie.gmMovie.setScrub((outPoint - inPoint)/2 + inPoint);
+                loadedMovie.gmMovie.grabbedFrame[scrubWindowGridNumber].gfFrameNumber = (outPoint - inPoint)/2 + inPoint;
+            }
+        }
+
     }
 
     if (updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed()) {
         updateInOut = FALSE;
         updateScrub = FALSE;
+//        ofLog(OF_LOG_VERBOSE, "updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed() - updateScrub false" );
 
         if(tweenTimeDelay.value < 5){
             updateNewPrintGrid = FALSE;
@@ -506,13 +520,7 @@ void ofApp::update(){
         if (counterToUpdate > 1) {
             ofLog(OF_LOG_VERBOSE, "droppedFiles[0].path()" + ofToString(droppedFiles[0].path()));
 
-            loadNewMovie2(droppedFiles[0].path());
-//            loadNewMovie(droppedFiles[0].path(), TRUE, FALSE, TRUE);
-//            loadedMovie2.gmMovie.load(droppedFiles[0].path());
-            loadedMovie2.loadNewMovieToBeGrabbed(droppedFiles[0].path(), 9, false, true);
-
-
-
+            loadNewMovie(droppedFiles[0].path(), TRUE, FALSE, TRUE);
             if (loadedMovie.isMovieLoaded()) {
                 moveToMovie();
             }
@@ -522,15 +530,15 @@ void ofApp::update(){
     }
 
     if (scrollBar.sbActive) {
-    //        ofLog(OF_LOG_VERBOSE, "scrollBar Active:" + ofToString(scrollAmountRel) );
+//            ofLog(OF_LOG_VERBOSE, "scrollBar Active:" + ofToString(scrollAmountRel) );
         if (scrollGrid) {
-    //            ofLog(OF_LOG_VERBOSE, "scrollGrid True:" + ofToString(scrollAmountRel) );
+//                ofLog(OF_LOG_VERBOSE, "scrollGrid True:" + ofToString(scrollAmountRel) );
             if (!scrollBar.sbCalculateScrollInertia && !scrollBar.sbScrollBarDrag) {
                 scrollGrid = false;
             } else {
             scrollBar.update();
             scrollAmountRel = scrollBar.getRelativePos();
-    //            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
+//                ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
             }
         }
     } else {
@@ -556,6 +564,7 @@ void ofApp::update(){
 
     if (currPrintingList) {
         updateScrub = FALSE;
+        ofLog(OF_LOG_VERBOSE, "currPrintingList - updateScrub false" );
         updateInOut = FALSE;
         printListToFile();
     }
@@ -573,17 +582,36 @@ void ofApp::update(){
         }
     }
 
-
-    // sollte kurze wait schleife fuer das scrubvideoloading sein - leider funktioniert das nicht so ganz - man kann zwar das scrubvideo etwas spaeter loaden, waerenddessen haelt aber trotzdem alles an
-    if (loadNewMovieToBeScrubbedBool) {
-        if (timer.getElapsedSeconds() > 0.1) {
-            loadedMovie.loadNewMovieToBeScrubbed(loadedMovie.gmMovie.getMoviePath());
-            loadNewMovieToBeScrubbedBool = FALSE;
+    if (ImGui::IsMouseReleased(0)) {
+//        ofLog(OF_LOG_VERBOSE, "ImGui mouseReleased" );
+        if (loadedMovie.gmMovie.isThreadRunning()) {
+            loadedMovie.gmMovie.stop(false);
+        }
+        if (updateInOut) {
+            ofDrawRectangle(0,0,640,360);
+            //      tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+            tweenFading.minValue = 255.0;
+            tweenFading.maxValue = 0.0;
+            tweenFading.duration = 0.5;
+            tweenFading.initialTime = ofGetElapsedTimef();
+            updateGridTimeArrayWithAutomaticInterval();
+            updateAllStills();
+            addToUndo = true;
+        }
+        if (addToUndo) {
+            addMoviePrintDataSet(undoPosition);
+            addToUndo = false;
         }
     }
-    loadedMovie.gmMovie.update();
-    loadedMovie2.gmMovie.update();
 
+
+//    // sollte kurze wait schleife fuer das scrubvideoloading sein - leider funktioniert das nicht so ganz - man kann zwar das scrubvideo etwas spaeter loaden, waerenddessen haelt aber trotzdem alles an
+//    if (loadNewMovieToBeScrubbedBool) {
+//        if (timer.getElapsedSeconds() > 0.1) {
+//            loadedMovie.loadNewMovieToBeScrubbed(loadedMovie.gmMovie.getMoviePath());
+//            loadNewMovieToBeScrubbedBool = FALSE;
+//        }
+//    }
 }
 
 //--------------------------------------------------------------
@@ -619,26 +647,32 @@ void ofApp::draw(){
                 ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
                 ofSetColor(255,255,255,(int)tweenFading.value);
 
-                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-    //                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * 1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+                loadedMovie.gmMovie.scrubImg.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
                 loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (tweenFading.value/255));
 
                 ofSetColor(255, 255, 255, (int)(tweenFading.value/255)*255);
 
-//                if (uiRangeSliderTimeline->hitLow) {
-//                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
-//                }
-//                if (uiRangeSliderTimeline->hitHigh) {
-//                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
-//                }
-//                if (uiRangeSliderTimeline->hitCenter) {
-//                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
-//                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
-//                }
+                if (updateInPoint) {
+//                    ofLog(OF_LOG_VERBOSE, "updateInPoint:" + ofToString(updateInPoint));
+                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
+                }
+                if (updateOutPoint) {
+//                    ofLog(OF_LOG_VERBOSE, "updateOutPoint:" + ofToString(updateOutPoint));
+                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
+                }
+                if (updateInOutPoint) {
+//                    ofLog(OF_LOG_VERBOSE, "updateInOutPoint:" + ofToString(updateInOutPoint));
+                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-inPointImage.getHeight()/2);
+                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-outPointImage.getHeight()/2);
+                }
 
-                if(tweenFading.value < 5){
+//                ofLog(OF_LOG_VERBOSE, "tweenFading.value:" + ofToString(tweenFading.value));
+                if(tweenFading.value < 0.05){
                     updateInOut = FALSE;
                     manipulateSlider = FALSE;
+                    updateInPoint = FALSE;
+                    updateOutPoint = FALSE;
+                    updateInOutPoint = FALSE;
                 }
 
                 ofSetColor(255);
@@ -670,24 +704,7 @@ void ofApp::draw(){
         }
     }
 
-<<<<<<< HEAD
-        loadedMovie.gmMovie.draw(0,400,640,360);
-        loadedMovie2.gmMovie.draw(640,400,640,360);
-
     ofxNotify::draw(drawNotify);
-}
-
-//--------------------------------------------------------------
-void ofApp::keyPressed(int key){
-    ofPixels tempPixels = loadedMovie.gmMovie.getPixels();
-    ofLog(OF_LOG_VERBOSE, "tempPixels width: " + ofToString(tempPixels.getWidth()) + " height: " + ofToString(tempPixels.getHeight()));
-    ofLog(OF_LOG_VERBOSE, "tempPixels width: " + ofToString(tempPixels.getWidth()) + " height: " + ofToString(tempPixels.getHeight()));
-    ofPixels tempPixels2 = loadedMovie2.gmMovie.getPixels();
-    ofLog(OF_LOG_VERBOSE, "tempPixels2 width: " + ofToString(tempPixels2.getWidth()) + " height: " + ofToString(tempPixels2.getHeight()));
-    ofLog(OF_LOG_VERBOSE, "tempPixels2 width: " + ofToString(tempPixels2.getWidth()) + " height: " + ofToString(tempPixels2.getHeight()));
-}
-=======
-//    ofxNotify::draw(drawNotify);
 }
 
 //--------------------------------------------------------------
@@ -696,6 +713,33 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ofPushStyle();
     ofSetColor(255);
 
+    // gui MoviePrint settings
+    gui.begin();
+
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.00f, 0.00f, 0.00f, 0.10f));
+
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Header, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_Column, ImColor(75, 21, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ColumnActive, ImColor(255, 0, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_ColumnHovered, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(238, 71, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImColor(238, 71, 0, 255));
+    style.GrabMinSize = 20;
+    style.GrabRounding = 4;
+    style.FrameRounding = 6;
+
     // overlay von MoviePrintPreview
     ofPushStyle();
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
@@ -703,7 +747,6 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ofDrawRectangle(ofGetWindowWidth()/2, (ofGetWindowHeight()-headerHeight-footerHeight/2)/2 + headerHeight, ofGetWindowWidth(), (ofGetWindowHeight()-headerHeight-footerHeight/2));
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     ofPopStyle();
->>>>>>> ofxEasing
 
     if (droppedFiles.size() > 1) { // draw
         if (loadedMovie.isMovieLoaded()) {
@@ -714,6 +757,48 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             }
         }
     }
+
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0);
+
+    if (!(tweenListInOut.value == 0.0)) { // stop drawing when position is at showMovieView
+
+        ImGui::Begin("droppedList", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+        //        glFontStash.drawMultiLine("ID", tempSize, _x + tempFontMargin, _y + _scrollAmount + tempSize);
+        //        glFontStash.drawMultiLine("Name", tempSize, _x + glDroppedItem[0].gliIDWidth + tempFontMargin, _y + _scrollAmount + tempSize);
+        //        glFontStash.drawMultiLine("Tried", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth - 5, _y + _scrollAmount + tempSize);
+        //        glFontStash.drawMultiLine("Printed", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth + tempFontMargin - glFontStash.getBBox("Printed", tempSize,0,0).getMaxY(), _y + _scrollAmount + tempSize);
+        ImGui::Columns(4, "mycolumns");
+        ImGui::Separator();
+        ImGui::Text("ID"); ImGui::NextColumn();
+        ImGui::Text("Name"); ImGui::NextColumn();
+        ImGui::Text("Tried"); ImGui::NextColumn();
+        ImGui::Text("Printed"); ImGui::NextColumn();
+
+        for(int k = 0; k < droppedItem.size(); k++){
+            static int selectedItem = -1;
+            if (ImGui::Selectable(ofToString(droppedItem[k].itemProperties.ipID).c_str(), selectedItem == k, ImGuiSelectableFlags_SpanAllColumns))
+                selectedItem = k;
+            if (ImGui::IsItemActive()) {
+                ofLog(OF_LOG_VERBOSE, "droppedItem[k].itemProperties.ipID:" + ofToString(droppedItem[k].itemProperties.ipID));
+                activeItemID = droppedItem[k].itemProperties.ipID;
+                updateMovieFromList = TRUE;
+            }
+            //        ImGui::Text(ofToString(droppedItem[k].itemProperties.ipID).c_str());
+            ImGui::NextColumn();
+            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipName).c_str());
+            ImGui::NextColumn();
+            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipTriedToPrint).c_str());
+            ImGui::NextColumn();
+            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipPrinted).c_str());
+            ImGui::NextColumn();
+        }
+        ImGui::End();
+    }
+
+    ImGui::PopStyleVar();
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImColor(255, 80, 6, 255));
 
     layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
 
@@ -760,39 +845,48 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         menuMovieInfo.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
         menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
         menuMovieInfo.drawMenu();
-//        drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
-//        fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuMovieInfo.getSizeH()-headerHeight)/30));
+
+        if ((menuMovieInfo.getSizeH()-headerHeight)>0) {
+
+            ImGui::Begin("MovieInfoMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
+            ImGui::End();
+        }
+
+        ImGui::PopStyleVar();
     }
 
     tempXPos = gridColumns-2;
     menuHelp.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuHelp.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuHelp.drawMenu();
-    ofSetColor(255, 255, 255, menuHelp.getRelSizeH() * 255);
-    helpMenuImage.draw((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*1, helpMenuImage.getWidth(), helpMenuImage.getHeight() * menuHelp.getRelSizeH());
 
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuHelp.getSizeH()-headerHeight)/30));
+
+    if ((menuHelp.getSizeH()-headerHeight)>0) {
+
+        ImGui::Begin("HelpMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
+        ImGui::End();
+    }
+    ImGui::PopStyleVar();
 
     tempXPos = gridColumns-1;
-    ofSetColor(255, 255, 255, 255);
-    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-    float tempXPosLerp = ofLerp((ofGetWindowWidth()-scrollBarWidth)/2.0, ((leftMargin + (thumbWidth + displayGridMargin)*tempXPos)/2.0) * _scaleFactor, menuMoviePrintSettings.getRelSizeH());
-    float tempYPos = headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin;
-    fboToPreview.draw(tempXPosLerp, tempYPos, tweenMoviePrintPreview.value * fboToPreviewWidth, tweenMoviePrintPreview.value * fboToPreviewHeight);
-    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
 
     menuMoviePrintSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
 
+    ofSetColor(255, 255, 255, 255);
 
-    // gui MoviePrint settings
-    gui.begin();
-//    bool* opened;
-//    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiSetCond_Always);
+    if (!showListView) {
+        if (loadedMovie.isMovieLoaded()) {
+            menuTimeline.setPosition(0, ofGetWindowHeight());
+            menuTimeline.setSize(ofGetWindowWidth(), footerHeight - footerHeightTimeline);
+            menuTimeline.drawMenu();
+        }
+    }
 
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ((menuMoviePrintSettings.getSizeH()-headerHeight)/30));
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.00f, 0.00f, 0.00f, 0.10f));
 
     if ((menuMoviePrintSettings.getSizeH()-headerHeight)>0) {
 
@@ -812,6 +906,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             } else {
                 formatExtension = "png";
             }
+            ofLog(OF_LOG_VERBOSE, "movieFileName: " + ofToString(movieFileName));
 
             ofFileDialogResult saveFileResult = ofSystemSaveDialog(movieFileName + "." + formatExtension, "Select a Folder");
             if (saveFileResult.bSuccess){
@@ -830,8 +925,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
         ImGui::Separator();
         if (ImGui::SliderInt("PrintColumns", &moviePrintDataSet.printGridColumns, 1,10)) {
             if (printGridSetWithColumnsAndRows) {
-                printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
-                calculateNewPrintGrid();
+                updatePrintGridColumnsOrRows(false);
             } else {
                 moviePrintDataSet.printGridRows = ceil(numberOfStills/(float)moviePrintDataSet.printGridColumns);
                 calculateNewPrintSize();
@@ -839,9 +933,7 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             addToUndo = true;
         }
         if (ImGui::SliderInt("PrintRows", &moviePrintDataSet.printGridRows, 1,20)) {
-            printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
-            calculateNewPrintGrid();
-            addToUndo = true;
+            updatePrintGridColumnsOrRows(true);
         }
         if (ImGui::SliderInt("PrintMargin", &moviePrintDataSet.printGridMargin, 0,30)) {
             calculateNewPrintSize();
@@ -852,88 +944,69 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
             calculateNewPrintSize();
             addToUndo = true;
         }
-        if (ImGui::RadioButton("Display Frames", &moviePrintDataSet.printDisplayTimecodeFramesOff, 0)) {
-            moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
-            loadedMovie.gmShowFramesUI = TRUE;
-            loadedMovie.vfFramesToTimeSwitch = FALSE;
-            addToUndo = true;
+        if (ImGui::RadioButton("Display Frames", &moviePrintDataSet.printDisplayTimecodeFramesOff, 2)) {
+//            moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
+//            loadedMovie.gmShowFramesUI = TRUE;
+//            loadedMovie.vfFramesToTimeSwitch = FALSE;
+//            addToUndo = true;
+            updatePrintDisplayTimecodeFramesOff(true);
         }
         if (ImGui::RadioButton("Display TimeCode", &moviePrintDataSet.printDisplayTimecodeFramesOff, 1)) {
-            moviePrintDataSet.printDisplayTimecodeFramesOff = 1;
-            loadedMovie.gmShowFramesUI = TRUE;
-            loadedMovie.vfFramesToTimeSwitch = TRUE;
-            addToUndo = true;
+//            moviePrintDataSet.printDisplayTimecodeFramesOff = 1;
+//            loadedMovie.gmShowFramesUI = TRUE;
+//            loadedMovie.vfFramesToTimeSwitch = TRUE;
+//            addToUndo = true;
+            updatePrintDisplayTimecodeFramesOff(true);
         }
-        if (ImGui::RadioButton("off", &moviePrintDataSet.printDisplayTimecodeFramesOff, 2)) {
-            moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
-            loadedMovie.gmShowFramesUI = FALSE;
-            addToUndo = true;
+        if (ImGui::RadioButton("off", &moviePrintDataSet.printDisplayTimecodeFramesOff, 0)) {
+//            moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
+//            loadedMovie.gmShowFramesUI = FALSE;
+//            addToUndo = true;
+            updatePrintDisplayTimecodeFramesOff(true);
         }
         ImGui::Separator();
-        ImGui::Checkbox("Save also individual frames", &moviePrintDataSet.printSingleFrames);
+
+        if (ImGui::Checkbox("Save also individual frames", &moviePrintDataSet.printSingleFrames)) {
+            addToUndo = true;
+        }
         ImGui::Separator();
 
         // has problem as it does not load moviePrintDataSet.printFormat -> see int and enum for solution
-        static int tempR = 0;
-        if (ImGui::RadioButton("png with alpha", &tempR, 0)) {
+        static int tempR = (int)moviePrintDataSet.printFormat;
+        if (ImGui::RadioButton("png with alpha", &tempR, 13)) {
+//            moviePrintDataSet.printFormat = (ofImageFormat)tempR; //OF_IMAGE_FORMAT_PNG;
             moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
+            addToUndo = true;
+//            ofLog(OF_LOG_VERBOSE, "tempR:" + ofToString(tempR) );
+//            ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.printFormat:" + ofToString(moviePrintDataSet.printFormat) );
         }
-        if (ImGui::RadioButton("jpg", &tempR, 1)) {
+        if (ImGui::RadioButton("jpg", &tempR, 2)) {
+//            moviePrintDataSet.printFormat = (ofImageFormat)tempR; //OF_IMAGE_FORMAT_JPEG;
             moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_JPEG;
+            addToUndo = true;
+//            ofLog(OF_LOG_VERBOSE, "tempR:" + ofToString(tempR) );
+//            ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.printFormat:" + ofToString(moviePrintDataSet.printFormat) );
         }
         ImGui::Separator();
-        static int tempS = 0;
-        if (ImGui::RadioButton("1024px width", &tempS, 0)) {
-            moviePrintDataSet.printSizeWidth = 1024;
+//        static int tempS = 0;
+        if (ImGui::RadioButton("1024px width", &moviePrintDataSet.printSizeWidth, 1024)) {
+//            moviePrintDataSet.printSizeWidth = 1024;
+            addToUndo = true;
         }
-        if (ImGui::RadioButton("2048px width", &tempS, 1)) {
-            moviePrintDataSet.printSizeWidth = 2048;
+        if (ImGui::RadioButton("2048px width", &moviePrintDataSet.printSizeWidth, 2048)) {
+//            moviePrintDataSet.printSizeWidth = 2048;
+            addToUndo = true;
         }
-        if (ImGui::RadioButton("3072px width", &tempS, 2)) {
-            moviePrintDataSet.printSizeWidth = 3072;
+        if (ImGui::RadioButton("3072px width", &moviePrintDataSet.printSizeWidth, 3072)) {
+//            moviePrintDataSet.printSizeWidth = 3072;
+            addToUndo = true;
         }
-        if (ImGui::RadioButton("4096px width", &tempS, 3)) {
-            moviePrintDataSet.printSizeWidth = 4096;
-        }
-
-        if (ImGui::SliderInt("InPoint", &inPoint, 0,totalFrames-1)) {
-            int i = inPoint;
-            int j = outPoint;
-            if ((outPoint-i < numberOfStills)) {
-                j = i + (numberOfStills - 1);
-                if (j > (totalFrames-1)) {
-                    j = (totalFrames-1);
-                    i = j - (numberOfStills - 1);
-                }
-            }
-        //    uiRangeSliderTimeline->setValueLow(i);
-        //    uiRangeSliderTimeline->setValueHigh(j);
-            inPoint = i;
-            outPoint = j;
-            updateGridTimeArrayWithAutomaticInterval();
-            updateAllStills();
-            ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+        if (ImGui::RadioButton("4096px width", &moviePrintDataSet.printSizeWidth, 4096)) {
+//            moviePrintDataSet.printSizeWidth = 4096;
+            addToUndo = true;
         }
 
-        if (ImGui::SliderInt("OutPoint", &outPoint, 0,totalFrames-1)) {
-            int i = inPoint;
-            int j = outPoint;
-            if ((j - inPoint < numberOfStills)) {
-                i = j - (numberOfStills - 1);
-                if (i < 0) {
-                    i = 0;
-                    j = (numberOfStills - 1);
-
-                }
-            }
-        //    uiRangeSliderTimeline->setValueLow(i);
-        //    uiRangeSliderTimeline->setValueHigh(j);
-            inPoint = i;
-            outPoint = j;
-            updateGridTimeArrayWithAutomaticInterval();
-            updateAllStills();
-            ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
-        }
+//        ImGui::PopItemWidth();
 
         ImGui::End();
 
@@ -980,61 +1053,89 @@ void ofApp::drawUI(int _scaleFactor, bool _hideInPrint){
     }
 
     ImGui::PopStyleVar();
-    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0);
 
-    if (!(tweenListInOut.value == 0.0)) { // stop drawing when position is at showMovieView
+//    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(75, 21, 0, 255));
+//    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(238, 71, 0, 255));
+//    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(170, 50, 0, 255));
+//    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(238, 71, 0, 255));
+//    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(170, 50, 0, 255));
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, menuTimeline.getRelSizeH());
 
-        ImGui::Begin("droppedList", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse);
+    if ((menuTimeline.getRelSizeH())>0) {
 
-        //        glFontStash.drawMultiLine("ID", tempSize, _x + tempFontMargin, _y + _scrollAmount + tempSize);
-        //        glFontStash.drawMultiLine("Name", tempSize, _x + glDroppedItem[0].gliIDWidth + tempFontMargin, _y + _scrollAmount + tempSize);
-        //        glFontStash.drawMultiLine("Tried", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth - 5, _y + _scrollAmount + tempSize);
-        //        glFontStash.drawMultiLine("Printed", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth + tempFontMargin - glFontStash.getBBox("Printed", tempSize,0,0).getMaxY(), _y + _scrollAmount + tempSize);
-        ImGui::Columns(4, "mycolumns");
-        ImGui::Separator();
-        ImGui::Text("ID"); ImGui::NextColumn();
-        ImGui::Text("Name"); ImGui::NextColumn();
-        ImGui::Text("Tried"); ImGui::NextColumn();
-        ImGui::Text("Printed"); ImGui::NextColumn();
+        ImGui::Begin("timelineMenu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoScrollbar);
 
-        for(int k = 0; k < droppedItem.size(); k++){
-            static int selectedItem = -1;
-            if (ImGui::Selectable(ofToString(droppedItem[k].itemProperties.ipID).c_str(), selectedItem == k, ImGuiSelectableFlags_SpanAllColumns))
-                selectedItem = k;
-            if (ImGui::IsItemActive()) {
-                ofLog(OF_LOG_VERBOSE, "droppedItem[k].itemProperties.ipID:" + ofToString(droppedItem[k].itemProperties.ipID));
-                activeItemID = droppedItem[k].itemProperties.ipID;
-                updateMovieFromList = TRUE;
-            }
-            //        ImGui::Text(ofToString(droppedItem[k].itemProperties.ipID).c_str());
-            ImGui::NextColumn();
-            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipName).c_str());
-            ImGui::NextColumn();
-            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipTriedToPrint).c_str());
-            ImGui::NextColumn();
-            ImGui::Text(ofToString(droppedItem[k].itemProperties.ipPrinted).c_str());
-            ImGui::NextColumn();
+        ImGui::PushItemWidth((menuTimeline.getSizeW()/3.0) - leftMargin*2 - rightMargin*2);
+        if (ImGui::SliderInt("##InPoint", &inPoint, 0,totalFrames-1, "Inpoint: %.0f")) {
+//            updateScrub = FALSE;
+//            updateInOut = TRUE;
+            updateInPoint = TRUE;
+            manipulateSlider = TRUE;
+//            scrubWindowGridNumber = 0;
+            limitInPoint(inPoint);
+//            loadedMovie.gmMovie.setScrub(inPoint);
         }
+        ImGui::SameLine();
+        int tempRange = outPoint - inPoint;
+        int tempMidPoint = inPoint + (tempRange/2);
+        if (ImGui::DragInt("##MidPoint", &tempMidPoint, 1.0, tempRange/2 ,totalFrames-1-tempRange/2, "Midpoint: %.0f")) {
+//            updateScrub = FALSE;
+//            updateInOut = TRUE;
+            updateInOutPoint = TRUE;
+            manipulateSlider = TRUE;
+            limitInPoint(tempMidPoint - tempRange/2);
+            limitOutPoint(tempMidPoint + tempRange/2);
+//            scrubWindowGridNumber = numberOfStills/2;
+//            setInOutPoint(tempMidPoint - tempRange/2, tempMidPoint + tempRange/2);
+//            loadedMovie.gmMovie.setScrub(tempMidPoint);
+        }
+        ImGui::SameLine();
+        if (ImGui::SliderInt("##OutPoint", &outPoint, 0,totalFrames-1, "Outpoint: %.0f")) {
+//            updateScrub = FALSE;
+//            updateInOut = TRUE;
+            updateOutPoint = TRUE;
+            manipulateSlider = TRUE;
+//            scrubWindowGridNumber = numberOfStills-1;
+            limitOutPoint(outPoint);
+//            loadedMovie.gmMovie.setScrub(outPoint);
+        }
+        ImGui::PopItemWidth();
+
         ImGui::End();
     }
 
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
     ImGui::PopStyleVar();
 
+    ImGui::PopStyleColor(18);
 
     gui.end();
 
+    if (loadedMovie.isMovieLoaded()) {
+        tempXPos = 0;
+        drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
+        fontStashHelveticaMedium.draw(loadedMovie.gmMovie.gfsMIFileNameAndExtension, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
+    }
 
+    tempXPos = gridColumns-2;
+    ofSetColor(255, 255, 255, menuHelp.getRelSizeH() * 255);
+    helpMenuImage.draw((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*1, helpMenuImage.getWidth(), helpMenuImage.getHeight() * menuHelp.getRelSizeH());
 
+    tempXPos = gridColumns-1;
     ofSetColor(255, 255, 255, 255);
+    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
+    float tempXPosLerp = ofLerp((ofGetWindowWidth()-scrollBarWidth)/2.0, ((leftMargin + (thumbWidth + displayGridMargin)*tempXPos)/2.0) * _scaleFactor, menuMoviePrintSettings.getRelSizeH());
+    float tempYPos = headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin;
+    fboToPreview.draw(tempXPosLerp, tempYPos, tweenMoviePrintPreview.value * fboToPreviewWidth, tweenMoviePrintPreview.value * fboToPreviewHeight);
+    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
 
-    if (!showListView) {
-        if (loadedMovie.isMovieLoaded()) {
-            menuTimeline.setPosition(0, ofGetWindowHeight());
-            menuTimeline.setSize(ofGetWindowWidth(), footerHeight/2);
-            menuTimeline.drawMenu();
-        }
+    if (loadedMovie.isMovieLoaded() && !showListView) {
+        // draw fake timeline
+        ofPushStyle();
+        ofSetColor(170,50,0,255);
+        int tempInPos = (menuTimeline.getSizeW()/(totalFrames-1))*inPoint;
+        int tempWidth = (menuTimeline.getSizeW()/(totalFrames-1))*outPoint - tempInPos;
+        ofDrawRectRounded(menuTimeline.getPositionX()+leftMargin + tempInPos, menuTimeline.getPositionY() + 3 - (menuTimeline.mMenuRollOverDimension + menuTimeline.mMenuHeight * menuTimeline.getRelSizeH()), tempWidth - leftMargin - rightMargin, menuTimeline.mMenuRollOverDimension-6, 3);
+        ofPopStyle();
     }
 
     ofPopStyle();
@@ -1176,11 +1277,16 @@ void ofApp::keyPressed(int key){
             }
                 break;
 
-    //            case 'v':
-    //            {
-    //                logPreviousMoviePrintDataSet();
-    //            }
-    //                break;
+                case 'v':
+                {
+                    if (useThread) {
+                        loadedMovie.gmMovie.start();
+//                        loadedMovie2.start();
+                    } else {
+//                        loadedMovie2.grabToImageAll();
+                    }
+                }
+                    break;
     //
     //            case 'c':
     //            {
@@ -1234,9 +1340,9 @@ void ofApp::keyPressed(int key){
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-//    if (!lockedDueToInteraction && !lockedDueToPrinting) {
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
 
-//        currentKey = -1;
+        currentKey = -1;
 
 //        if (uiRangeSliderTimeline->getState()) {
 
@@ -1245,7 +1351,7 @@ void ofApp::keyReleased(int key){
 //                uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
 //                updateGridTimeArrayWithAutomaticInterval();
 //                updateAllStills();
-    //                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+//                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
 //                tweenFading.minValue = 255.0;
 //                tweenFading.maxValue = 0.0;
 //                tweenFading.duration = 0.0;
@@ -1259,49 +1365,49 @@ void ofApp::keyReleased(int key){
 
 //            }
 //        }
-//        if (!showListView && loadedMovie.isMovieLoaded) {
-//            if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == 105 || key == 111) {
-//                if (key == OF_KEY_LEFT){
-//                    rollOverButtonsClicked(rollOverMovieID, 1);
-//                } else if (key == OF_KEY_RIGHT){
-//                    rollOverButtonsClicked(rollOverMovieID, 2);
-//                } else if (key == 105){
-//                    rollOverButtonsClicked(rollOverMovieID, 3);
-//                } else if (key == 111){
-//                    rollOverButtonsClicked(rollOverMovieID, 4);
-//                }
-//                addToUndo = true;
-    //                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
-//                tweenFading.minValue = 255.0;
-//                tweenFading.maxValue = 0.0;
-//                tweenFading.duration = 0.0;
-//                tweenFading.initialTime = ofGetElapsedTimef();
-//                addToUndo = true;
-//                if (addToUndo) {
-//                    addMoviePrintDataSet(undoPosition);
-//                    addToUndo = false;
-//                }
-//                ofLog(OF_LOG_VERBOSE, "Key Manipulation over Thumb" );
-//            }
-//        }
+        if (!showListView && loadedMovie.isMovieLoaded()) {
+            if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == 105 || key == 111) {
+                if (key == OF_KEY_LEFT){
+                    rollOverButtonsClicked(rollOverMovieID, 1);
+                } else if (key == OF_KEY_RIGHT){
+                    rollOverButtonsClicked(rollOverMovieID, 2);
+                } else if (key == 105){
+                    rollOverButtonsClicked(rollOverMovieID, 3);
+                } else if (key == 111){
+                    rollOverButtonsClicked(rollOverMovieID, 4);
+                }
+                addToUndo = true;
+                //    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+                tweenFading.minValue = 255.0;
+                tweenFading.maxValue = 0.0;
+                tweenFading.duration = 0.0;
+                tweenFading.initialTime = ofGetElapsedTimef();
+                addToUndo = true;
+                if (addToUndo) {
+                    addMoviePrintDataSet(undoPosition);
+                    addToUndo = false;
+                }
+                ofLog(OF_LOG_VERBOSE, "Key Manipulation over Thumb" );
+            }
+        }
 
 
-//        manipulateSlider = FALSE;
-//    //        loadedMovie.gmScrubMovie = FALSE; // deactivated so shiftKeyPressed and released works in scrubView
-//        loadedMovie.gmRollOver = FALSE;
+        manipulateSlider = FALSE;
+    //        loadedMovie.gmScrubMovie = FALSE; // deactivated so shiftKeyPressed and released works in scrubView
+        loadedMovie.gmRollOver = FALSE;
 
-//        superKeyPressed = FALSE;
-//        shiftKeyPressed = FALSE;
-//    } else {
-//        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
-//    }
+        superKeyPressed = FALSE;
+        shiftKeyPressed = FALSE;
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
     if (!lockedDueToInteraction && !lockedDueToPrinting) {
 
-        if (y > ofGetHeight() - footerHeight/1.2) {
+        if (y > ofGetHeight() - (footerHeight-footerHeightTimeline)/1.2) {
             if (!showTimeline) {
                 ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
                 finishedTimeline = FALSE;
@@ -1342,14 +1448,14 @@ void ofApp::mousePressed(int x, int y, int button){
     if (!lockedDueToInteraction && !lockedDueToPrinting) {
     //        ofLog(OF_LOG_VERBOSE, "which button is clicked:" + ofToString(button));
 
-        if (loadedMovie.isMovieLoaded() && loadedMovie.gmMovieScrub.isLoaded()) {
+        if (loadedMovie.isMovieLoaded() && loadedMovie.gmMovie.isScrubMovieLoaded()) {
             if(button == 0){
-                if (y > ofGetHeight() - footerHeight/1.2) {
+                if (y > ofGetHeight() - (footerHeight-footerHeightTimeline)/1.2) {
                     if (showTimeline) {
                         ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
                         finishedTimeline = FALSE;
                         showTimeline = TRUE;
-                        //                    moveInOutTimeline();
+                        moveInOutTimeline();
                     }
                 }
 
@@ -1364,7 +1470,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
 
                 if (!showListView) {
-                    if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) || menuSettings.getMenuActivated()) {
+                    if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated() || menuSettings.getMenuActivated())) {
                         if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
 
                             rollOverMovieID = loadedMovie.gmRollOverMovieID;
@@ -1393,47 +1499,47 @@ void ofApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
+    ofLog(OF_LOG_VERBOSE, "mouseReleased" );
     if (!lockedDueToInteraction && !lockedDueToPrinting) {
         if (loadedMovie.isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "mouseReleased" );
+            ofLog(OF_LOG_VERBOSE, "mouseReleased and movieloaded" );
 
             if (!showListView) {
-                if (loadedMovie.isThreadRunning()) {
-                    loadedMovie.stop(false);
+                if (loadedMovie.gmMovie.isThreadRunning()) {
+                    loadedMovie.gmMovie.stop(false);
                 }
-                if (updateInOut) {
-                    ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
-    //                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
-                    tweenFading.minValue = 255.0;
-                    tweenFading.maxValue = 0.0;
-                    tweenFading.duration = 0.5;
-                    tweenFading.initialTime = ofGetElapsedTimef();
-                    updateGridTimeArrayWithAutomaticInterval();
-                    updateAllStills();
-                    addToUndo = true;
-                }
+//                if (updateInOut) {
+//                    //      tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+//                    tweenFading.minValue = 255.0;
+//                    tweenFading.maxValue = 0.0;
+//                    tweenFading.duration = 0.5;
+//                    tweenFading.initialTime = ofGetElapsedTimef();
+//                    updateGridTimeArrayWithAutomaticInterval();
+//                    updateAllStills();
+//                    addToUndo = true;
+//                }
                 if (updateScrub) {
-    //                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+                    //     tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     tweenFading.minValue = 255.0;
                     tweenFading.maxValue = 0.0;
                     tweenFading.duration = 0.5;
                     tweenFading.initialTime = ofGetElapsedTimef();
 
                     int i = loadedMovie.gmScrubID;
-                    if (scrubInitialFrame != loadedMovie.grabbedStill[i].gsFrameNumber) {
-//                        updateOneThumb(i, loadedMovie.grabbedStill[i].gsFrameNumber);
+                    if (scrubInitialFrame != loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber) {
+                        updateOneThumb(i, loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber);
                         addToUndo = true;
                     }
 
                 }
                 if (rollOverClicked) {
-//                    rollOverButtonsClicked(rollOverMovieID, rollOverMovieButtonID);
+                    rollOverButtonsClicked(rollOverMovieID, rollOverMovieButtonID);
                     addToUndo = true;
                 }
             }
         }
         if (addToUndo) {
-//            addMoviePrintDataSet(undoPosition);
+            addMoviePrintDataSet(undoPosition);
             addToUndo = false;
         }
         manipulateSlider = FALSE;
@@ -1479,7 +1585,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
             if( dragInfo.files.size() > 0 ){
 
-                loadNewMovie("", FALSE, TRUE, FALSE);
+//                loadNewMovie("", FALSE, TRUE, FALSE);
 
 //                droppedList.disableMouseEvents(droppedFiles.size());
                 droppedFiles.clear();
@@ -1531,12 +1637,12 @@ void ofApp::moveToMovie(){
 
 //    scrollBarList.unregisterMouseEvents();
 //    scrollBarList.unregisterTouchEvents();
-//    scrollBar.registerMouseEvents();
+    scrollBar.registerMouseEvents();
 //    scrollBar.registerTouchEvents();
 
 //    guiTimeline->setVisible(TRUE);
-//    menuTimeline.registerMouseEvents();
-//    menuTimeline.setMenuActive();
+    menuTimeline.registerMouseEvents();
+    menuTimeline.setMenuActive();
 
     printListNotImage = FALSE;
     updateInOut = FALSE;
@@ -1580,15 +1686,15 @@ void ofApp::moveInOutTimeline(){
 //--------------------------------------------------------------
 void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBackground, bool _loadScrubMovie){
 
-//    movieLoading = TRUE;
-//    if (!_loadInBackground) {
-//        moveToMovie();
-//    }
+    movieLoading = TRUE;
+    if (!_loadInBackground) {
+        moveToMovie();
+    }
 
-//    loadedMovie.stop(TRUE);
+    loadedMovie.gmMovie.stop(TRUE);
 
     ofxNotify() << "Movie has started to load";
-    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, numberOfStills, showPlaceHolder, !_loadInBackground);
+    loadedMovie.loadAndAllocateNewMovie(_newMoviePath, numberOfStills, showPlaceHolder, !_loadInBackground);
     calculateNewPrintGrid();
     if (loadedMovie.gmTotalFrames <=1) {
         movieProperlyLoaded = FALSE;
@@ -1601,7 +1707,7 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
     ofLog(OF_LOG_VERBOSE, "_newMoviePath" + ofToString(_newMoviePath) );
     ofLog(OF_LOG_VERBOSE, "totalFrames" + ofToString(totalFrames) );
 
-//    updateTimeSlider(_wholeRange);
+    updateTimeSlider(_wholeRange);
     updateGridTimeArrayWithAutomaticInterval();
     updateAllStills();
 
@@ -1645,62 +1751,53 @@ void ofApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBac
     }
 
 
-//    stringMovieInfo.clear();
-//    stringMovieInfo.push_back("Format: ");
-//    stringMovieInfo.push_back("Format/String: ");
-//    stringMovieInfo.push_back("FileSize: ");
-//    stringMovieInfo.push_back("Duration: ");
-//    stringMovieInfo.push_back("FrameCount: ");
-//    stringMovieInfo.push_back("Size: ");
-//    stringMovieInfo.push_back("DisplayAspectRatio: ");
-//    stringMovieInfo.push_back("FrameRate: ");
-//    stringMovieInfo.push_back("Codec: ");
-//    stringMovieInfo.push_back("Codec/Info: ");
-//    stringMovieInfo.push_back("BitRate: ");
-//    stringMovieInfo.push_back("PixelAspectRatio: ");
-//    stringMovieInfo.push_back("DisplayAspectRatio: ");
-//    stringMovieInfo.push_back("FrameRate_Mode: ");
-//    stringMovieInfo.push_back("ColorSpace: ");
-//    stringMovieInfo.push_back("ChromaSubsampling: ");
-//    stringMovieInfo.push_back("BitDepth: ");
-//    stringMovieInfo.push_back("Interlacement: ");
-//    stringMovieInfo.push_back("AudioCodec: ");
-//    stringMovieInfo.push_back("Channels: ");
-//    stringMovieInfo.push_back("SamplingRate: ");
+    stringMovieInfo.clear();
+    stringMovieInfo.push_back("Format: ");
+    stringMovieInfo.push_back("Format/String: ");
+    stringMovieInfo.push_back("FileSize: ");
+    stringMovieInfo.push_back("Duration: ");
+    stringMovieInfo.push_back("Duration calculated: ");
+    stringMovieInfo.push_back("FrameCount: ");
+    stringMovieInfo.push_back("Size: ");
+    stringMovieInfo.push_back("DisplayAspectRatio: ");
+    stringMovieInfo.push_back("FrameRate: ");
+    stringMovieInfo.push_back("Codec: ");
+    stringMovieInfo.push_back("Codec/Info: ");
+    stringMovieInfo.push_back("BitRate: ");
+    stringMovieInfo.push_back("PixelAspectRatio: ");
+    stringMovieInfo.push_back("DisplayAspectRatio: ");
+    stringMovieInfo.push_back("FrameRate_Mode: ");
+    stringMovieInfo.push_back("ColorSpace: ");
+    stringMovieInfo.push_back("ChromaSubsampling: ");
+    stringMovieInfo.push_back("BitDepth: ");
+    stringMovieInfo.push_back("Interlacement: ");
+    stringMovieInfo.push_back("AudioCodec: ");
+    stringMovieInfo.push_back("Channels: ");
+    stringMovieInfo.push_back("SamplingRate: ");
 
-//    stringMovieData.clear();
-//    stringMovieData.push_back(loadedMovie.gmMIFormat);
-//    stringMovieData.push_back(loadedMovie.gmMIFormatString);
-//    stringMovieData.push_back(loadedMovie.gmMIFileSizeString);
-//    stringMovieData.push_back(loadedMovie.gmMIDurationString1);
-//    stringMovieData.push_back(loadedMovie.gmMIFrameCount);
-//    stringMovieData.push_back(loadedMovie.gmMIWidth);
-//    stringMovieData.push_back(loadedMovie.gmMIDisplayAspectRatioString);
-//    stringMovieData.push_back(loadedMovie.gmMIFrameRateString);
-//    stringMovieData.push_back(loadedMovie.gmMIVFormat);
-//    stringMovieData.push_back(loadedMovie.gmMIFormatInfo);
-//    stringMovieData.push_back(loadedMovie.gmMIBitRate);
-//    stringMovieData.push_back(loadedMovie.gmMIPixelAspectRatio);
-//    stringMovieData.push_back(loadedMovie.gmMIDisplayAspectRatio);
-//    stringMovieData.push_back(loadedMovie.gmMIFrameRate_ModeString);
-//    stringMovieData.push_back(loadedMovie.gmMIColorSpace);
-//    stringMovieData.push_back(loadedMovie.gmMIChromaSubsampling);
-//    stringMovieData.push_back(loadedMovie.gmMIBitDepthString);
-//    stringMovieData.push_back(loadedMovie.gmMIInterlacementString);
-//    stringMovieData.push_back(loadedMovie.gmMIAFormat);
-//    stringMovieData.push_back(loadedMovie.gmMIAChannelsString);
-//    stringMovieData.push_back(loadedMovie.gmMIASamplingRate);
-
-}
-
-//--------------------------------------------------------------
-void ofApp::loadNewMovie2(string _newMoviePath){
-
-    ofxNotify() << "Movie2 has started to load";
-    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, 9, false, true);
-    ofLog(OF_LOG_VERBOSE, "Finished Loading Movie2--------------------------------------------");
-
-
+    stringMovieData.clear();
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFormat);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFormatString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFileSizeString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDuration);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDurationCalculated);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFrameCount);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIWidth);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDisplayAspectRatioString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFrameRateString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIVFormat);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFormatInfo);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIBitRate);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIPixelAspectRatio);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIDisplayAspectRatio);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIFrameRate_ModeString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIColorSpace);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIChromaSubsampling);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIBitDepthString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIInterlacementString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIAFormat);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIAChannelsString);
+    stringMovieData.push_back(loadedMovie.gmMovie.gfsMIASamplingRate);
 
 }
 
@@ -1723,7 +1820,7 @@ bool ofApp::checkExtension(string _tempExtension){
 //        _tempExtension == "jpg" ||
 //        _tempExtension == "jpe" ||
 //        _tempExtension == "jpeg" ||
-//        _tempExtension == "gif" ||
+        _tempExtension == "gif" ||
 //        _tempExtension == "png" ||
 //        _tempExtension == "tif" ||
 //        _tempExtension == "tiff" ||
@@ -1734,9 +1831,9 @@ bool ofApp::checkExtension(string _tempExtension){
         _tempExtension == "3gpp" ||
         _tempExtension == "mkv" ||
         _tempExtension == "dv" ||
-//        _tempExtension == "flv" ||
+        _tempExtension == "flv" ||
 //        _tempExtension == "swf" ||
-//        _tempExtension == "vob" ||
+        _tempExtension == "vob" ||
         _tempExtension == "divx" ||
 //        _tempExtension == "mxf" ||
         _tempExtension == "m1v" ||
@@ -1761,18 +1858,18 @@ void ofApp::calculateNewPrintGrid(){
 
 
     float gridRatio;
-    if (loadedMovie.gmMovie.isLoaded()) { // if no movie is loaded yet, then take a 16 by 9 and square pixel ratio
+    if (loadedMovie.gmMovie.isMovieLoaded()) { // if no movie is loaded yet, then take a 16 by 9 and square pixel ratio
         scrubWindowH = scrubWindowW * (1/loadedMovie.gmImageRatio) * loadedMovie.gmPixelRatio;
     } else {
         scrubWindowH = scrubWindowW * 0.5625 * 1;
     }
-    loadedMovie.stop(TRUE);
-    if (isnan(loadedMovie.gmImageRatio) || !loadedMovie.gmMovie.isLoaded()) {
+    loadedMovie.gmMovie.stop(TRUE);
+    if (isnan(loadedMovie.gmImageRatio) || !loadedMovie.gmMovie.isMovieLoaded()) {
         gridRatio = 0.5625;
     } else {
         gridRatio = 1.0/loadedMovie.gmImageRatio;
     }
-    while (loadedMovie.isThreadRunning()) {
+    while (loadedMovie.gmMovie.isThreadRunning()) {
     }
 
     thumbHeight = thumbWidth*gridRatio;
@@ -1825,7 +1922,7 @@ void ofApp::updateGridTimeArrayWithAutomaticInterval(){
         inPoint = 0;
     }
     if (outPoint > (totalFrames-1)) {
-        outPoint = (totalFrames-1);
+        outPoint = max(0,(totalFrames-1));
     }
 
     for (int i=0; i<numberOfStills; i++) {
@@ -1854,19 +1951,11 @@ void ofApp::updateAllStills(){
     }
 
     movieIsBeingGrabbed = TRUE;
-
-      //    loadedMovie.stop(TRUE);
-
-
-//    loadedMovie.gmMovie.play();
-//    loadedMovie.gmMovie.setFrame(2000);
-
-    ofPixels tempPixels = loadedMovie.gmMovie.getPixels();
-    ofLog(OF_LOG_VERBOSE, "tempPixels width: " + ofToString(tempPixels.getWidth()) + " height: " + ofToString(tempPixels.getHeight()));
-    ofLog(OF_LOG_VERBOSE, "tempPixels width: " + ofToString(tempPixels.getWidth()) + " height: " + ofToString(tempPixels.getHeight()));
-//    grabbedImage.setFromPixels(tempPixels);
-
-//    loadedMovie.start();
+    if (useThread) {
+        loadedMovie.gmMovie.start();
+    } else {
+        loadedMovie.gmMovie.grabToImageAll();
+    }
 
     ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
 }
@@ -1961,12 +2050,12 @@ void ofApp::moveToList(){
 
     showListView = TRUE;
 
-    loadedMovie.stop(TRUE);
+    loadedMovie.gmMovie.stop(TRUE);
     loadedMovie.disableMouseEvents();
 
 //    guiTimeline->setVisible(FALSE);
-//    menuTimeline.unRegisterMouseEvents();
-//    menuTimeline.setMenuInactive();
+    menuTimeline.unRegisterMouseEvents();
+    menuTimeline.setMenuInactive();
 
     printListNotImage = TRUE;
 
@@ -2052,7 +2141,7 @@ void ofApp::setResourcePath(){
     ofLog(OF_LOG_VERBOSE, "appPathStr: " + ofToString(appPathStr) );
     ofLog(OF_LOG_VERBOSE, "appPathUpStr: " + ofToString(appPathUpStr) );
     ofLog(OF_LOG_VERBOSE, "newDataPath: " + ofToString(newPath) );
-    ofSetDataPathRoot(newPath); // tell OF to look for resources here
+//    ofSetDataPathRoot(newPath); // tell OF to look for resources here
 }
 
 //--------------------------------------------------------------
@@ -2119,6 +2208,7 @@ void ofApp::addMoviePrintDataSet(int _addToPosition){
             addGridTimeArrayToMoviePrintDataSet();
         }
     }
+    logPreviousMoviePrintDataSet();
 }
 
 //--------------------------------------------------------------
@@ -2135,9 +2225,9 @@ void ofApp::addGridTimeArrayToMoviePrintDataSet(){ // adds the GridTimeArray to 
         if ((!moviePrintDataSet.gridTimeArray.empty()) && loadedMovie.isMovieLoaded()){
             for (int i=0; i<numberOfStills; i++) {
     //                ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray[i]:" + ofToString(moviePrintDataSet.gridTimeArray[i]));
-    //                moviePrintDataSet.gridTimeArray[i] = loadedMovie.grabbedStill[i].gsFrameNumber;
+    //                moviePrintDataSet.gridTimeArray[i] = loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber;
                 previousMoviePrintDataSet.back().gridTimeArray[i] = moviePrintDataSet.gridTimeArray[i];
-    //                previousMoviePrintDataSet.back().gridTimeArray[i] = loadedMovie.grabbedStill[i].gsFrameNumber;
+    //                previousMoviePrintDataSet.back().gridTimeArray[i] = loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber;
             }
         } else {
             for (int i=0; i<numberOfStills; i++) {
@@ -2175,7 +2265,40 @@ bool ofApp::hasChangedMoviePrintDataSet(){
 }
 
 //--------------------------------------------------------------
+void ofApp::updatePrintGridColumnsOrRows(bool _addToUndo){
+    printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
+    calculateNewPrintGrid();
+    if (_addToUndo) {
+        addToUndo = true;
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::updatePrintDisplayTimecodeFramesOff(bool _addToUndo){
+    switch (moviePrintDataSet.printDisplayTimecodeFramesOff) {
+    // 0=off, 1=timecode, 2=frames
+    case 2:
+        loadedMovie.gmShowFramesUI = TRUE;
+        loadedMovie.vfFramesToTimeSwitch = FALSE;
+        break;
+    case 1:
+        loadedMovie.gmShowFramesUI = TRUE;
+        loadedMovie.vfFramesToTimeSwitch = TRUE;
+        break;
+    case 0:
+        loadedMovie.gmShowFramesUI = FALSE;
+        break;
+    default:
+        break;
+    }
+    if (_addToUndo) {
+        addToUndo = true;
+    }
+}
+
+//--------------------------------------------------------------
 void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
+    ofLog(OF_LOG_VERBOSE, "applyMoviePrintDataSet:" + ofToString(undoPosition));
     string tempName;
 //    ofxUIWidget *tempWidget;
     bool tempHasTheNumberOfThumbsChanged = false;
@@ -2183,6 +2306,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
     // printGridColumns
     if (moviePrintDataSet.printGridColumns != _newMoviePrintDataSet.printGridColumns) {
         moviePrintDataSet.printGridColumns = _newMoviePrintDataSet.printGridColumns;
+        updatePrintGridColumnsOrRows(false);
 //        uiSliderPrintColumns->setValue(moviePrintDataSet.printGridColumns);
 //        tempWidget = guiSettingsMoviePrint->getWidget("PrintColumns");
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
@@ -2192,6 +2316,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
     // printGridRows
     if (moviePrintDataSet.printGridRows != _newMoviePrintDataSet.printGridRows) {
         moviePrintDataSet.printGridRows = _newMoviePrintDataSet.printGridRows;
+        updatePrintGridColumnsOrRows(false);
 //        uiSliderPrintRows->setValue(moviePrintDataSet.printGridRows);
 //        tempWidget = guiSettingsMoviePrint->getWidget("PrintRows");
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
@@ -2204,6 +2329,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
 //        uiSliderPrintMargin->setValue(moviePrintDataSet.printGridMargin);
 //        tempWidget = guiSettingsMoviePrint->getWidget("PrintMargin");
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
+        calculateNewPrintSize();
     }
 
     // printDisplayVideoAudioInfo
@@ -2212,6 +2338,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
 //        uiToggleHeaderDisplay->setValue(moviePrintDataSet.printDisplayVideoAudioInfo);
 //        tempWidget = guiSettingsMoviePrint->getWidget("Display Header");
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
+        calculateNewPrintSize();
     }
 
     // printDisplayTimecodeFramesOff
@@ -2234,6 +2361,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
 //        uiRadioSetFrameDisplay->activateToggle(tempName);
 //        tempWidget = guiSettingsMoviePrint->getWidget(tempName);
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
+        updatePrintDisplayTimecodeFramesOff(false);
     }
 
     // printSingleFrames
@@ -2261,6 +2389,7 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
 //        uiRadioPrintOutputFormat->activateToggle(tempName);
 //        tempWidget = guiSettingsMoviePrint->getWidget(tempName);
 //        guiSettingsMoviePrint->triggerEvent(tempWidget);
+//        ofLog(OF_LOG_VERBOSE, "apply dataset ---- moviePrintDataSet.printFormat:" + ofToString(moviePrintDataSet.printFormat) );
     }
 
     // printSizeWidth
@@ -2291,19 +2420,25 @@ void ofApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
         for (int i = 0; i<numberOfStills; i++) {
             if ((tempHasTheNumberOfThumbsChanged == true) || (moviePrintDataSet.gridTimeArray[i] != _newMoviePrintDataSet.gridTimeArray[i])) { // when the number of Thumbs has changed, all get updated - otherwise only the changed ones get updated
                 moviePrintDataSet.gridTimeArray[i] = _newMoviePrintDataSet.gridTimeArray[i];
-                loadedMovie.grabbedStill[i].gsFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
-                loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
-                loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
+                loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
+                loadedMovie.gmMovie.grabbedFrame[i].gfToBeGrabbed = TRUE;
+                loadedMovie.gmMovie.grabbedFrame[i].gfToBeUpdated = TRUE;
                 ofLog(OF_LOG_VERBOSE, "Still:" + ofToString(i) + " will be updated:" +  ofToString(_newMoviePrintDataSet.gridTimeArray[i]));
             }
         }
         loadedMovie.updateOrderNumber();
-        if (!loadedMovie.isThreadRunning()) {
-            loadedMovie.start();
+        if (!loadedMovie.gmMovie.isThreadRunning()) {
+            if (useThread) {
+                loadedMovie.gmMovie.start();
+            } else {
+                loadedMovie.gmMovie.grabToImageAll();
+            }
         }
 
 //        uiRangeSliderTimeline->setValueLow(getLowestFrameNumber());
 //        uiRangeSliderTimeline->setValueHigh(getHighestFrameNumber());
+        inPoint = getLowestFrameNumber();
+        outPoint = getHighestFrameNumber();
 
     }
 }
@@ -2324,31 +2459,13 @@ void ofApp::logPreviousMoviePrintDataSet(){
 //--------------------------------------------------------------
 void ofApp::exit(){
 
-    loadedMovie.stop(false);
+    loadedMovie.gmMovie.stop(false);
 
 //    delete guiTimeline;
 
 //    guiSettingsMoviePrint->saveSettings("guiMoviePrintSettings.xml");
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //--------------------------------------------------------------
 void ofApp::drawMovieInfo(float _x, float _y, float _fade){
@@ -2358,18 +2475,14 @@ void ofApp::drawMovieInfo(float _x, float _y, float _fade){
     ofEnableAlphaBlending();
     ofSetColor(255, 255, 255, _fade * 255);
 
-//    for (int i=0; i<stringMovieInfo.size(); i++) {
-//        float tempWidthOfPath = fontStashHelveticaLight.getBBox(stringMovieInfo[i], tempFontHeightSmall, 0, 0).getWidth();
-//        fontStashHelveticaLight.draw(stringMovieInfo[i],tempFontHeightSmall, _x, (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
-//        fontStashHelveticaMedium.draw(stringMovieData[i], tempFontHeightSmall, (int)(_x + tempWidthOfPath), (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
-//    }
+    for (int i=0; i<stringMovieInfo.size(); i++) {
+        float tempWidthOfPath = fontStashHelveticaLight.getBBox(stringMovieInfo[i], tempFontHeightSmall, 0, 0).getWidth();
+        fontStashHelveticaLight.draw(stringMovieInfo[i],tempFontHeightSmall, _x, (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
+        fontStashHelveticaMedium.draw(stringMovieData[i], tempFontHeightSmall, (int)(_x + tempWidthOfPath), (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
+    }
 
     ofPopStyle();
-
-
-
 }
-
 
 //--------------------------------------------------------------
 void ofApp::drawPrintScreen(){
@@ -2473,6 +2586,7 @@ void ofApp::drawLoadMovieScreen(){
 
 //--------------------------------------------------------------
 void ofApp::drawScrubScreen(float _scaleFactor){
+
     ofPushStyle();
     ofEnableAlphaBlending();
     ofSetColor(0,(tweenFading.value/255)*100);
@@ -2481,7 +2595,7 @@ void ofApp::drawScrubScreen(float _scaleFactor){
     // draw the scrubMovie
     ofSetColor(255,(int)tweenFading.value);
     int j = loadedMovie.gmScrubID;
-    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+    loadedMovie.gmMovie.scrubImg.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
     loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.value, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(tweenFading.value/255));
 
     // drawing frame
@@ -2514,8 +2628,9 @@ void ofApp::drawScrubScreen(float _scaleFactor){
 
     ofDisableAlphaBlending();
     ofSetColor(255);
-    if(tweenFading.value < 5){
+    if(tweenFading.value < 0.05){
         updateScrub = FALSE;
+        ofLog(OF_LOG_VERBOSE, "tweenFading.value < 0.05 - updateScrub false" );
         loadedMovie.gmScrubMovie = FALSE;
         scrubbingJustStarted = true;
     }
@@ -2635,7 +2750,7 @@ void ofApp::printImageToFile(int _printSizeWidth){
             for (int i=0; i<loadedMovie.gmNumberOfStills; i++) {
                 string singleImageName = fileName + "_" + ofToString(i, 3, '0') + "." + formatExtension;
                 singleImageName = singleImagePath + singleImageName;
-                ofSaveImage(loadedMovie.grabbedStill[i].gsImage, singleImageName, OF_IMAGE_QUALITY_HIGH);
+                ofSaveImage(loadedMovie.gmMovie.grabbedFrame[i].gfImage, singleImageName, OF_IMAGE_QUALITY_HIGH);
             }
         }
 
@@ -2655,71 +2770,71 @@ void ofApp::printImageToFile(int _printSizeWidth){
 //--------------------------------------------------------------
 void ofApp::printListToFile(){
 
-//    if (!droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint && itemToPrint == 0 && !movieIsBeingGrabbed && !currPrintingList) {
-//        currPrintingList = TRUE;
+    if (!droppedItem[itemToPrint].itemProperties.ipTriedToPrint && itemToPrint == 0 && !movieIsBeingGrabbed && !currPrintingList) {
+        currPrintingList = TRUE;
 //        droppedList.disableMouseEvents(droppedFiles.size());
 //        droppedList.setActiveItem(itemToPrint);
-//        loadNewMovie(droppedList.glDroppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
-//    }
-//    if (!droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint && !movieIsBeingGrabbed && currPrintingList) {
-//        ofLog(OF_LOG_VERBOSE, "printImageToFile: " + ofToString(itemToPrint) );
-//        if (loadedMovie.isMovieLoaded){
-//            calculateNewPrintGrid();
-//            printImageToFile(moviePrintDataSet.printSizeWidth);
-//            droppedList.glDroppedItem[itemToPrint].itemProperties.ipPrinted = TRUE;
-//        }
-//        droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint = TRUE;
-//        ofLog(OF_LOG_VERBOSE, "ipTriedToPrint: " + ofToString(droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint) );
-//        ofLog(OF_LOG_VERBOSE, "ipPrinted: " + ofToString(droppedList.glDroppedItem[itemToPrint].itemProperties.ipPrinted) );
-//        for (int i=0; i < droppedList.glDroppedItem.size(); i++) {
-//            if (!droppedList.glDroppedItem[i].itemProperties.ipTriedToPrint){
-//                itemToPrint = i;
-//                i = droppedList.glDroppedItem.size();
-//            }
-//        }
+        loadNewMovie(droppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
+    }
+    if (!droppedItem[itemToPrint].itemProperties.ipTriedToPrint && !movieIsBeingGrabbed && currPrintingList) {
+        ofLog(OF_LOG_VERBOSE, "printImageToFile: " + ofToString(itemToPrint) );
+        if (loadedMovie.isMovieLoaded()){
+            calculateNewPrintGrid();
+            printImageToFile(moviePrintDataSet.printSizeWidth);
+            droppedItem[itemToPrint].itemProperties.ipPrinted = TRUE;
+        }
+        droppedItem[itemToPrint].itemProperties.ipTriedToPrint = TRUE;
+        ofLog(OF_LOG_VERBOSE, "ipTriedToPrint: " + ofToString(droppedItem[itemToPrint].itemProperties.ipTriedToPrint) );
+        ofLog(OF_LOG_VERBOSE, "ipPrinted: " + ofToString(droppedItem[itemToPrint].itemProperties.ipPrinted) );
+        for (int i=0; i < droppedItem.size(); i++) {
+            if (!droppedItem[i].itemProperties.ipTriedToPrint){
+                itemToPrint = i;
+                i = droppedItem.size();
+            }
+        }
 //        droppedList.setActiveItem(itemToPrint);
-//        loadNewMovie(droppedList.glDroppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
-//    }
+        loadNewMovie(droppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
+    }
 
-//    int tempIterator = 0;
-//    for (int i=0; i < droppedList.glDroppedItem.size(); i++) {
-//        if (droppedList.glDroppedItem[i].itemProperties.ipTriedToPrint){
-//            tempIterator++;
-//        }
-//    }
-//    if (tempIterator >= droppedList.glDroppedItem.size()) {
-//        stopListPrinting();
-//    }
+    int tempIterator = 0;
+    for (int i=0; i < droppedItem.size(); i++) {
+        if (droppedItem[i].itemProperties.ipTriedToPrint){
+            tempIterator++;
+        }
+    }
+    if (tempIterator >= droppedItem.size()) {
+        stopListPrinting();
+    }
 
-//    timer.setStartTime();
-//    finishedPrinting = TRUE;
+    timer.setStartTime();
+    finishedPrinting = TRUE;
 
 }
 
 //--------------------------------------------------------------
 void ofApp::resetItemsToPrint(){
-//    for (int i=0; i < droppedList.glDroppedItem.size(); i++) {
-//        droppedList.glDroppedItem[i].itemProperties.ipTriedToPrint = FALSE;
-//        droppedList.glDroppedItem[i].itemProperties.ipPrinted = FALSE;
-//    }
+    for (int i=0; i < droppedItem.size(); i++) {
+        droppedItem[i].itemProperties.ipTriedToPrint = FALSE;
+        droppedItem[i].itemProperties.ipPrinted = FALSE;
+    }
 }
 
 
 //--------------------------------------------------------------
 void ofApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieButtonID){
     if (_rollOverMovieButtonID == 3) {
-        setInPoint(loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber);
+        setInPoint(loadedMovie.gmMovie.grabbedFrame[_rollOverMovieID].gfFrameNumber);
         loadedMovie.gmRollOver = FALSE;
         ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
 
     } else if (_rollOverMovieButtonID == 4) {
-        setOutPoint(loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber);
+        setOutPoint(loadedMovie.gmMovie.grabbedFrame[_rollOverMovieID].gfFrameNumber);
         loadedMovie.gmRollOver = FALSE;
         ofLog(OF_LOG_VERBOSE, "manipulated OutPoint" );
 
     } else if (_rollOverMovieButtonID == 1) {
         ofLog(OF_LOG_VERBOSE, "frame backwards" );
-        int j = loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber;
+        int j = loadedMovie.gmMovie.grabbedFrame[_rollOverMovieID].gfFrameNumber;
         if(shiftKeyPressed) {
             j = j - 10;
         } else if(superKeyPressed){
@@ -2742,7 +2857,7 @@ void ofApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieButto
         updateOneThumb(_rollOverMovieID, j);
     } else if (_rollOverMovieButtonID == 2) {
         ofLog(OF_LOG_VERBOSE, "frame forward" );
-        int j = loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber;
+        int j = loadedMovie.gmMovie.grabbedFrame[_rollOverMovieID].gfFrameNumber;
         if(shiftKeyPressed) {
             j = j + 10;
         } else if(superKeyPressed){
@@ -2780,14 +2895,18 @@ int ofApp::getHighestFrameNumber(){
 //--------------------------------------------------------------
 void ofApp::updateOneThumb(int _thumbID, int _newFrameNumber){
     moviePrintDataSet.gridTimeArray[_thumbID] = _newFrameNumber;
-    loadedMovie.grabbedStill[_thumbID].gsFrameNumber = _newFrameNumber;
-    loadedMovie.grabbedStill[_thumbID].gsManipulated = TRUE;
-    loadedMovie.grabbedStill[_thumbID].gsToBeGrabbed = TRUE;
-    loadedMovie.grabbedStill[_thumbID].gsToBeUpdated = TRUE;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gfFrameNumber = _newFrameNumber;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gfManipulated = TRUE;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gfToBeGrabbed = TRUE;
+    loadedMovie.gmMovie.grabbedFrame[_thumbID].gfToBeUpdated = TRUE;
     loadedMovie.updateOrderNumber();
 
-    if (!loadedMovie.isThreadRunning()) {
-        loadedMovie.start();
+    if (!loadedMovie.gmMovie.isThreadRunning()) {
+        if (useThread) {
+            loadedMovie.gmMovie.start();
+        } else {
+            loadedMovie.gmMovie.grabToImageAll();
+        }
     }
 
 //    uiRangeSliderTimeline->setValueLow(getLowestFrameNumber());
@@ -2810,62 +2929,82 @@ void ofApp::updateAllLimits(){
 }
 
 //--------------------------------------------------------------
+void ofApp::setInOutPoint(int _inPoint, int _outPoint){
+    setInPoint(_inPoint);
+    setOutPoint(_outPoint);
+    ofLog(OF_LOG_VERBOSE, "manipulated In- and OutPoint" );
+}
+
+//--------------------------------------------------------------
+void ofApp::limitInPoint(int _inPoint){
+    int i = _inPoint;
+    int j = outPoint;
+    if ((outPoint-i < numberOfStills)) {
+        j = i + (numberOfStills - 1);
+        if (j > (totalFrames-1)) {
+            j = (totalFrames-1);
+            i = j - (numberOfStills - 1);
+        }
+    }
+    inPoint = i;
+    outPoint = j;
+    ofLog(OF_LOG_VERBOSE, "limited InPoint" );
+}
+
+//--------------------------------------------------------------
+void ofApp::limitOutPoint(int _outPoint){
+    int i = inPoint;
+    int j = _outPoint;
+    if ((j - inPoint < numberOfStills)) {
+        i = j - (numberOfStills - 1);
+        if (i < 0) {
+            i = 0;
+            j = (numberOfStills - 1);
+
+        }
+    }
+    inPoint = i;
+    outPoint = j;
+    ofLog(OF_LOG_VERBOSE, "limited OutPoint" );
+}
+
+//--------------------------------------------------------------
 void ofApp::setInPoint(int _inPoint){
-//    int i = _inPoint;
-//    int j = uiRangeSliderTimeline->getScaledValueHigh();
-//    if ((uiRangeSliderTimeline->getScaledValueHigh()-i < numberOfStills)) {
-//        j = i + (numberOfStills - 1);
-//        if (j > (totalFrames-1)) {
-//            j = (totalFrames-1);
-//            i = j - (numberOfStills - 1);
-//        }
-//    }
-//    uiRangeSliderTimeline->setValueLow(i);
-//    uiRangeSliderTimeline->setValueHigh(j);
-//    uiSliderValueLow = i;
-//    uiSliderValueHigh = j;
-//    updateGridTimeArrayWithAutomaticInterval();
-//    updateAllStills();
-//    ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+    limitInPoint(_inPoint);
+    updateGridTimeArrayWithAutomaticInterval();
+    updateAllStills();
+    ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
 }
 
 //--------------------------------------------------------------
 void ofApp::setOutPoint(int _outPoint){
-//    int i = uiRangeSliderTimeline->getScaledValueLow();
-//    int j = _outPoint;
-//    if ((j - uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
-//        i = j - (numberOfStills - 1);
-//        if (i < 0) {
-//            i = 0;
-//            j = (numberOfStills - 1);
-
-//        }
-//    }
-//    uiRangeSliderTimeline->setValueLow(i);
-//    uiRangeSliderTimeline->setValueHigh(j);
-//    uiSliderValueLow = i;
-//    uiSliderValueHigh = j;
-//    updateGridTimeArrayWithAutomaticInterval();
-//    updateAllStills();
-//    ofLog(OF_LOG_VERBOSE, "manipulated OutPoint" );
+    limitOutPoint(_outPoint);
+    updateGridTimeArrayWithAutomaticInterval();
+    updateAllStills();
+    ofLog(OF_LOG_VERBOSE, "manipulated OutPoint" );
 }
 
 //--------------------------------------------------------------
 void ofApp::updateTimeSlider(bool _wholeRange) {
-
 //    uiRangeSliderTimeline->setMax(totalFrames-1);
 //    uiRangeSliderTimeline->setValueLow(0);
 
-//    if (_wholeRange) {
-//        if (totalFrames > 250) {
+    if (_wholeRange) {
+        if (totalFrames > 250) {
+            setInPoint(25);
+            setOutPoint(totalFrames-26);
 //            uiRangeSliderTimeline->setValueLow(25);
 //            uiRangeSliderTimeline->setValueHigh(totalFrames-26);
-//        } else {
+        } else {
+            setInPoint(0);
+            setOutPoint(totalFrames-1);
 //            uiRangeSliderTimeline->setValueHigh(totalFrames-1);
-//        }
-//    } else {
+        }
+    } else {
+        setInPoint(0);
+        setOutPoint(numberOfStills);
 //        uiRangeSliderTimeline->setValueHigh(numberOfStills);
-//    }
+    }
 //    uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
 //    uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
 }
@@ -2889,23 +3028,23 @@ void ofApp::stopPrinting(){
 
 //--------------------------------------------------------------
 void ofApp::startListPrinting(){
-//    lockedDueToPrinting = true;
-//    inactivateAllMenus();
-//    ofLog(OF_LOG_VERBOSE, "Start Printing List-------------------------------------------");
-//    itemToPrint = 0;
+    lockedDueToPrinting = true;
+    inactivateAllMenus();
+    ofLog(OF_LOG_VERBOSE, "Start Printing List-------------------------------------------");
+    itemToPrint = 0;
 //    droppedList.disableMouseEvents(droppedFiles.size());
-//    resetItemsToPrint();
-//    printListToFile();
+    resetItemsToPrint();
+    printListToFile();
 }
 
 //--------------------------------------------------------------
 void ofApp::stopListPrinting(){
-//    currPrintingList = FALSE;
-//    moveToList();
-//    activateAllMenus();
+    currPrintingList = FALSE;
+    moveToList();
+    activateAllMenus();
 //    droppedList.enableMouseEvents();
-//    lockedDueToPrinting = false;
-//    ofLog(OF_LOG_VERBOSE, "Finished Printing List-------------------------------------------");
+    lockedDueToPrinting = false;
+    ofLog(OF_LOG_VERBOSE, "Finished Printing List-------------------------------------------");
 }
 
 //--------------------------------------------------------------

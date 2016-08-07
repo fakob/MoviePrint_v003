@@ -1,2 +1,5 @@
 bin/MoviePrint_v003_debug.app
 bin/MoviePrint_v003_debug.app.dSYM
+bin/data
+bin/MoviePrints
+*.autosave

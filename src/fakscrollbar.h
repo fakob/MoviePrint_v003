@@ -10,6 +10,8 @@
 #define FAKSCROLLBAR_H
 
 //#include "ofxMultiTouchPad.h"
+#include "ofxEasing.h"
+//#include "faktween.h"
 
 class fakScrollBar {
 
@@ -54,6 +56,11 @@ public:
 
         sbNumberOfTouches = 0;
         sbMaxNumberOfTouches = 0;
+
+//        tweenScroll.initialTime = ofGetElapsedTimef();
+//        tweenScroll.duration = 0.5;
+//        tweenScroll.minValue = 255.0;
+//        tweenScroll.maxValue = 0.0;
     }
 
     void setScrollHeight(float _sbScrollHeight){
@@ -160,7 +167,7 @@ public:
     }
 
     void mouseScrolled(ofMouseEventArgs & args){
-        //        ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(args.x) + ":" + ofToString(args.y) );
+//                ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(args.x) + ":" + ofToString(args.y) + "scroll x:y " + ofToString(args.scrollX) + ":" + ofToString(args.scrollY) );
         sbScrollBarDrag = false;
 
 //        if (sbMaxNumberOfTouches > 0){ // check if touchmouse
@@ -190,7 +197,9 @@ public:
         sbMouseIsScrolling = true;
         sbCalculateScrollInertia = true;
         ofNotifyEvent(sbScrollingGoingOn, args, this);
-        ofResetElapsedTimeCounter();
+//        ofResetElapsedTimeCounter();
+//        tweenScroll.initialTime = ofGetElapsedTimef();
+
     }
 
     void mouseEntered(ofMouseEventArgs & args){}
@@ -210,7 +219,7 @@ public:
 
 
             if (sbScrollBarDrag) {
-//                ofLog(OF_LOG_VERBOSE, "_____________barUpdate " + ofToString(sbMousePos.y) );
+                ofLog(OF_LOG_VERBOSE, "_____________barUpdate " + ofToString(sbMousePos.y) );
                 if (sbRollOverScrollBar) {
                     if (!sbFirstClick) {
                         sbFirstClickMouseY = sbMousePos.y - sbScrollBarY;
@@ -231,66 +240,87 @@ public:
 //                ofLog(OF_LOG_VERBOSE, "_____________scrollUpdate " + ofToString(sbMouseScrollVelocity.y) );
 
                 if ((sbScrollBarY > sbScrollBarYMax)) {
+////                    ofLog(OF_LOG_VERBOSE, "_____________sbScrollBarY > sbScrollBarYMax " + ofToString(sbMouseScrollVelocity.y) );
 
-                    if ( sbMouseScrollVelocity.y <= 0 ) { // Return to bottom position
-                        sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMax) *-1;
-//                        ofLog(OF_LOG_VERBOSE, "Return " + ofToString(sbScrollBarY,2));
-                    } else if (sbNumberOfTouches > 0){ // if still holding then do nothing
-                        sbMouseScrollVelocity.y = sbMouseScrollVelocity.y * ((sbOvershootHeight - abs(sbScrollBarY - sbScrollBarYMax))/(float)sbOvershootHeight);
-                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
-                        sbScrollBarY = fmin(sbScrollBarY,sbScrollBarYMax+sbOvershootHeight);
-                        ofLog(OF_LOG_VERBOSE, "sbMouseScrollVelocity " + ofToString(sbMouseScrollVelocity.y,2));
-                        ofLog(OF_LOG_VERBOSE, "Holding " + ofToString(sbScrollBarY,2));
-                    } else { // Slow down
-                        float change = sbBounceDecelerationConstant * getTimeRampDown();
-                        sbMouseScrollVelocity.y -= change;
-                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
-//                        ofLog(OF_LOG_VERBOSE, "Slow down " + ofToString(sbScrollBarY,2));
-                    }
+//                    if ( sbMouseScrollVelocity.y <= 0 ) { // Return to bottom position
+//                        sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMax) *-1;
+////                        ofLog(OF_LOG_VERBOSE, "Return " + ofToString(sbScrollBarY,2));
+//                    } else if (sbNumberOfTouches > 0){ // if still holding then do nothing
+//                        sbMouseScrollVelocity.y = sbMouseScrollVelocity.y * ((sbOvershootHeight - abs(sbScrollBarY - sbScrollBarYMax))/(float)sbOvershootHeight);
+//                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
+//                        sbScrollBarY = fmin(sbScrollBarY,sbScrollBarYMax+sbOvershootHeight);
+//                        ofLog(OF_LOG_VERBOSE, "sbMouseScrollVelocity " + ofToString(sbMouseScrollVelocity.y,2));
+//                        ofLog(OF_LOG_VERBOSE, "Holding " + ofToString(sbScrollBarY,2));
+//                    } else { // Slow down
+//        //                        float change = sbBounceDecelerationConstant * getTimeRampDown();
+//                        float change = sbBounceDecelerationConstant;
+//                        sbMouseScrollVelocity.y -= change;
+//                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
+////                        ofLog(OF_LOG_VERBOSE, "Slow down " + ofToString(sbScrollBarY,2));
+//                    }
 
-                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
+//        //                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
+//                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y;
 
-                    if (sbScrollBarY < (sbScrollBarYMax + 0.001)){ // when close to aim (threshold 0.001), lead to aim manually
-                        sbScrollBarY = sbScrollBarYMax;
-                        sbMouseScrollVelocity = ofVec2f(0.0,0.0);
-                    }
+//                    if (sbScrollBarY < (sbScrollBarYMax + 0.001)){ // when close to aim (threshold 0.001), lead to aim manually
+//                        sbScrollBarY = sbScrollBarYMax;
+//                        sbMouseScrollVelocity = ofVec2f(0.0,0.0);
+//                    }
+
+                    // to simplify no bouncing at end
+                    sbScrollBarY = sbScrollBarYMax;
 
                 } else if ((sbScrollBarY < sbScrollBarYMin)) {
 
-                    if ( sbMouseScrollVelocity.y > 0 ) { // Return to bottom position
-                        sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMin);
-                    } else if (sbNumberOfTouches > 0){ // if still holding then do nothing
-                        sbMouseScrollVelocity.y = sbMouseScrollVelocity.y * ((sbOvershootHeight - abs(sbScrollBarY - sbScrollBarYMin))/(float)sbOvershootHeight);
-                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
-                        sbScrollBarY = fmax(sbScrollBarY,sbScrollBarYMin-sbOvershootHeight);
-                        ofLog(OF_LOG_VERBOSE, "sbMouseScrollVelocity " + ofToString(sbMouseScrollVelocity.y,2));
-                        ofLog(OF_LOG_VERBOSE, "Holding " + ofToString(sbScrollBarY,2));
-                    } else { // Slow down
-                        float change = sbBounceDecelerationConstant * getTimeRampDown();
-                        sbMouseScrollVelocity.y += change;
-                        sbMouseScrollVelocity.y = fmax(sbMouseScrollVelocity.y, sbMaxVelocity * -1);
-                    }
+//                    ofLog(OF_LOG_VERBOSE, "_____________sbScrollBarY < sbScrollBarYMin " + ofToString(sbMouseScrollVelocity.y) );
+//                    if ( sbMouseScrollVelocity.y > 0 ) { // Return to bottom position
+//                        sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMin);
+//                    } else if (sbNumberOfTouches > 0){ // if still holding then do nothing
+//                        sbMouseScrollVelocity.y = sbMouseScrollVelocity.y * ((sbOvershootHeight - abs(sbScrollBarY - sbScrollBarYMin))/(float)sbOvershootHeight);
+//                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
+//                        sbScrollBarY = fmax(sbScrollBarY,sbScrollBarYMin-sbOvershootHeight);
+//                        ofLog(OF_LOG_VERBOSE, "sbMouseScrollVelocity " + ofToString(sbMouseScrollVelocity.y,2));
+//                        ofLog(OF_LOG_VERBOSE, "Holding " + ofToString(sbScrollBarY,2));
+//                    } else { // Slow down
+//        //                        float change = sbBounceDecelerationConstant * getTimeRampDown();
+//                        float change = sbBounceDecelerationConstant;
+//                        sbMouseScrollVelocity.y += change;
+//                        sbMouseScrollVelocity.y = fmax(sbMouseScrollVelocity.y, sbMaxVelocity * -1);
+//                    }
 
-                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
+//        //                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
+//                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y;
 
-                    if (sbScrollBarY > (sbScrollBarYMin - 0.001)){ // when close to aim (threshold 0.001), lead to aim manually
-                        sbScrollBarY = sbScrollBarYMin;
-                        sbMouseScrollVelocity = ofVec2f(0.0,0.0);
-                    }
+//                    if (sbScrollBarY > (sbScrollBarYMin - 0.001)){ // when close to aim (threshold 0.001), lead to aim manually
+//                        sbScrollBarY = sbScrollBarYMin;
+//                        sbMouseScrollVelocity = ofVec2f(0.0,0.0);
+//                    }
+
+                    // to simplify no bouncing at end
+                    sbScrollBarY = sbScrollBarYMin;
 
                 } else {
+//                    ofLog(OF_LOG_VERBOSE, "_____________else " + ofToString(sbMouseScrollVelocity.y) );
                     sbMouseScrollVelocity.y = sbMouseScrollVelocity.y / sbDecelarationConstant;
-                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
+        //                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
+//                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y;
+
+                    // to simplify limit at end
+                    sbScrollBarY = fmax(sbScrollBarYMin, fmin(sbScrollBarYMax, sbScrollBarY + sbMouseScrollVelocity.y));
                 }
 
-                if (ofGetElapsedTimeMillis() > 50) {
+//                if (tweenScroll.value > 50) {
+//                    if (ofGetElapsedTimeMillis() > 50) {
                     sbMouseIsScrolling = false;
-                    if (ofGetElapsedTimeMillis() > sbBounceBackTimeMs) {
+//                    if (ofGetElapsedTimeMillis() > sbBounceBackTimeMs) {
                         sbCalculateScrollInertia = false;
-                    }
-                }
+//                    }
+//                }
             }
         }
+
+//        tweenScroll.value = ofxeasing::map_clamp(ofGetElapsedTimef(), tweenScroll.initialTime, (tweenScroll.initialTime + tweenScroll.duration), tweenScroll.minValue, tweenScroll.maxValue, &ofxeasing::exp::easeInOut);
+
     }
 
     float getTimeRampDown(){
@@ -310,6 +340,9 @@ public:
     }
 
     // Properties
+
+//    fakTween tweenScroll;
+
     ofEvent<ofVec2f> sbClickedInside;
     ofEvent<ofVec2f> sbScrollingGoingOn;
 
