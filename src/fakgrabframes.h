@@ -62,9 +62,12 @@ public:
 
     void setup(string vfMovieName, int _numberOfFrames){
         gfsSetupFinished = false;
-        loadNewMovieToBeGrabbed(vfMovieName);
-        loadNewMovieToBeScrubbed(vfMovieName);
-        allocateNewNumberOfFrames(_numberOfFrames);
+        bool loadingWasSuccessful = false;
+        loadingWasSuccessful = loadNewMovieToBeGrabbed(vfMovieName);
+        if (loadingWasSuccessful) {
+            loadNewMovieToBeScrubbed(vfMovieName);
+            allocateNewNumberOfFrames(_numberOfFrames);
+        }
         gfsSetupFinished = true;
         isFrameAccurate = true; //false uses CV_CAP_PROP_POS_MSEC and jumps to milliseconds, but it is not faster only really unaccurate apparently
     }
@@ -77,7 +80,6 @@ public:
             return false;
         }
     }
-
 
     bool loadNewMovieToBeGrabbed(string vfMovieName){
         stop(FALSE);
@@ -164,8 +166,14 @@ public:
             if (isMovieLoaded()) {
                 ofLog(OF_LOG_VERBOSE, "Width: " + ofToString(gfsFrameWidth) + " Height: " + ofToString(gfsFrameHeight) + " ImageRatio:" + ofToString(gfsImageRatio) + " PixelRatio:" + ofToString(gfsPixelRatio)  + " Framerate:" + ofToString(gfsFrameRate) + " totalFrames:" + ofToString(gfsTotalFrames));
                 ofLog(OF_LOG_VERBOSE, "Movie loaded");
+                if ((gfsFrameWidth == 0) || (gfsFrameHeight == 0)) {
+                    ofLog(OF_LOG_VERBOSE, "Movie has no width or height, will load empty movie to unload movie");
+                    movieFile.open(""); // load empty to unload movie
+                    return false;
+                }
             } else {
                 ofLog(OF_LOG_VERBOSE, "Movie not loaded");
+                return false;
             }
             return isMovieLoaded();
         } else {
