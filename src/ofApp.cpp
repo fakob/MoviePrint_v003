@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
-    drawNotify = true; // ofxNotify
+    drawNotify = false; // ofxNotify
     showPlaceHolder = false; // added for developing
 
 //    // used for ofxAvCodec addon
@@ -392,7 +392,6 @@ void ofApp::update(){
             int i = loadedMovie.gmScrubID;
 
             if (scrubbingJustStarted) {
-                scrubbingJustStarted = false;
                 scrubDelta = 0.0;
                 scrubMouseDelta = 0.0;
                 scrubInitialFrame = loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber;
@@ -453,7 +452,11 @@ void ofApp::update(){
 //                loadedMovie.gmMovieScrub.nextFrame();
 //                loadedMovie.gmMovieScrub.nextFrame();
 //            } else {
+            ofLog(OF_LOG_VERBOSE, "loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber:" + ofToString(loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber) + " newFrameNumber:" + ofToString(newFrameNumber));
             if (loadedMovie.gmMovie.grabbedFrame[i].gfFrameNumber != newFrameNumber) {
+                loadedMovie.gmMovie.setFrameScrub(i, newFrameNumber);
+            } else if (scrubbingJustStarted) {
+                scrubbingJustStarted = false;
                 loadedMovie.gmMovie.setFrameScrub(i, newFrameNumber);
             }
 //            }
