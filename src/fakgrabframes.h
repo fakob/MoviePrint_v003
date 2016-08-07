@@ -5,6 +5,7 @@
 #include <iostream>
 #include "ofMain.h"
 #include "fakgrabbedframe.h"
+#include "ofxNotify.h"
 
 #include "ofxCv.h"
 
@@ -68,91 +69,110 @@ public:
         isFrameAccurate = true; //false uses CV_CAP_PROP_POS_MSEC and jumps to milliseconds, but it is not faster only really unaccurate apparently
     }
 
+    bool checkIfSpecialCharacters(string _x) {
+        if (_x.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_/ .") != std::string::npos)
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     bool loadNewMovieToBeGrabbed(string vfMovieName){
         stop(FALSE);
 
         ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function" + ofToString(vfMovieName));
         ofFile fileToRead(vfMovieName);
         gfsMoviePath = fileToRead.getAbsolutePath();
-        movieFile.open(gfsMoviePath);
-        // ofLog(OF_LOG_VERBOSE, "fileToRead.getAbsolutePath(): " + ofToString(fileToRead.getAbsolutePath()));
-        // movieFile.read(matOrig);
 
-        if(movieFile.isOpened()){
-            // get some meta data about frame.
-            gfsFrameRate = float(movieFile.get(CV_CAP_PROP_FPS));
-            gfsTotalFrames = int(movieFile.get(CV_CAP_PROP_FRAME_COUNT));
-            gfsFrameHeight = int(movieFile.get(CV_CAP_PROP_FRAME_HEIGHT));
-            gfsFrameWidth = int(movieFile.get(CV_CAP_PROP_FRAME_WIDTH));
-            //                double posFrames = movieFile.get(CV_CAP_PROP_POS_FRAMES);
-            //                double posMsec = movieFile.get(CV_CAP_PROP_POS_MSEC);
-            gfsImageRatio = gfsFrameWidth/(float)gfsFrameHeight;
-            gfsPixelRatio = 1.0;
-            gfsFrameMS = 1000 / gfsFrameRate;
-
-            gfsMIFilePath = fileToRead.path();
-            gfsMIFilePathOhne = extractMoviePathWithoutFilename(gfsMIFilePath);
-
-            gfsMIFileName = fileToRead.getBaseName();
-            gfsMIFileExtension = fileToRead.getExtension();
-            gfsMIFileNameAndExtension = gfsMIFileName + "." + gfsMIFileExtension;
-
-
-//getting CV_CAP_PROP_FOURCC does not work yet
-//            int ex = static_cast<int>(movieFile.get(CV_CAP_PROP_FOURCC));     // Get Codec Type- Int form
-//            char EXT[] = {(char)(ex & 0XFF) , (char)((ex & 0XFF00) >> 8),(char)((ex & 0XFF0000) >> 16),(char)((ex & 0XFF000000) >> 24), 0};
-//            ofLog(OF_LOG_VERBOSE, "EXT[]: " + ofToString(EXT));
-
-//            printf("fourcc=%d\n", f); // outputs fourcc=6
-//            char fourcc[5];
-//            fourCCStringFromCode((int)f, fourcc);
-//            printf("fourcc=%s\n", fourcc);
-
-            double f = movieFile.get(CV_CAP_PROP_FOURCC);
-            gfsMIFormat = ofToString(f);
-//            ofLog(OF_LOG_VERBOSE, "CV_CAP_PROP_FOURCC: " + ofToString(f));
-
-            // Seek to the end of the video.
-            movieFile.set(CV_CAP_PROP_POS_AVI_RATIO, 1);
-            // Get video length (because we're at the end).
-            gfsDurationMS = movieFile.get(CV_CAP_PROP_POS_MSEC);
-
-            gfsMIFormatString = "";
-            gfsMIFileSizeString = ofToString(fileToRead.getSize());
-            gfsMIDuration = ofToString(gfsDurationMS/1000);
-            gfsMIDurationCalculated = ofToString((float)gfsTotalFrames/gfsFrameRate) + " sec";
-            gfsMIFrameCount = ofToString(gfsTotalFrames);
-            gfsMIWidth = ofToString(gfsFrameWidth) + " x " + ofToString(gfsFrameHeight);
-            gfsMIDisplayAspectRatioString = ofToString((float)gfsFrameWidth/(float)gfsFrameHeight);
-            gfsMIFrameRateString = ofToString(gfsFrameRate) + " fps";
-            gfsMIVFormat = "";
-            gfsMIFormatInfo = "";
-            gfsMIBitRate = "";
-            gfsMIPixelAspectRatio = "";
-            gfsMIDisplayAspectRatio = "";
-            gfsMIFrameRate_ModeString = "";
-            gfsMIColorSpace = "";
-            gfsMIChromaSubsampling = "";
-            gfsMIBitDepthString = "";
-            gfsMIInterlacementString = "";
-            gfsMIAFormat = "";
-            gfsMIAChannelsString = "";
-            gfsMIASamplingRate = "";
-
+        if (checkIfSpecialCharacters(gfsMoviePath)) {
+            ofxNotify() << "Sorry, MoviePrint can currently not read files where the filename or path contains special characters";
         }
-//        while (!isMovieLoaded()) {
-//            ofLog(OF_LOG_VERBOSE, "_____________________________________ waiting for movie to load - " + ofToString(gfsMoviePath));
-//        }
 
-        ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function" + ofToString(vfMovieName));
+        if (fileToRead.doesFileExist(gfsMoviePath)) {
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ File exists " + ofToString(gfsMoviePath));
+            movieFile.open(gfsMoviePath);
+             ofLog(OF_LOG_VERBOSE, "fileToRead.getAbsolutePath(): " + ofToString(fileToRead.getAbsolutePath()));
+            // movieFile.read(matOrig);
 
-        if (isMovieLoaded()) {
-            ofLog(OF_LOG_VERBOSE, "Width: " + ofToString(gfsFrameWidth) + " Height: " + ofToString(gfsFrameHeight) + " ImageRatio:" + ofToString(gfsImageRatio) + " PixelRatio:" + ofToString(gfsPixelRatio)  + " Framerate:" + ofToString(gfsFrameRate) + " totalFrames:" + ofToString(gfsTotalFrames));
-            ofLog(OF_LOG_VERBOSE, "Movie loaded");
+            if(movieFile.isOpened()){
+                // get some meta data about frame.
+                gfsFrameRate = float(movieFile.get(CV_CAP_PROP_FPS));
+                gfsTotalFrames = int(movieFile.get(CV_CAP_PROP_FRAME_COUNT));
+                gfsFrameHeight = int(movieFile.get(CV_CAP_PROP_FRAME_HEIGHT));
+                gfsFrameWidth = int(movieFile.get(CV_CAP_PROP_FRAME_WIDTH));
+                //                double posFrames = movieFile.get(CV_CAP_PROP_POS_FRAMES);
+                //                double posMsec = movieFile.get(CV_CAP_PROP_POS_MSEC);
+                gfsImageRatio = gfsFrameWidth/(float)gfsFrameHeight;
+                gfsPixelRatio = 1.0;
+                gfsFrameMS = 1000 / gfsFrameRate;
+
+                gfsMIFilePath = fileToRead.path();
+                gfsMIFilePathOhne = extractMoviePathWithoutFilename(gfsMIFilePath);
+
+                gfsMIFileName = fileToRead.getBaseName();
+                gfsMIFileExtension = fileToRead.getExtension();
+                gfsMIFileNameAndExtension = gfsMIFileName + "." + gfsMIFileExtension;
+
+
+    //getting CV_CAP_PROP_FOURCC does not work yet
+    //            int ex = static_cast<int>(movieFile.get(CV_CAP_PROP_FOURCC));     // Get Codec Type- Int form
+    //            char EXT[] = {(char)(ex & 0XFF) , (char)((ex & 0XFF00) >> 8),(char)((ex & 0XFF0000) >> 16),(char)((ex & 0XFF000000) >> 24), 0};
+    //            ofLog(OF_LOG_VERBOSE, "EXT[]: " + ofToString(EXT));
+
+    //            printf("fourcc=%d\n", f); // outputs fourcc=6
+    //            char fourcc[5];
+    //            fourCCStringFromCode((int)f, fourcc);
+    //            printf("fourcc=%s\n", fourcc);
+
+                double f = movieFile.get(CV_CAP_PROP_FOURCC);
+                gfsMIFormat = ofToString(f);
+    //            ofLog(OF_LOG_VERBOSE, "CV_CAP_PROP_FOURCC: " + ofToString(f));
+
+                // Seek to the end of the video.
+                movieFile.set(CV_CAP_PROP_POS_AVI_RATIO, 1);
+                // Get video length (because we're at the end).
+                gfsDurationMS = movieFile.get(CV_CAP_PROP_POS_MSEC);
+
+                gfsMIFormatString = "";
+                gfsMIFileSizeString = ofToString(fileToRead.getSize());
+                gfsMIDuration = ofToString(gfsDurationMS/1000);
+                gfsMIDurationCalculated = ofToString((float)gfsTotalFrames/gfsFrameRate) + " sec";
+                gfsMIFrameCount = ofToString(gfsTotalFrames);
+                gfsMIWidth = ofToString(gfsFrameWidth) + " x " + ofToString(gfsFrameHeight);
+                gfsMIDisplayAspectRatioString = ofToString((float)gfsFrameWidth/(float)gfsFrameHeight);
+                gfsMIFrameRateString = ofToString(gfsFrameRate) + " fps";
+                gfsMIVFormat = "";
+                gfsMIFormatInfo = "";
+                gfsMIBitRate = "";
+                gfsMIPixelAspectRatio = "";
+                gfsMIDisplayAspectRatio = "";
+                gfsMIFrameRate_ModeString = "";
+                gfsMIColorSpace = "";
+                gfsMIChromaSubsampling = "";
+                gfsMIBitDepthString = "";
+                gfsMIInterlacementString = "";
+                gfsMIAFormat = "";
+                gfsMIAChannelsString = "";
+                gfsMIASamplingRate = "";
+
+            }
+
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function" + ofToString(vfMovieName));
+
+            if (isMovieLoaded()) {
+                ofLog(OF_LOG_VERBOSE, "Width: " + ofToString(gfsFrameWidth) + " Height: " + ofToString(gfsFrameHeight) + " ImageRatio:" + ofToString(gfsImageRatio) + " PixelRatio:" + ofToString(gfsPixelRatio)  + " Framerate:" + ofToString(gfsFrameRate) + " totalFrames:" + ofToString(gfsTotalFrames));
+                ofLog(OF_LOG_VERBOSE, "Movie loaded");
+            } else {
+                ofLog(OF_LOG_VERBOSE, "Movie not loaded");
+            }
+            return isMovieLoaded();
         } else {
-            ofLog(OF_LOG_VERBOSE, "Movie not loaded");
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ File does not exist " + ofToString(gfsMoviePath));
+            return false;
         }
-        return isMovieLoaded();
+
     }
 
     string extractMoviePathWithoutFilename(string _gfsMIFilePath){

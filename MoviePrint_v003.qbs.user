@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.6.1, 2016-08-06T21:12:50. -->
+<!-- Written by QtCreator 3.6.1, 2016-08-07T00:46:23. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -217,7 +217,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qbs.RunConfiguration:MoviePrint_v003.qtc_Desktop_ddfcd8ca---Qbs.RC.NameSeparator---MoviePrint_v003</value>
     <value type="QString" key="Qbs.RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qbs.RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="Qbs.RunConfiguration.WorkingDirectory.default"></value>
+    <value type="QString" key="Qbs.RunConfiguration.WorkingDirectory.default">/Users/fakob/_jakob/work/fakob_MoviePrintApp_130515/03_Programming/02_Setups/01_OF/of_v0.9.3_osx_release/apps/myApps/MoviePrint_v003/bin/MoviePrint_v003_debug.app/Contents/MacOS</value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>

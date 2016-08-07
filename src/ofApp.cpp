@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
-    drawNotify = false; // ofxNotify
+    drawNotify = true; // ofxNotify
     showPlaceHolder = false; // added for developing
 
 //    // used for ofxAvCodec addon
@@ -486,7 +486,7 @@ void ofApp::update(){
     if (updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed()) {
         updateInOut = FALSE;
         updateScrub = FALSE;
-        ofLog(OF_LOG_VERBOSE, "updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed() - updateScrub false" );
+//        ofLog(OF_LOG_VERBOSE, "updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed() - updateScrub false" );
 
         if(tweenTimeDelay.value < 5){
             updateNewPrintGrid = FALSE;
@@ -1933,7 +1933,7 @@ void ofApp::updateGridTimeArrayWithAutomaticInterval(){
 //            moviePrintDataSet.gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, inPoint, outPoint, TRUE);
             moviePrintDataSet.gridTimeArray[i] = ofMap(i, 0, (numberOfStills - 1), inPoint, outPoint, TRUE);
         }
-        ofLog(OF_LOG_VERBOSE, "inPoint: " + ofToString(inPoint) + " outPoint: " + ofToString(outPoint) + " totalFrames: " + ofToString(totalFrames));
+//        ofLog(OF_LOG_VERBOSE, "inPoint: " + ofToString(inPoint) + " outPoint: " + ofToString(outPoint) + " totalFrames: " + ofToString(totalFrames));
     }
     ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray: " +  ofToString(moviePrintDataSet.gridTimeArray));
 }
